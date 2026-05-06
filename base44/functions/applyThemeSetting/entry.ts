@@ -13,15 +13,19 @@ Deno.serve(async (req) => {
 
     // We store theme preferences on the user profile so they persist
     const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-    
+    if (profiles.length === 0) {
+      return Response.json({ error: 'Profil nicht gefunden' }, { status: 404 });
+    }
+
+    const profile = profiles[0];
     const themeData = {};
+    
+    // Only change what was explicitly requested
     if (darkMode !== undefined) themeData.theme_dark_mode = darkMode;
     if (accentColor !== undefined) themeData.theme_accent_color = accentColor;
     if (gradient !== undefined) themeData.theme_gradient = gradient;
 
-    if (profiles.length > 0) {
-      await base44.entities.UserProfile.update(profiles[0].id, themeData);
-    }
+    await base44.entities.UserProfile.update(profile.id, themeData);
 
     return Response.json({ 
       success: true, 
