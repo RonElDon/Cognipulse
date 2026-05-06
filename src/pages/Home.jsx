@@ -5,7 +5,21 @@ import { base44 } from '@/api/base44Client';
 import { useProfile } from '@/lib/useProfile';
 import { DOMAINS, EXERCISES, getLevel } from '@/lib/exercises';
 import XPBar from '@/components/ui/XPBar';
-import { Brain, Flame, Trophy, Zap, ChevronRight, PlayCircle, Star } from 'lucide-react';
+import { Brain, Flame, Trophy, Zap, ChevronRight, PlayCircle, Star, Palette } from 'lucide-react';
+
+const GRADIENT_PRESETS = [
+  { id: 'auto', label: 'Auto', style: null }, // animated
+  { id: 'purple', label: 'Lila',  style: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+  { id: 'rose',   label: 'Rose',  style: 'linear-gradient(135deg, #f43f5e 0%, #f97316 100%)' },
+  { id: 'cyan',   label: 'Cyan',  style: 'linear-gradient(135deg, #06b6d4 0%, #6366f1 100%)' },
+  { id: 'emerald',label: 'Grün',  style: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)' },
+  { id: 'amber',  label: 'Gold',  style: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' },
+  { id: 'night',  label: 'Nacht', style: 'linear-gradient(135deg, #0f172a 0%, #312e81 100%)' },
+];
+
+const PRESET_DOTS = [
+  '#764ba2', '#f43f5e', '#06b6d4', '#10b981', '#f59e0b', '#0f172a',
+];
 
 const MOTIVATIONAL = [
   "Dein Gehirn ist ein Muskel — trainiere es täglich! 🧠",
@@ -19,7 +33,31 @@ export default function Home() {
   const { profile, loading } = useProfile();
   const [recentResults, setRecentResults] = useState([]);
   const [user, setUser] = useState(null);
+  const [selectedGradient, setSelectedGradient] = useState(() => localStorage.getItem('hero_gradient') || 'auto');
+  const [showPicker, setShowPicker] = useState(false);
+  const [customColor, setCustomColor] = useState(() => localStorage.getItem('hero_custom_color') || '#6366f1');
   const quote = MOTIVATIONAL[new Date().getDay() % MOTIVATIONAL.length];
+
+  const handleSelectGradient = (id) => {
+    setSelectedGradient(id);
+    localStorage.setItem('hero_gradient', id);
+    setShowPicker(false);
+  };
+
+  const handleCustomColor = (color) => {
+    setCustomColor(color);
+    localStorage.setItem('hero_custom_color', color);
+    setSelectedGradient('custom');
+    localStorage.setItem('hero_gradient', 'custom');
+  };
+
+  const heroStyle = selectedGradient === 'auto'
+    ? {}
+    : selectedGradient === 'custom'
+      ? { background: `linear-gradient(135deg, ${customColor} 0%, ${customColor}99 100%)`, backgroundSize: undefined }
+      : { background: GRADIENT_PRESETS.find(p => p.id === selectedGradient)?.style };
+
+  const heroClass = selectedGradient === 'auto' ? 'hero-gradient' : '';
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -51,8 +89,64 @@ export default function Home() {
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       {/* Hero Header */}
-      <div className="hero-gradient px-6 pt-8 pb-12 relative overflow-hidden">
+      <div className={`${heroClass} px-6 pt-8 pb-12 relative overflow-hidden`} style={heroStyle}>
         <div className="absolute inset-0 bg-black/10" />
+        {/* Color Picker Button */}
+        <div className="relative z-10 flex justify-end max-w-2xl mx-auto mb-1">
+          <button
+            onClick={() => setShowPicker(v => !v)}
+            className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full transition-all"
+          >
+            <Palette className="w-3.5 h-3.5" /> Farbe
+          </button>
+          {showPicker && (
+            <div className="absolute top-9 right-0 bg-white rounded-2xl shadow-2xl p-4 z-50 w-56">
+              <div className="text-xs font-black text-slate-700 mb-3">Hintergrundfarbe wählen</div>
+              <div className="grid grid-cols-4 gap-2 mb-3">
+                {/* Auto animated */}
+                <button
+                  onClick={() => handleSelectGradient('auto')}
+                  className={`h-9 rounded-xl overflow-hidden border-2 transition-all ${selectedGradient === 'auto' ? 'border-slate-800 scale-110' : 'border-transparent'}`}
+                  title="Animiert"
+                >
+                  <div className="w-full h-full hero-gradient" />
+                </button>
+                {/* Preset colors */}
+                {PRESET_DOTS.map((color, i) => (
+                  <button
+                    key={color}
+                    onClick={() => handleSelectGradient(GRADIENT_PRESETS[i + 1].id)}
+                    className={`h-9 rounded-xl border-2 transition-all ${selectedGradient === GRADIENT_PRESETS[i + 1].id ? 'border-slate-800 scale-110' : 'border-transparent'}`}
+                    style={{ background: GRADIENT_PRESETS[i + 1].style }}
+                    title={GRADIENT_PRESETS[i + 1].label}
+                  />
+                ))}
+                {/* Custom color swatch */}
+                <button
+                  className={`h-9 rounded-xl border-2 transition-all flex items-center justify-center overflow-hidden ${selectedGradient === 'custom' ? 'border-slate-800 scale-110' : 'border-slate-200'}`}
+                  style={{ backgroundColor: customColor }}
+                  title="Eigene Farbe"
+                  onClick={() => document.getElementById('hero-color-input').click()}
+                >
+                  <span className="text-white text-lg font-black">+</span>
+                </button>
+              </div>
+              <input
+                id="hero-color-input"
+                type="color"
+                value={customColor}
+                onChange={e => handleCustomColor(e.target.value)}
+                className="sr-only"
+              />
+              <button
+                onClick={() => document.getElementById('hero-color-input').click()}
+                className="w-full py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-colors"
+              >
+                🎨 Eigene Farbe wählen
+              </button>
+            </div>
+          )}
+        </div>
         <div className="relative max-w-2xl mx-auto">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-white/80 text-sm font-semibold mb-1">
