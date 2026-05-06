@@ -17,7 +17,7 @@ export default function AppLayout({ lang = 'de' }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
+  const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor, applyExternalTheme } = useTheme();
 
   const ACCENT_COLORS = [
     { name: 'Purple', value: '#8b5cf6' },
@@ -33,6 +33,7 @@ export default function AppLayout({ lang = 'de' }) {
   const handleColorChange = async (color) => {
     if (accentColor === color) return;
     try {
+      applyExternalTheme({ accentColor: color });
       const user = await base44.auth.me();
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       if (profiles.length > 0) {
