@@ -1,0 +1,61 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "display_name": {
+      "type": "string",
+      "description": "User's display name"
+    },
+    "age": {
+      "type": "number",
+      "description": "User's age"
+    },
+    "preferred_language": {
+      "type": "string",
+      "enum": [
+        "en",
+        "de"
+      ],
+      "default": "en"
+    },
+    "total_xp": {
+      "type": "number",
+      "default": 0
+    },
+    "current_streak": {
+      "type": "number",
+      "default": 0
+    },
+    "longest_streak": {
+      "type": "number",
+      "default": 0
+    },
+    "last_played_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "badges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "goals": {
+      "type": "object",
+      "properties": {
+        "daily_exercises": {
+          "type": "number",
+          "default": 3
+        },
+        "focus_domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": []
+}

@@ -4,6 +4,10 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
+      fontFamily: {
+        nunito: ['Nunito', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+      },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -59,24 +63,26 @@ module.exports = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+        brand: {
+          purple: 'rgb(139, 92, 246)',
+          indigo: 'rgb(99, 102, 241)',
+          blue: 'rgb(59, 130, 246)',
+          cyan: 'rgb(6, 182, 212)',
+          emerald: 'rgb(16, 185, 129)',
+          amber: 'rgb(245, 158, 11)',
+          rose: 'rgb(244, 63, 94)',
+          orange: 'rgb(249, 115, 22)',
+        }
   		},
   		keyframes: {
   			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
+  				from: { height: '0' },
+  				to: { height: 'var(--radix-accordion-content-height)' }
   			},
   			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
+  				from: { height: 'var(--radix-accordion-content-height)' },
+  				to: { height: '0' }
   			}
   		},
   		animation: {

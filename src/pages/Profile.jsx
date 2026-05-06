@@ -1,0 +1,209 @@
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { base44 } from '@/api/base44Client';
+import { useProfile } from '@/lib/useProfile';
+import { BADGES, DOMAINS, getLevel } from '@/lib/exercises';
+import XPBar from '@/components/ui/XPBar';
+import { User, Settings, Globe, Target, LogOut, Check, Edit2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+export default function Profile() {
+  const { profile, loading, updateProfile } = useProfile();
+  const [user, setUser] = useState(null);
+  const [editName, setEditName] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
+    base44.entities.ExerciseResult.list('-created_date', 100).then(setResults).catch(() => {});
+  }, []);
+
+  const xp = profile?.total_xp || 0;
+  const { current: lvl } = getLevel(xp);
+
+  // Compute badge unlocks
+  const totalGames = results.length;
+  const streak = profile?.current_streak || 0;
+  const hasPerfect = results.some(r => r.score === 100);
+  const domainsPlayed = new Set(results.map(r => r.domain)).size;
+  const bestReaction = results.reduce((min, r) => r.reaction_time_ms ? Math.min(min, r.reaction_time_ms) : min, Infinity);
+  const userBadgeIds = profile?.badges || [];
+
+  const badgeStats = { totalGames, streak, totalXP: xp, hasPerfect, domainsPlayed, bestReaction };
+  const earnedBadges = BADGES.filter(b => b.condition(badgeStats));
+
+  const handleSaveName = async () => {
+    if (!newName.trim()) return;
+    await updateProfile({ display_name: newName.trim() });
+    setEditName(false);
+    toast.success('Name updated!');
+  };
+
+  const handleLanguageChange = async (lang) => {
+    await updateProfile({ preferred_language: lang });
+    toast.success(`Language set to ${lang === 'en' ? 'English' : 'Deutsch'}`);
+  };
+
+  const handleGoalChange = async (daily) => {
+    await updateProfile({ goals: { ...profile?.goals, daily_exercises: daily } });
+    toast.success('Goal updated!');
+  };
+
+  const handleLogout = () => {
+    base44.auth.logout();
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen pb-24 md:pb-8">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 px-4 pt-8 pb-14">
+        <div className="max-w-lg mx-auto text-center">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-3xl font-black text-white mx-auto mb-3 shadow-xl">
+            {(profile?.display_name || user?.full_name || '?')[0].toUpperCase()}
+          </div>
+          {editName ? (
+            <div className="flex items-center gap-2 justify-center">
+              <input
+                autoFocus
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSaveName()}
+                className="bg-white/10 text-white text-lg font-black text-center rounded-xl px-3 py-1 focus:outline-none focus:ring-2 focus:ring-purple-400 border border-white/20"
+                placeholder="Your name"
+              />
+              <button onClick={handleSaveName} className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
+                <Check className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 justify-center">
+              <h1 className="text-xl font-black text-white">{profile?.display_name || user?.full_name || 'Brain Explorer'}</h1>
+              <button onClick={() => { setNewName(profile?.display_name || ''); setEditName(true); }}
+                className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                <Edit2 className="w-3 h-3 text-white/70" />
+              </button>
+            </div>
+          )}
+          <p className="text-white/60 text-sm mt-1">{user?.email}</p>
+          <div className="mt-2 inline-block text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: lvl.color + '30', color: lvl.color }}>
+            Level {lvl.level} · {lvl.name}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-lg mx-auto px-4 -mt-8 space-y-4">
+        {/* XP */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+        >
+          <XPBar xp={xp} />
+        </motion.div>
+
+        {/* Badges */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+        >
+          <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">🏅 Badges ({earnedBadges.length}/{BADGES.length})</h2>
+          <div className="grid grid-cols-4 gap-3">
+            {BADGES.map(badge => {
+              const earned = badge.condition(badgeStats);
+              return (
+                <div key={badge.id} className={`flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${earned ? 'bg-amber-50' : 'bg-slate-50 opacity-40'}`}>
+                  <div className={`text-3xl ${!earned && 'grayscale'}`}>{badge.icon}</div>
+                  <div className="text-xs font-bold text-slate-700 text-center leading-tight">{badge.name}</div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Language */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+        >
+          <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">
+            <Globe className="w-5 h-5 text-blue-600" /> Language
+          </h2>
+          <div className="grid grid-cols-2 gap-3">
+            {[{ code: 'en', label: '🇬🇧 English' }, { code: 'de', label: '🇩🇪 Deutsch' }].map(l => (
+              <button
+                key={l.code}
+                onClick={() => handleLanguageChange(l.code)}
+                className={`py-3 rounded-2xl font-bold text-sm transition-all ${
+                  profile?.preferred_language === l.code
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Daily Goal */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+        >
+          <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">
+            <Target className="w-5 h-5 text-emerald-600" /> Daily Goal
+          </h2>
+          <p className="text-sm text-slate-500 mb-3">How many exercises per day?</p>
+          <div className="grid grid-cols-4 gap-2">
+            {[1, 3, 5, 10].map(n => (
+              <button
+                key={n}
+                onClick={() => handleGoalChange(n)}
+                className={`py-3 rounded-2xl font-black text-lg transition-all ${
+                  (profile?.goals?.daily_exercises || 3) === n
+                    ? 'bg-emerald-500 text-white shadow-md'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+        >
+          <h2 className="font-black text-slate-800 mb-4">📊 My Stats</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: 'Total Exercises', value: totalGames, icon: '🎯' },
+              { label: 'Total XP', value: xp, icon: '⚡' },
+              { label: 'Best Streak', value: `${profile?.longest_streak || 0} days`, icon: '🔥' },
+              { label: 'Domains Tried', value: `${domainsPlayed}/6`, icon: '🧠' },
+            ].map(s => (
+              <div key={s.label} className="bg-slate-50 rounded-2xl p-3">
+                <div className="text-2xl">{s.icon}</div>
+                <div className="font-black text-slate-800 text-lg mt-1">{s.value}</div>
+                <div className="text-xs text-slate-500">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Logout */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+          <button
+            onClick={handleLogout}
+            className="w-full py-3 rounded-2xl border-2 border-red-100 text-red-500 font-bold flex items-center justify-center gap-2 hover:bg-red-50 transition-colors"
+          >
+            <LogOut className="w-4 h-4" /> Sign Out
+          </button>
+        </motion.div>
+      </div>
+    </div>
+  );
+}

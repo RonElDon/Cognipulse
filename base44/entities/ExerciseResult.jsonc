@@ -1,0 +1,56 @@
+{
+  "name": "ExerciseResult",
+  "type": "object",
+  "properties": {
+    "exercise_id": {
+      "type": "string",
+      "description": "ID of the exercise"
+    },
+    "exercise_name": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "attention",
+        "memory",
+        "executive",
+        "visuomotor",
+        "processing",
+        "reasoning"
+      ]
+    },
+    "score": {
+      "type": "number",
+      "description": "Score achieved (0-100)"
+    },
+    "accuracy": {
+      "type": "number",
+      "description": "Accuracy percentage"
+    },
+    "reaction_time_ms": {
+      "type": "number",
+      "description": "Average reaction time in ms"
+    },
+    "level": {
+      "type": "number",
+      "description": "Difficulty level played"
+    },
+    "xp_earned": {
+      "type": "number",
+      "default": 0
+    },
+    "duration_seconds": {
+      "type": "number"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "exercise_id",
+    "domain",
+    "score"
+  ]
+}
