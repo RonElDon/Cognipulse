@@ -7,6 +7,7 @@ import { useProfile } from '@/lib/useProfile';
 import { DOMAINS, EXERCISES, getLevel } from '@/lib/exercises';
 import XPBar from '@/components/ui/XPBar';
 import { Brain, Flame, Trophy, Zap, ChevronRight, PlayCircle, Star, Palette } from 'lucide-react';
+import DailyPlanCard from '@/components/training/DailyPlanCard';
 import { useTheme, GRADIENT_PRESETS } from '@/lib/ThemeContext';
 
 const PRESET_DOTS = [
@@ -166,6 +167,9 @@ export default function Home() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-6">
+        {/* Daily Training Plan by Neuro */}
+        <DailyPlanCard />
+
         {/* Today's Exercises */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-5 border border-slate-100"

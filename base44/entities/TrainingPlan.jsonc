@@ -1,0 +1,40 @@
+{
+  "name": "TrainingPlan",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The date this plan is for (YYYY-MM-DD)"
+    },
+    "exercises": {
+      "type": "array",
+      "description": "Ordered list of exercise IDs for today",
+      "items": {
+        "type": "string"
+      }
+    },
+    "focus_domains": {
+      "type": "array",
+      "description": "Domain IDs this plan focuses on",
+      "items": {
+        "type": "string"
+      }
+    },
+    "completed_exercises": {
+      "type": "array",
+      "description": "Exercise IDs the user has already completed today",
+      "items": {
+        "type": "string"
+      }
+    },
+    "generated_by": {
+      "type": "string",
+      "description": "neuro or manual"
+    }
+  },
+  "required": [
+    "date",
+    "exercises"
+  ]
+}
