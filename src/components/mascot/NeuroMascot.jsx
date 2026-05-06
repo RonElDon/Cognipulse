@@ -216,14 +216,14 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
         )}
       </AnimatePresence>
 
-      {/* Mascot button */}
+      {/* Mascot button — simple brain icon, no distracting animation */}
       <motion.button
         onClick={() => open ? setOpen(false) : handleOpen()}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-16 h-16 flex items-center justify-center drop-shadow-xl"
-        whileHover={{ scale: 1.12 }}
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-300/40 dark:shadow-purple-900/40 flex items-center justify-center border-2 border-white/30"
+        whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.93 }}
       >
-        <NeuroCharacter emotion={face === 'happy' ? 'happy' : face === 'excited' ? 'excited' : face === 'proud' ? 'proud' : face === 'thinking' ? 'thinking' : face === 'sad' ? 'sad' : face === 'sleeping' ? 'sleeping' : face === 'party' ? 'excited' : face === 'challenge' ? 'encouraging' : 'happy'} size={64} />
+        <span className="text-2xl">🧠</span>
       </motion.button>
 
       {/* Chat panel */}
@@ -259,7 +259,9 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
             <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
               {messages.length === 0 && !loading && (
                 <div className="text-center py-2">
-                  <div className="text-3xl mb-2">🧠</div>
+                  <div className="flex justify-center mb-3">
+                    <NeuroCharacter emotion="happy" size={72} />
+                  </div>
                   <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3">
                     Hey! Ich bin Neuro, dein persönlicher Trainingsbegleiter. Ich analysiere deine Stärken und Schwächen und empfehle dir die richtigen Übungen. 🧠
                   </div>

@@ -58,22 +58,24 @@
 
 @layer base {
   .dark {
-    --background: 18 22 32;
-    --foreground: 210 218 230;
-    --card: 26 32 46;
-    --card-foreground: 210 218 230;
-    --popover: 26 32 46;
-    --popover-foreground: 210 218 230;
+    --background: 10 12 20;
+    --foreground: 200 210 225;
+    --card: 16 20 32;
+    --card-foreground: 200 210 225;
+    --popover: 16 20 32;
+    --popover-foreground: 200 210 225;
     --primary: 139 92 246;
     --primary-foreground: 255 255 255;
-    --secondary: 36 44 60;
-    --secondary-foreground: 210 218 230;
-    --muted: 36 44 60;
-    --muted-foreground: 140 155 175;
-    --accent: 36 44 60;
-    --accent-foreground: 210 218 230;
-    --border: 40 50 68;
-    --input: 36 44 60;
+    --secondary: 22 28 44;
+    --secondary-foreground: 180 195 215;
+    --muted: 22 28 44;
+    --muted-foreground: 110 130 155;
+    --accent: 22 28 44;
+    --accent-foreground: 180 195 215;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 28 36 56;
+    --input: 22 28 44;
     --ring: 139 92 246;
   }
 }
@@ -90,8 +92,28 @@
   }
 
   .dark body, .dark {
-    background: hsl(224, 28%, 10%);
-    color: hsl(215, 20%, 85%);
+    background: hsl(228, 35%, 6%);
+    color: hsl(215, 20%, 82%);
+  }
+
+  /* All white cards become truly dark */
+  .dark .bg-white {
+    background-color: hsl(228, 30%, 10%) !important;
+  }
+
+  /* Slate-50 backgrounds become dark */
+  .dark .bg-slate-50 {
+    background-color: hsl(228, 28%, 8%) !important;
+  }
+
+  /* Slate-100 surfaces */
+  .dark .bg-slate-100 {
+    background-color: hsl(228, 25%, 14%) !important;
+  }
+
+  /* Shadow tones for dark mode */
+  .dark .shadow-xl, .dark .shadow-lg, .dark .shadow-md {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5) !important;
   }
 }
 
