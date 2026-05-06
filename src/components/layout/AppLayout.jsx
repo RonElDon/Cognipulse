@@ -19,25 +19,28 @@ export default function AppLayout({ lang = 'de' }) {
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
 
   const DarkToggle = () => (
-    <div className="flex items-center gap-1 bg-slate-800 dark:bg-slate-700 rounded-xl p-1">
+    <div className="flex items-center gap-1 bg-slate-900 dark:bg-slate-950 rounded-xl p-1">
       <button
         onClick={enableAutoDark}
         title="Automatisch"
-        className={`p-1.5 rounded-lg transition-all ${autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+        className="p-1.5 rounded-lg transition-all"
+        style={autoDark ? { backgroundColor: accentColor, color: 'white' } : { color: 'rgb(148, 163, 184)' }}
       >
         <Monitor className="w-3.5 h-3.5" />
       </button>
       <button
         onClick={() => { if (darkMode) toggleDark(); }}
         title="Hell"
-        className={`p-1.5 rounded-lg transition-all ${!darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+        className="p-1.5 rounded-lg transition-all"
+        style={!darkMode && !autoDark ? { backgroundColor: accentColor, color: 'white' } : { color: 'rgb(148, 163, 184)' }}
       >
         <Sun className="w-3.5 h-3.5" />
       </button>
       <button
         onClick={() => { if (!darkMode) toggleDark(); }}
         title="Dunkel"
-        className={`p-1.5 rounded-lg transition-all ${darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+        className="p-1.5 rounded-lg transition-all"
+        style={darkMode && !autoDark ? { backgroundColor: accentColor, color: 'white' } : { color: 'rgb(148, 163, 184)' }}
       >
         <Moon className="w-3.5 h-3.5" />
       </button>
@@ -133,7 +136,8 @@ export default function AppLayout({ lang = 'de' }) {
       {/* Sidebar Toggle Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className={`hidden md:flex fixed top-6 z-50 w-9 h-12 items-center justify-center bg-slate-900 dark:bg-slate-950 text-white hover:bg-slate-800 dark:hover:bg-slate-900 transition-all duration-300 rounded-r-xl ${sidebarOpen ? 'left-64' : 'left-0'}`}
+        className={`hidden md:flex fixed top-6 z-50 w-9 h-12 items-center justify-center hover:opacity-90 transition-all duration-300 rounded-r-xl ${sidebarOpen ? 'left-64' : 'left-0'}`}
+        style={{ backgroundColor: accentColor, color: 'white' }}
         title={sidebarOpen ? "Menü schließen" : "Menü öffnen"}
       >
         {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
