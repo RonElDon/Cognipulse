@@ -89,13 +89,43 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
       if (p.theme_accent_color) themePayload.accentColor = p.theme_accent_color;
       if (p.theme_gradient) themePayload.gradient = p.theme_gradient;
 
-      // Only apply if something changed
       const key = JSON.stringify(themePayload);
       if (key !== lastThemeRef.current && Object.keys(themePayload).length > 0) {
         lastThemeRef.current = key;
         applyExternalTheme(themePayload);
       }
     } catch (e) { /* silent */ }
+  };
+
+  // Parse agent message for theme keywords and apply immediately (no backend roundtrip needed)
+  const applyThemeFromMessage = (content) => {
+    const c = content.toLowerCase();
+    const payload = {};
+    // Dark mode
+    if (c.includes('dark mode') && (c.includes('aktiviert') || c.includes('eingeschaltet') || c.includes('an') || c.includes('ein'))) {
+      payload.darkMode = true;
+    }
+    if ((c.includes('hell') || c.includes('light mode') || c.includes('heller modus')) && (c.includes('aktiviert') || c.includes('eingeschaltet') || c.includes('an') || c.includes('ein') || c.includes('umgestellt'))) {
+      payload.darkMode = false;
+    }
+    // Gradient shortcuts from easter eggs
+    if (c.includes('nacht-gradient') || c.includes('nacht-modus') || (c.includes('nacht') && c.includes('gradient'))) {
+      payload.gradient = 'night';
+      payload.darkMode = true;
+    }
+    if (c.includes('party') || c.includes('🎉')) {
+      payload.gradient = 'rose';
+      payload.accentColor = '#ec4899';
+    }
+    if (c.includes('rainbow') || c.includes('regenbogen')) {
+      payload.accentColor = ['#f43f5e','#f59e0b','#10b981','#06b6d4','#8b5cf6'][Math.floor(Math.random()*5)];
+    }
+    if (c.includes('matrix')) {
+      payload.accentColor = '#10b981';
+    }
+    if (Object.keys(payload).length > 0) {
+      applyExternalTheme(payload);
+    }
   };
 
   const handleOpen = async () => {
@@ -116,15 +146,16 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
           const last = msgs[msgs.length - 1];
           if (last?.role === 'assistant' && last?.content) {
             setLoading(false);
-            // Detect face from content
             const c = last.content.toLowerCase();
+            // Detect face
             if (c.includes('party') || c.includes('🎉')) setFace('party');
             else if (c.includes('fantastisch') || c.includes('excellent') || c.includes('🌟')) setFace('proud');
             else if (c.includes('herausforderung') || c.includes('challenge')) setFace('excited');
             else if (c.includes('zzz') || c.includes('schläft') || c.includes('😴')) setFace('sleeping');
             else setFace('happy');
-            // Sync theme after agent responds (slight delay to let backend finish)
-            setTimeout(syncThemeFromProfile, 1500);
+            // Apply theme immediately from message content, then also sync from backend
+            applyThemeFromMessage(last.content);
+            setTimeout(syncThemeFromProfile, 2000);
           }
         });
       } catch (e) {
@@ -142,6 +173,13 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
     setInput('');
     setLoading(true);
     setFace('thinking');
+    // Optimistic local theme apply for common commands
+    const t = text.toLowerCase();
+    if (t.includes('dark mode') || t.includes('dunkel') || t.includes('dark lord') || t.includes('sith') || t.includes('nacht')) {
+      applyExternalTheme({ darkMode: true });
+    } else if (t.includes('hell') || t.includes('light mode') || t.includes('tag modus') || t.includes('heller')) {
+      applyExternalTheme({ darkMode: false });
+    }
     try {
       await base44.agents.addMessage(conversation, { role: 'user', content: text });
     } catch (e) {

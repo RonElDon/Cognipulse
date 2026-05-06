@@ -55,6 +55,18 @@
           }
         }
       }
+    },
+    "theme_dark_mode": {
+      "type": "boolean",
+      "description": "Dark mode preference set by Neuro"
+    },
+    "theme_accent_color": {
+      "type": "string",
+      "description": "Accent color hex set by Neuro"
+    },
+    "theme_gradient": {
+      "type": "string",
+      "description": "Hero gradient preset set by Neuro"
     }
   },
   "required": []
