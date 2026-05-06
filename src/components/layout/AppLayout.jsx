@@ -82,6 +82,7 @@ export default function AppLayout({ lang = 'de' }) {
           type="color"
           value={accentColor}
           onChange={(e) => handleColorChange(e.target.value)}
+          onMouseDown={(e) => e.stopPropagation()}
           title="Farbe mit Maus auswählen"
           className="w-full h-12 rounded-lg cursor-pointer border border-white/30"
         />
