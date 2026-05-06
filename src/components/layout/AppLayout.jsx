@@ -17,6 +17,8 @@ export default function AppLayout({ lang = 'de' }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [tempColor, setTempColor] = useState(accentColor);
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor, applyExternalTheme } = useTheme();
 
   const ACCENT_COLORS = [
@@ -66,26 +68,59 @@ export default function AppLayout({ lang = 'de' }) {
           <Moon className="w-3.5 h-3.5" />
         </button>
       </div>
-      <div className="flex items-center gap-2">
-        <div className="flex gap-2">
-          {ACCENT_COLORS.map(c => (
-            <button
-              key={c.value}
-              onClick={() => handleColorChange(c.value)}
-              title={c.name}
-              className={`w-6 h-6 rounded-lg transition-all hover:scale-110 ${accentColor === c.value ? 'ring-2 ring-white' : 'border border-white/30'}`}
-              style={{ backgroundColor: c.value }}
-            />
-          ))}
+      <button
+        onClick={() => {
+          setTempColor(accentColor);
+          setPaletteOpen(true);
+        }}
+        className="w-6 h-6 rounded-lg cursor-pointer border-2"
+        style={{ backgroundColor: accentColor, borderColor: accentColor }}
+        title="Farbe ändern"
+      />
+      {paletteOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center" onClick={() => setPaletteOpen(false)}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Farbe auswählen</h3>
+            <div className="flex gap-3 mb-6">
+              <input
+                type="color"
+                value={tempColor}
+                onChange={(e) => setTempColor(e.target.value)}
+                className="w-20 h-20 rounded-lg cursor-pointer border-2 border-slate-300 dark:border-slate-600"
+              />
+              <div className="flex flex-col gap-2">
+                {ACCENT_COLORS.map(c => (
+                  <button
+                    key={c.value}
+                    onClick={() => setTempColor(c.value)}
+                    className={`w-10 h-10 rounded-lg transition-all ${tempColor === c.value ? 'ring-2 ring-white' : 'border border-slate-300'}`}
+                    style={{ backgroundColor: c.value }}
+                    title={c.name}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPaletteOpen(false)}
+                className="flex-1 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={() => {
+                  handleColorChange(tempColor);
+                  setPaletteOpen(false);
+                }}
+                className="flex-1 px-4 py-2 rounded-lg text-white font-semibold transition-colors"
+                style={{ backgroundColor: tempColor }}
+              >
+                Bestätigen
+              </button>
+            </div>
+          </div>
         </div>
-        <input
-          type="color"
-          value={accentColor}
-          onChange={(e) => handleColorChange(e.target.value)}
-          title="Custom Farbe"
-          className="w-6 h-6 rounded-lg cursor-pointer border border-white/30 hover:scale-110 transition-all"
-        />
-      </div>
+      )}
     </div>
   );
 
