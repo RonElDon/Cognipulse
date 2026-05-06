@@ -18,6 +18,7 @@ export default function AppLayout({ lang = 'de' }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [selectedColor, setSelectedColor] = useState(null);
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor, applyExternalTheme } = useTheme();
 
   const ACCENT_COLORS = [
@@ -75,25 +76,46 @@ export default function AppLayout({ lang = 'de' }) {
         Farbe
       </button>
       {paletteOpen && (
-        <div className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-lg">
+        <div className="space-y-3 p-3 bg-slate-700/50 rounded-lg">
           <div className="flex gap-2">
             {ACCENT_COLORS.map(c => (
               <button
                 key={c.value}
-                onClick={() => handleColorChange(c.value)}
+                onClick={() => setSelectedColor(c.value)}
                 title={c.name}
-                className={`w-6 h-6 rounded-lg transition-all hover:scale-110 ${accentColor === c.value ? 'ring-2 ring-white' : 'border border-white/30'}`}
+                className={`w-6 h-6 rounded-lg transition-all hover:scale-110 ${selectedColor === c.value ? 'ring-2 ring-white' : 'border border-white/30'}`}
                 style={{ backgroundColor: c.value }}
               />
             ))}
           </div>
           <input
             type="color"
-            value={accentColor}
-            onChange={(e) => handleColorChange(e.target.value)}
+            value={selectedColor || accentColor}
+            onChange={(e) => setSelectedColor(e.target.value)}
             title="Custom Farbe"
-            className="w-6 h-6 rounded-lg cursor-pointer border border-white/30 hover:scale-110 transition-all"
+            className="w-full h-8 rounded-lg cursor-pointer border border-white/30"
           />
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                if (selectedColor) handleColorChange(selectedColor);
+                setPaletteOpen(false);
+                setSelectedColor(null);
+              }}
+              className="flex-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-colors"
+            >
+              Bestätigen
+            </button>
+            <button
+              onClick={() => {
+                setPaletteOpen(false);
+                setSelectedColor(null);
+              }}
+              className="flex-1 px-3 py-1.5 bg-slate-600 hover:bg-slate-500 text-white text-xs font-bold rounded-lg transition-colors"
+            >
+              Abbrechen
+            </button>
+          </div>
         </div>
       )}
     </div>
