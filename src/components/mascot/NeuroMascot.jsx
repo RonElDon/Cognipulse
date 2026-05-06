@@ -358,7 +358,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-3 flex items-center gap-3 flex-shrink-0">
-              <NeuroBrainGlobe size={44} float={false} emotion="happy" />
+              <NeuroBrainGlobe size={32} float={false} emotion="happy" />
               <div className="flex-1">
                 <div className="font-black text-white text-sm flex items-center gap-1.5">
                   Neuro <Sparkles className="w-3 h-3 text-yellow-300" />
@@ -373,7 +373,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
             {/* Reactive globe — visible when chatting */}
             {messages.length > 0 && (
               <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-                <NeuroReactiveGlobe size={56} emotion={loading ? 'thinking' : face} />
+                <NeuroReactiveGlobe size={80} emotion={loading ? 'thinking' : face} />
               </div>
             )}
 
@@ -382,7 +382,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
               {messages.length === 0 && !loading && (
                 <div className="text-center py-2">
                   <div className="flex justify-center mb-3">
-                    <NeuroReactiveGlobe size={80} emotion={face} />
+                    <NeuroReactiveGlobe size={96} emotion={face} />
                   </div>
                   <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3">
                     Hey! Ich bin Neuro, dein persönlicher Trainingsbegleiter. Ich analysiere deine Stärken und Schwächen und empfehle dir die richtigen Übungen. 🧠
