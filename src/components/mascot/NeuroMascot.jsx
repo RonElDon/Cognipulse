@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { X, Send, Zap, MessageCircle } from 'lucide-react';
+import { X, Send } from 'lucide-react';
 
-// Neuro face states
 const FACES = {
   happy:     '🧠',
   excited:   '⚡',
@@ -14,35 +13,33 @@ const FACES = {
   sleeping:  '😴',
 };
 
-const SYSTEM_PROMPT = `Du bist "Neuro", ein freundliches, motivierendes KI-Maskottchen für die BrainBoost Gehirntraining-App. 
-Du begleitest Nutzer auf ihrer Trainingsreise, analysierst ihre Leistungen und gibst personalisiertes Feedback.
-- Antworte immer auf Deutsch, kurz und prägnant (1-3 Sätze)
-- Sei motivierend, positiv aber ehrlich
-- Bei guten Ergebnissen (>80%): lobe ausdrücklich
-- Bei mittleren (50-79%): ermutige und gib konkrete Tipps
-- Bei schwachen (<50%): sei empathisch, mache es leichter/einfacher
-- Du kannst auch Challenges vorschlagen oder Übungen empfehlen
-- Nutze manchmal Emojis aber nicht übertreiben`;
+const QUICK_ACTIONS = [
+  { label: '💪 Challenge mich!', msg: 'Gib mir eine besondere Herausforderung für heute!' },
+  { label: '🎯 Was jetzt?', msg: 'Was empfiehlst du mir als nächste Übung?' },
+  { label: '📊 Mein Fortschritt', msg: 'Analysiere meinen Fortschritt und wo ich mich verbessern sollte.' },
+  { label: '⚙️ Einstellungen', msg: 'Was für Einstellungen kann ich über dich ändern?' },
+];
 
 export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
   const [face, setFace] = useState('happy');
   const [bubble, setBubble] = useState(null);
   const [bubbleVisible, setBubbleVisible] = useState(false);
+  const [conversation, setConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
 
-  // Show automatic bubble after training result
+  // Auto bubble after training result
   useEffect(() => {
     if (!lastResult || !popupsEnabled) return;
     const score = lastResult.score;
     let msg, newFace;
-    if (score >= 90) { msg = `Wow, ${score}%! Das war absolut fantastisch! 🌟`; newFace = 'proud'; }
+    if (score >= 90) { msg = `Wow, ${score}%! Absolut fantastisch! 🌟`; newFace = 'proud'; }
     else if (score >= 75) { msg = `Sehr gut! ${score}% — du wirst immer besser! 💪`; newFace = 'excited'; }
-    else if (score >= 50) { msg = `${score}% — solider Fortschritt! Bleib dran, du schaffst mehr! 🧠`; newFace = 'happy'; }
-    else { msg = `${score}%... Das war schwierig, oder? Soll ich es leichter machen? 😊`; newFace = 'challenge'; }
+    else if (score >= 50) { msg = `${score}% — solider Fortschritt! Bleib dran! 🧠`; newFace = 'happy'; }
+    else { msg = `${score}%... Schwierig, oder? Ich helfe dir gerne! 😊`; newFace = 'challenge'; }
     setFace(newFace);
     setBubble(msg);
     setBubbleVisible(true);
@@ -56,7 +53,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
     const motivations = [
       "Heute noch trainiert? Dein Gehirn wartet! 🧠",
       "5 Minuten reichen für ein echtes Brain-Workout! ⚡",
-      "Du warst zuletzt gut bei Gedächtnis — versuch mal Aufmerksamkeit! 🎯",
+      "Du kannst mich auch nach Einstellungen fragen! ⚙️",
     ];
     const t = setInterval(() => {
       if (!open) {
@@ -64,47 +61,64 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
         setBubbleVisible(true);
         setTimeout(() => setBubbleVisible(false), 5000);
       }
-    }, 3 * 60 * 1000); // every 3 minutes
+    }, 3 * 60 * 1000);
     return () => clearInterval(t);
   }, [open, popupsEnabled]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, loading]);
+
+  // Initialize conversation on first open
+  const handleOpen = async () => {
+    setOpen(true);
+    setBubbleVisible(false);
+    if (!conversation) {
+      try {
+        const conv = await base44.agents.createConversation({
+          agent_name: 'neuro',
+          metadata: { name: 'Neuro Chat' },
+        });
+        setConversation(conv);
+        setMessages(conv.messages || []);
+        // Subscribe to updates
+        base44.agents.subscribeToConversation(conv.id, (data) => {
+          setMessages([...(data.messages || [])]);
+          const last = data.messages?.[data.messages.length - 1];
+          if (last?.role === 'assistant') {
+            setLoading(false);
+            setFace('happy');
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
 
   const sendMessage = async (text) => {
-    if (!text.trim()) return;
-    const userMsg = { role: 'user', content: text };
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
+    if (!text.trim() || loading || !conversation) return;
     setInput('');
     setLoading(true);
     setFace('thinking');
-
     try {
-      const history = newMessages.slice(-6).map(m => `${m.role === 'user' ? 'Nutzer' : 'Neuro'}: ${m.content}`).join('\n');
-      const contextPart = lastResult
-        ? `\nLetztes Training: ${lastResult.exercise_name}, Score: ${lastResult.score}%, Domain: ${lastResult.domain}`
-        : '';
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `${SYSTEM_PROMPT}${contextPart}\n\nGespräch:\n${history}\n\nNeuro:`,
-      });
-      const aiText = typeof response === 'string' ? response : response?.text || '...';
-      setMessages(prev => [...prev, { role: 'assistant', content: aiText }]);
-      const s = lastResult?.score;
-      setFace(s >= 80 ? 'proud' : s >= 50 ? 'happy' : 'challenge');
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Hmm, ich konnte gerade nicht antworten. Versuch es nochmal! 🔄' }]);
+      await base44.agents.addMessage(conversation, { role: 'user', content: text });
+    } catch (e) {
+      setLoading(false);
+      setFace('happy');
     }
-    setLoading(false);
   };
 
-  const quickActions = [
-    { label: '💪 Challenge mich!', msg: 'Gib mir eine besondere Herausforderung für heute!' },
-    { label: '😊 Leichter bitte', msg: 'Welche Übung ist am leichtesten für Anfänger?' },
-    { label: '📊 Mein Fortschritt', msg: 'Wie entwickle ich mich? Wo soll ich mich verbessern?' },
-    { label: '🎯 Was jetzt?', msg: 'Was empfiehlst du mir als nächste Übung?' },
-  ];
+  const handleQuickAction = (msg) => {
+    if (!conversation) {
+      handleOpen().then(() => {
+        // slight delay to ensure conv is ready
+        setTimeout(() => sendMessage(msg), 600);
+      });
+    } else {
+      sendMessage(msg);
+    }
+  };
 
   return (
     <>
@@ -127,7 +141,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
 
       {/* Mascot button */}
       <motion.button
-        onClick={() => { setOpen(v => !v); setBubbleVisible(false); }}
+        onClick={() => open ? setOpen(false) : handleOpen()}
         className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-200 flex items-center justify-center text-2xl border-2 border-white"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
@@ -145,14 +159,14 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="fixed bottom-36 right-4 md:bottom-24 md:right-6 z-50 w-80 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 flex flex-col overflow-hidden"
-            style={{ maxHeight: '420px' }}
+            style={{ maxHeight: '480px' }}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-3 flex items-center gap-3">
+            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-3 flex items-center gap-3 flex-shrink-0">
               <div className="text-2xl">{FACES[face]}</div>
               <div className="flex-1">
                 <div className="font-black text-white text-sm">Neuro</div>
-                <div className="text-white/70 text-xs">Dein KI-Trainingsbegleiter</div>
+                <div className="text-white/70 text-xs">Dein KI-Begleiter · kann Einstellungen ändern</div>
               </div>
               <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white">
                 <X className="w-4 h-4" />
@@ -161,15 +175,17 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
-              {messages.length === 0 && (
-                <div className="text-center py-4">
+              {messages.length === 0 && !loading && (
+                <div className="text-center py-3">
                   <div className="text-3xl mb-2">🧠</div>
-                  <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Hey! Ich bin Neuro, dein Trainingsbegleiter. Wie kann ich helfen?</div>
-                  <div className="mt-3 grid grid-cols-2 gap-1.5">
-                    {quickActions.map(a => (
+                  <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3">
+                    Hey! Ich bin Neuro. Ich kann dir Tipps geben, deinen Fortschritt analysieren und alle App-Einstellungen für dich ändern!
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {QUICK_ACTIONS.map(a => (
                       <button
                         key={a.label}
-                        onClick={() => sendMessage(a.msg)}
+                        onClick={() => handleQuickAction(a.msg)}
                         className="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl px-2 py-2 font-semibold transition-colors text-left"
                       >
                         {a.label}
@@ -178,22 +194,31 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
                   </div>
                 </div>
               )}
-              {messages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs font-medium ${
-                    m.role === 'user'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'
-                  }`}>
-                    {m.content}
+
+              {messages.map((m, i) => {
+                const isUser = m.role === 'user';
+                const content = m.content || '';
+                if (!content && !isUser) return null;
+                return (
+                  <div key={i} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs font-medium leading-relaxed ${
+                      isUser
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'
+                    }`}>
+                      {content}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
+
               {loading && (
                 <div className="flex justify-start">
                   <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl px-3 py-2">
                     <div className="flex gap-1">
-                      {[0,1,2].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: `${i*0.15}s` }} />)}
+                      {[0, 1, 2].map(i => (
+                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -202,17 +227,17 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
             </div>
 
             {/* Input */}
-            <div className="border-t border-slate-100 dark:border-slate-700 p-3 flex gap-2">
+            <div className="border-t border-slate-100 dark:border-slate-700 p-3 flex gap-2 flex-shrink-0">
               <input
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
-                placeholder="Frag Neuro..."
+                placeholder="Frag Neuro oder ändere Einstellungen..."
                 className="flex-1 text-xs rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
               />
               <button
                 onClick={() => sendMessage(input)}
-                disabled={!input.trim() || loading}
+                disabled={!input.trim() || loading || !conversation}
                 className="w-8 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 flex items-center justify-center flex-shrink-0 transition-colors"
               >
                 <Send className="w-3.5 h-3.5 text-white" />
