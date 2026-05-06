@@ -1,6 +1,6 @@
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useState } from 'react';
-import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight, Palette } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
 import { base44 } from '@/api/base44Client';
 import NeuroMascot from '@/components/mascot/NeuroMascot';
@@ -17,6 +17,7 @@ export default function AppLayout({ lang = 'de' }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor, applyExternalTheme } = useTheme();
 
   const ACCENT_COLORS = [
@@ -66,26 +67,35 @@ export default function AppLayout({ lang = 'de' }) {
           <Moon className="w-3.5 h-3.5" />
         </button>
       </div>
-      <div className="flex items-center gap-3">
-        <div className="flex gap-2">
-          {ACCENT_COLORS.map(c => (
-            <button
-              key={c.value}
-              onClick={() => handleColorChange(c.value)}
-              title={c.name}
-              className={`w-6 h-6 rounded-lg transition-all hover:scale-110 ${accentColor === c.value ? 'ring-2 ring-white' : 'border border-white/30'}`}
-              style={{ backgroundColor: c.value }}
-            />
-          ))}
+      <button
+        onClick={() => setPaletteOpen(!paletteOpen)}
+        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold transition-colors"
+      >
+        <Palette className="w-4 h-4" />
+        Farbe
+      </button>
+      {paletteOpen && (
+        <div className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-lg">
+          <div className="flex gap-2">
+            {ACCENT_COLORS.map(c => (
+              <button
+                key={c.value}
+                onClick={() => handleColorChange(c.value)}
+                title={c.name}
+                className={`w-6 h-6 rounded-lg transition-all hover:scale-110 ${accentColor === c.value ? 'ring-2 ring-white' : 'border border-white/30'}`}
+                style={{ backgroundColor: c.value }}
+              />
+            ))}
+          </div>
+          <input
+            type="color"
+            value={accentColor}
+            onChange={(e) => handleColorChange(e.target.value)}
+            title="Custom Farbe"
+            className="w-6 h-6 rounded-lg cursor-pointer border border-white/30 hover:scale-110 transition-all"
+          />
         </div>
-        <input
-          type="color"
-          value={accentColor}
-          onChange={(e) => handleColorChange(e.target.value)}
-          title="Custom Farbe"
-          className="w-6 h-6 rounded-lg cursor-pointer border border-white/30 hover:scale-110 transition-all"
-        />
-      </div>
+      )}
     </div>
   );
 
