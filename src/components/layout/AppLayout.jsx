@@ -26,6 +26,8 @@ export default function AppLayout({ lang = 'de' }) {
     { name: 'Emerald', value: '#10b981' },
     { name: 'Amber', value: '#f59e0b' },
     { name: 'Orange', value: '#f97316' },
+    { name: 'Blue', value: '#3b82f6' },
+    { name: 'Pink', value: '#f43f5e' },
   ];
 
   const handleColorChange = async (color) => {
@@ -66,7 +68,7 @@ export default function AppLayout({ lang = 'de' }) {
           <Moon className="w-3.5 h-3.5" />
         </button>
       </div>
-      <div className="flex gap-1.5 flex-wrap">
+      <div className="flex gap-1.5 flex-wrap items-center">
         {ACCENT_COLORS.map(c => (
           <button
             key={c.value}
@@ -76,6 +78,13 @@ export default function AppLayout({ lang = 'de' }) {
             style={{ backgroundColor: c.value }}
           />
         ))}
+        <input
+          type="color"
+          value={accentColor}
+          onChange={(e) => handleColorChange(e.target.value)}
+          title="Eigene Farbe"
+          className="w-5 h-5 rounded-lg cursor-pointer border-2 border-white/20 hover:scale-110 transition-all"
+        />
       </div>
     </div>
   );
