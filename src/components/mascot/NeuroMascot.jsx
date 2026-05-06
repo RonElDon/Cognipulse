@@ -107,11 +107,11 @@ function NeuroReactiveGlobe({ size = 80, emotion = 'happy' }) {
         rotate: { repeat: Infinity, duration: cfg.dur * 1.3, ease: 'easeInOut', repeatType: 'mirror' },
         ...extraTransition,
       }}
-      className="rounded-full flex items-center justify-center relative overflow-hidden"
+      className="rounded-full flex items-center justify-center relative overflow-visible"
       style={{
         width: size, height: size,
         background: cfg.bg,
-        boxShadow: `0 0 0 2px rgba(255,255,255,0.25) inset, 0 6px 28px ${cfg.glow}`,
+        boxShadow: `0 0 0 2px rgba(255,255,255,0.25) inset, 0 6px 28px ${cfg.glow}, 0 ${Math.round(size * 0.4)}px ${Math.round(size * 0.6)}px rgba(0,0,0,0.15)`,
       }}
     >
       <div style={{
@@ -320,8 +320,11 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed top-16 right-4 md:top-20 md:right-6 z-50 w-96 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 flex flex-col overflow-hidden"
-            style={{ height: '480px' }}
+            className="fixed top-6 right-4 md:top-8 md:right-6 z-50 w-96 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 flex flex-col overflow-hidden"
+            style={{ 
+              height: '560px',
+              backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%)'
+            }}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-3 flex items-center gap-3 flex-shrink-0">
