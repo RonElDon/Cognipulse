@@ -216,35 +216,9 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
     } catch (e) { /* silent */ }
   };
 
-  // Parse agent message for theme keywords and apply immediately (no backend roundtrip needed)
-  const applyThemeFromMessage = (content) => {
-    const c = content.toLowerCase();
-    const payload = {};
-    // Dark mode
-    if (c.includes('dark mode') && (c.includes('aktiviert') || c.includes('eingeschaltet') || c.includes('an') || c.includes('ein'))) {
-      payload.darkMode = true;
-    }
-    if ((c.includes('hell') || c.includes('light mode') || c.includes('heller modus')) && (c.includes('aktiviert') || c.includes('eingeschaltet') || c.includes('an') || c.includes('ein') || c.includes('umgestellt'))) {
-      payload.darkMode = false;
-    }
-    // Gradient shortcuts from easter eggs
-    if (c.includes('nacht-gradient') || c.includes('nacht-modus') || (c.includes('nacht') && c.includes('gradient'))) {
-      payload.gradient = 'night';
-      payload.darkMode = true;
-    }
-    if (c.includes('party') || c.includes('🎉')) {
-      payload.gradient = 'rose';
-      payload.accentColor = '#ec4899';
-    }
-    if (c.includes('rainbow') || c.includes('regenbogen')) {
-      payload.accentColor = ['#f43f5e','#f59e0b','#10b981','#06b6d4','#8b5cf6'][Math.floor(Math.random()*5)];
-    }
-    if (c.includes('matrix')) {
-      payload.accentColor = '#10b981';
-    }
-    if (Object.keys(payload).length > 0) {
-      applyExternalTheme(payload);
-    }
+  // Theme changes only come from the backend (applyThemeSetting), not from parsing message text
+  const applyThemeFromMessage = (_content) => {
+    // intentionally empty — theme is applied via syncThemeFromProfile after backend call
   };
 
   const handleOpen = async () => {
@@ -292,13 +266,6 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
     setInput('');
     setLoading(true);
     setFace('thinking');
-    // Optimistic local theme apply for common commands
-    const t = text.toLowerCase();
-    if (t.includes('dark mode') || t.includes('dunkel') || t.includes('dark lord') || t.includes('sith') || t.includes('nacht')) {
-      applyExternalTheme({ darkMode: true });
-    } else if (t.includes('hell') || t.includes('light mode') || t.includes('tag modus') || t.includes('heller')) {
-      applyExternalTheme({ darkMode: false });
-    }
     try {
       await base44.agents.addMessage(conversation, { role: 'user', content: text });
     } catch (e) {
@@ -354,7 +321,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="fixed bottom-36 right-4 md:bottom-24 md:right-6 z-50 w-96 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 flex flex-col overflow-hidden"
-            style={{ maxHeight: '650px' }}
+            style={{ maxHeight: '900px' }}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-3 flex items-center gap-3 flex-shrink-0">
