@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '@/lib/ThemeContext';
 import { X, Send, Sparkles } from 'lucide-react';
+import NeuroCharacter from './NeuroCharacter';
 
 const FACES = {
   happy:     '🧠',
@@ -218,13 +219,11 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
       {/* Mascot button */}
       <motion.button
         onClick={() => open ? setOpen(false) : handleOpen()}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-200/60 flex items-center justify-center text-2xl border-2 border-white"
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-16 h-16 flex items-center justify-center drop-shadow-xl"
         whileHover={{ scale: 1.12 }}
         whileTap={{ scale: 0.93 }}
-        animate={{ y: [0, -5, 0] }}
-        transition={{ y: { repeat: Infinity, duration: 2.5, ease: 'easeInOut' } }}
       >
-        {FACES[face]}
+        <NeuroCharacter emotion={face === 'happy' ? 'happy' : face === 'excited' ? 'excited' : face === 'proud' ? 'proud' : face === 'thinking' ? 'thinking' : face === 'sad' ? 'sad' : face === 'sleeping' ? 'sleeping' : face === 'party' ? 'excited' : face === 'challenge' ? 'encouraging' : 'happy'} size={64} />
       </motion.button>
 
       {/* Chat panel */}
@@ -239,13 +238,12 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-3 flex items-center gap-3 flex-shrink-0">
-              <motion.div
-                className="text-2xl"
-                animate={face === 'thinking' ? { rotate: [0, -10, 10, 0] } : face === 'party' ? { scale: [1, 1.3, 1] } : {}}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-              >
-                {FACES[face]}
-              </motion.div>
+              <div className="-my-1 flex-shrink-0">
+                <NeuroCharacter
+                  emotion={face === 'happy' ? 'happy' : face === 'excited' ? 'excited' : face === 'proud' ? 'proud' : face === 'thinking' ? 'thinking' : face === 'sad' ? 'sad' : face === 'sleeping' ? 'sleeping' : face === 'party' ? 'excited' : face === 'challenge' ? 'encouraging' : 'happy'}
+                  size={44}
+                />
+              </div>
               <div className="flex-1">
                 <div className="font-black text-white text-sm flex items-center gap-1.5">
                   Neuro <Sparkles className="w-3 h-3 text-yellow-300" />
