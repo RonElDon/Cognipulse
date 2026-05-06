@@ -19,7 +19,6 @@ export default function AppLayout({ lang = 'de' }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
 
-  const { accentColor } = useTheme();
   const ACCENT_COLORS = [
     { name: 'Purple', value: '#8b5cf6' },
     { name: 'Rose', value: '#ec4899' },
