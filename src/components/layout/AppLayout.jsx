@@ -66,7 +66,7 @@ export default function AppLayout({ lang = 'de' }) {
           <Moon className="w-3.5 h-3.5" />
         </button>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3">
         <div className="flex gap-2">
           {ACCENT_COLORS.map(c => (
             <button
@@ -82,8 +82,8 @@ export default function AppLayout({ lang = 'de' }) {
           type="color"
           value={accentColor}
           onChange={(e) => handleColorChange(e.target.value)}
-          title="Custom Farbe"
-          className="w-6 h-6 rounded-lg cursor-pointer border border-white/30 hover:scale-110 transition-all"
+          title="Farbe mit Maus auswählen"
+          className="w-full h-12 rounded-lg cursor-pointer border border-white/30"
         />
       </div>
     </div>
