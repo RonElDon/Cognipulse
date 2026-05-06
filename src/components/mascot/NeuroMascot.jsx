@@ -5,55 +5,122 @@ import { useTheme } from '@/lib/ThemeContext';
 import { X, Send, Sparkles } from 'lucide-react';
 import NeuroCharacter from './NeuroCharacter';
 
-// Reusable animated brain-globe
-function NeuroBrainGlobe({ size = 44, float = true }) {
+// Emotion configs for the animated globe
+const GLOBE_EMOTIONS = {
+  happy:       { bg: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)', glow: 'rgba(139,92,246,0.4)',  y: [-4, 4],   rotate: [-2, 2],   dur: 2.6 },
+  excited:     { bg: 'radial-gradient(circle at 38% 32%, #fde68a, #f59e0b 55%, #d97706)', glow: 'rgba(245,158,11,0.5)',  y: [-8, 8],   rotate: [-4, 4],   dur: 1.4 },
+  proud:       { bg: 'radial-gradient(circle at 38% 32%, #a7f3d0, #10b981 55%, #059669)', glow: 'rgba(16,185,129,0.5)', y: [-5, 3],   rotate: [-1, 3],   dur: 2.0 },
+  thinking:    { bg: 'radial-gradient(circle at 38% 32%, #bfdbfe, #6366f1 55%, #4338ca)', glow: 'rgba(99,102,241,0.4)', y: [-2, 2],   rotate: [-3, 3],   dur: 3.8 },
+  sad:         { bg: 'radial-gradient(circle at 38% 32%, #cbd5e1, #64748b 55%, #475569)', glow: 'rgba(100,116,139,0.3)',y: [-2, 1],   rotate: [-1, 1],   dur: 4.0 },
+  challenge:   { bg: 'radial-gradient(circle at 38% 32%, #fed7aa, #f97316 55%, #ea580c)', glow: 'rgba(249,115,22,0.5)', y: [-6, 6],   rotate: [-3, 3],   dur: 1.8 },
+  party:       { bg: 'radial-gradient(circle at 38% 32%, #fbcfe8, #ec4899 55%, #be185d)', glow: 'rgba(236,72,153,0.5)', y: [-10, 10], rotate: [-5, 5],   dur: 1.0 },
+  sleeping:    { bg: 'radial-gradient(circle at 38% 32%, #ede9fe, #a78bfa 55%, #7c3aed)', glow: 'rgba(167,139,250,0.3)',y: [-2, 2],   rotate: [-0.5, 0.5],dur: 5.0 },
+};
+
+// Brain SVG content — same shape always
+function BrainSVG({ w, h }) {
+  return (
+    <svg viewBox="0 0 64 56" width={w} height={h} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: 'relative', zIndex: 1 }}>
+      <path d="M10 34 Q6 28 10 22 Q10 14 18 12 Q22 6 30 8 Q34 6 38 8 Q46 6 50 14 Q57 16 57 24 Q60 30 56 36 Q54 44 46 44 Q42 48 36 46 Q32 50 28 46 Q22 48 18 44 Q10 44 10 34Z" fill="#f0abfc" stroke="#7c3aed" strokeWidth="2.2" strokeLinejoin="round"/>
+      <path d="M22 12 Q22 6 28 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+      <path d="M32 8 Q34 4 38 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+      <path d="M10 22 Q6 20 8 14 Q12 10 18 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+      <path d="M10 34 Q4 32 6 26 Q8 20 12 20" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+      <path d="M54 22 Q58 18 56 14 Q52 10 48 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+      <path d="M56 34 Q60 30 58 24 Q55 19 52 21" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+      <path d="M32 12 Q32 22 32 32" stroke="#c084fc" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
+      <circle cx="24" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
+      <circle cx="25" cy="28" r="2.5" fill="#6d28d9"/>
+      <circle cx="25.8" cy="27" r="0.9" fill="white"/>
+      <circle cx="40" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
+      <circle cx="41" cy="28" r="2.5" fill="#6d28d9"/>
+      <circle cx="41.8" cy="27" r="0.9" fill="white"/>
+      <path d="M27 35 Q32 39 37 35" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+      <ellipse cx="32" cy="37" rx="2.5" ry="1.2" fill="#f9a8d4" opacity="0.8"/>
+    </svg>
+  );
+}
+
+// Static globe for header — no animation
+function NeuroBrainGlobe({ size = 44, float = false, emotion = 'happy' }) {
   const svgW = Math.round(size * 0.68);
   const svgH = Math.round(size * 0.60);
+  const cfg = GLOBE_EMOTIONS[emotion] || GLOBE_EMOTIONS.happy;
+
   return (
     <motion.div
-      className="rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+      className="rounded-full flex items-center justify-center flex-shrink-0 relative overflow-hidden"
       style={{
-        width: size,
-        height: size,
-        background: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)',
-        boxShadow: '0 0 0 2px rgba(255,255,255,0.25) inset, 0 4px 16px rgba(109,40,217,0.4)',
+        width: size, height: size,
+        background: cfg.bg,
+        boxShadow: `0 0 0 2px rgba(255,255,255,0.25) inset, 0 4px 20px ${cfg.glow}`,
       }}
-      animate={float ? {
-        y: [0, -6, 0],
-        rotate: [-1.5, 1.5, -1.5],
-      } : {}}
+      animate={float ? { y: cfg.y, rotate: cfg.rotate } : {}}
       transition={float ? {
-        y: { repeat: Infinity, duration: 2.6, ease: 'easeInOut' },
-        rotate: { repeat: Infinity, duration: 3.4, ease: 'easeInOut' },
+        y: { repeat: Infinity, duration: cfg.dur, ease: 'easeInOut', repeatType: 'mirror' },
+        rotate: { repeat: Infinity, duration: cfg.dur * 1.3, ease: 'easeInOut', repeatType: 'mirror' },
       } : {}}
     >
-      {/* Glass shine */}
-      <div className="absolute rounded-full" style={{
-        width: '40%', height: '28%',
-        top: '12%', left: '16%',
-        background: 'rgba(255,255,255,0.35)',
-        borderRadius: '50%',
-        filter: 'blur(2px)',
-        pointerEvents: 'none',
+      <div style={{
+        position: 'absolute', width: '40%', height: '26%',
+        top: '11%', left: '15%',
+        background: 'rgba(255,255,255,0.32)',
+        borderRadius: '50%', filter: 'blur(2px)',
       }} />
-      <svg viewBox="0 0 64 56" width={svgW} height={svgH} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: 'relative', zIndex: 1 }}>
-        <path d="M10 34 Q6 28 10 22 Q10 14 18 12 Q22 6 30 8 Q34 6 38 8 Q46 6 50 14 Q57 16 57 24 Q60 30 56 36 Q54 44 46 44 Q42 48 36 46 Q32 50 28 46 Q22 48 18 44 Q10 44 10 34Z" fill="#f0abfc" stroke="#7c3aed" strokeWidth="2.2" strokeLinejoin="round"/>
-        <path d="M22 12 Q22 6 28 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-        <path d="M32 8 Q34 4 38 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-        <path d="M10 22 Q6 20 8 14 Q12 10 18 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-        <path d="M10 34 Q4 32 6 26 Q8 20 12 20" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-        <path d="M54 22 Q58 18 56 14 Q52 10 48 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-        <path d="M56 34 Q60 30 58 24 Q55 19 52 21" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-        <path d="M32 12 Q32 22 32 32" stroke="#c084fc" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
-        <circle cx="24" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
-        <circle cx="25" cy="28" r="2.5" fill="#6d28d9"/>
-        <circle cx="25.8" cy="27" r="0.9" fill="white"/>
-        <circle cx="40" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
-        <circle cx="41" cy="28" r="2.5" fill="#6d28d9"/>
-        <circle cx="41.8" cy="27" r="0.9" fill="white"/>
-        <path d="M27 35 Q32 39 37 35" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-        <ellipse cx="32" cy="37" rx="2.5" ry="1.2" fill="#f9a8d4" opacity="0.8"/>
-      </svg>
+      <BrainSVG w={svgW} h={svgH} />
+    </motion.div>
+  );
+}
+
+// Large reactive globe for welcome screen — animates based on emotion
+function NeuroReactiveGlobe({ size = 80, emotion = 'happy' }) {
+  const svgW = Math.round(size * 0.68);
+  const svgH = Math.round(size * 0.60);
+  const cfg = GLOBE_EMOTIONS[emotion] || GLOBE_EMOTIONS.happy;
+
+  // Extra reaction animations per emotion
+  const extraAnim =
+    emotion === 'excited' || emotion === 'party'
+      ? { scale: [1, 1.08, 0.96, 1.04, 1] }
+      : emotion === 'thinking'
+      ? { scale: [1, 0.97, 1] }
+      : emotion === 'proud'
+      ? { scale: [1, 1.05, 1] }
+      : emotion === 'sad'
+      ? { scale: [1, 0.95, 1] }
+      : { scale: [1, 1.02, 1] };
+
+  const extraTransition =
+    emotion === 'excited' || emotion === 'party'
+      ? { scale: { repeat: Infinity, duration: 0.7, ease: 'easeInOut' } }
+      : { scale: { repeat: Infinity, duration: 2.5, ease: 'easeInOut' } };
+
+  return (
+    <motion.div
+      key={emotion}
+      initial={{ scale: 0.85, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1, y: cfg.y, rotate: cfg.rotate, ...extraAnim }}
+      transition={{
+        scale: { duration: 0.4 },
+        opacity: { duration: 0.35 },
+        y: { repeat: Infinity, duration: cfg.dur, ease: 'easeInOut', repeatType: 'mirror' },
+        rotate: { repeat: Infinity, duration: cfg.dur * 1.3, ease: 'easeInOut', repeatType: 'mirror' },
+        ...extraTransition,
+      }}
+      className="rounded-full flex items-center justify-center relative overflow-hidden"
+      style={{
+        width: size, height: size,
+        background: cfg.bg,
+        boxShadow: `0 0 0 2px rgba(255,255,255,0.25) inset, 0 6px 28px ${cfg.glow}`,
+      }}
+    >
+      <div style={{
+        position: 'absolute', width: '38%', height: '24%',
+        top: '11%', left: '15%',
+        background: 'rgba(255,255,255,0.32)',
+        borderRadius: '50%', filter: 'blur(2px)',
+      }} />
+      <BrainSVG w={svgW} h={svgH} />
     </motion.div>
   );
 }
@@ -291,7 +358,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-3 flex items-center gap-3 flex-shrink-0">
-              <NeuroBrainGlobe size={44} float={true} />
+              <NeuroBrainGlobe size={44} float={false} emotion="happy" />
               <div className="flex-1">
                 <div className="font-black text-white text-sm flex items-center gap-1.5">
                   Neuro <Sparkles className="w-3 h-3 text-yellow-300" />
@@ -303,12 +370,19 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
               </button>
             </div>
 
+            {/* Reactive globe — visible when chatting */}
+            {messages.length > 0 && (
+              <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+                <NeuroReactiveGlobe size={56} emotion={loading ? 'thinking' : face} />
+              </div>
+            )}
+
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
               {messages.length === 0 && !loading && (
                 <div className="text-center py-2">
                   <div className="flex justify-center mb-3">
-                    <NeuroBrainGlobe size={80} float={true} />
+                    <NeuroReactiveGlobe size={80} emotion={face} />
                   </div>
                   <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3">
                     Hey! Ich bin Neuro, dein persönlicher Trainingsbegleiter. Ich analysiere deine Stärken und Schwächen und empfehle dir die richtigen Übungen. 🧠
