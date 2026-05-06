@@ -17,9 +17,9 @@ export default function AppLayout({ lang = 'de' }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor, applyExternalTheme } = useTheme();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [tempColor, setTempColor] = useState(accentColor);
-  const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor, applyExternalTheme } = useTheme();
 
   const ACCENT_COLORS = [
     { name: 'Purple', value: '#8b5cf6' },
