@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+// Dark mode classes via ThemeContext in AppLayout
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
@@ -6,16 +7,7 @@ import { useProfile } from '@/lib/useProfile';
 import { DOMAINS, EXERCISES, getLevel } from '@/lib/exercises';
 import XPBar from '@/components/ui/XPBar';
 import { Brain, Flame, Trophy, Zap, ChevronRight, PlayCircle, Star, Palette } from 'lucide-react';
-
-const GRADIENT_PRESETS = [
-  { id: 'auto', label: 'Auto', style: null }, // animated
-  { id: 'purple', label: 'Lila',  style: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-  { id: 'rose',   label: 'Rose',  style: 'linear-gradient(135deg, #f43f5e 0%, #f97316 100%)' },
-  { id: 'cyan',   label: 'Cyan',  style: 'linear-gradient(135deg, #06b6d4 0%, #6366f1 100%)' },
-  { id: 'emerald',label: 'Grün',  style: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)' },
-  { id: 'amber',  label: 'Gold',  style: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' },
-  { id: 'night',  label: 'Nacht', style: 'linear-gradient(135deg, #0f172a 0%, #312e81 100%)' },
-];
+import { useTheme, GRADIENT_PRESETS } from '@/lib/ThemeContext';
 
 const PRESET_DOTS = [
   '#764ba2', '#f43f5e', '#06b6d4', '#10b981', '#f59e0b', '#0f172a',
@@ -33,31 +25,18 @@ export default function Home() {
   const { profile, loading } = useProfile();
   const [recentResults, setRecentResults] = useState([]);
   const [user, setUser] = useState(null);
-  const [selectedGradient, setSelectedGradient] = useState(() => localStorage.getItem('hero_gradient') || 'auto');
   const [showPicker, setShowPicker] = useState(false);
-  const [customColor, setCustomColor] = useState(() => localStorage.getItem('hero_custom_color') || '#6366f1');
+  const { selectedGradient, selectGradient, customColor, setCustomColorValue, heroStyle, heroClass } = useTheme();
   const quote = MOTIVATIONAL[new Date().getDay() % MOTIVATIONAL.length];
 
   const handleSelectGradient = (id) => {
-    setSelectedGradient(id);
-    localStorage.setItem('hero_gradient', id);
+    selectGradient(id);
     setShowPicker(false);
   };
 
   const handleCustomColor = (color) => {
-    setCustomColor(color);
-    localStorage.setItem('hero_custom_color', color);
-    setSelectedGradient('custom');
-    localStorage.setItem('hero_gradient', 'custom');
+    setCustomColorValue(color);
   };
-
-  const heroStyle = selectedGradient === 'auto'
-    ? {}
-    : selectedGradient === 'custom'
-      ? { background: `linear-gradient(135deg, ${customColor} 0%, ${customColor}99 100%)`, backgroundSize: undefined }
-      : { background: GRADIENT_PRESETS.find(p => p.id === selectedGradient)?.style };
-
-  const heroClass = selectedGradient === 'auto' ? 'hero-gradient' : '';
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});

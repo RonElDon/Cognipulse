@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { EXERCISES, DOMAINS } from '@/lib/exercises';
 import { ArrowLeft, Trophy, Zap, RefreshCw, Home } from 'lucide-react';
+import NeuroMascot from '@/components/mascot/NeuroMascot';
 
 // ============ Mini-games ============
 
@@ -289,12 +290,30 @@ function PatternGame({ onComplete, level }) {
 }
 
 const GAME_COMPONENTS = {
+  // Attention
   att_1: AttentionGame, att_2: AttentionGame, att_3: AttentionGame, att_4: AttentionGame,
+  att_5: AttentionGame, att_6: AttentionGame, att_7: AttentionGame, att_8: AttentionGame,
+  // Memory
   mem_1: MemoryGame, mem_2: PatternGame, mem_3: PatternGame, mem_4: PatternGame,
+  mem_5: MemoryGame, mem_6: PatternGame, mem_7: PatternGame, mem_8: MemoryGame,
+  // Executive
   exe_1: ReactionGame, exe_2: ReactionGame, exe_3: PatternGame, exe_4: ReactionGame,
+  exe_5: PatternGame, exe_6: ReactionGame, exe_7: ReactionGame, exe_8: ReactionGame,
+  // Visuomotor
   vis_1: AttentionGame, vis_2: AttentionGame, vis_3: AttentionGame, vis_4: AttentionGame,
+  vis_5: AttentionGame, vis_6: PatternGame, vis_7: AttentionGame, vis_8: AttentionGame,
+  // Processing
   pro_1: ReactionGame, pro_2: ReactionGame, pro_3: ReactionGame, pro_4: ReactionGame,
+  pro_5: ReactionGame, pro_6: ReactionGame, pro_7: ReactionGame, pro_8: AttentionGame,
+  // Reasoning
   rea_1: PatternGame, rea_2: PatternGame, rea_3: PatternGame, rea_4: PatternGame,
+  rea_5: PatternGame, rea_6: PatternGame, rea_7: PatternGame, rea_8: PatternGame,
+  // Language
+  lan_1: PatternGame, lan_2: PatternGame, lan_3: PatternGame, lan_4: PatternGame,
+  lan_5: PatternGame, lan_6: PatternGame, lan_7: MemoryGame, lan_8: MemoryGame,
+  // Math
+  mat_1: ReactionGame, mat_2: PatternGame, mat_3: ReactionGame, mat_4: ReactionGame,
+  mat_5: ReactionGame, mat_6: ReactionGame, mat_7: PatternGame, mat_8: ReactionGame,
 };
 
 export default function Exercise() {
@@ -303,6 +322,7 @@ export default function Exercise() {
   const exercise = EXERCISES.find(e => e.id === id);
   const [phase, setPhase] = useState('intro'); // intro, playing, result
   const [result, setResult] = useState(null);
+  const [lastNeuroResult, setLastNeuroResult] = useState(null);
   const [saving, setSaving] = useState(false);
   const [level, setLevel] = useState(exercise?.difficulty || 1);
 
@@ -314,6 +334,7 @@ export default function Exercise() {
   const handleComplete = async (gameResult) => {
     setResult(gameResult);
     setPhase('result');
+    setLastNeuroResult({ ...gameResult, exercise_name: exercise.name, domain: exercise.domain });
     setSaving(true);
     try {
       const user = await base44.auth.me();
@@ -448,6 +469,7 @@ export default function Exercise() {
           </AnimatePresence>
         </div>
       </div>
+      <NeuroMascot lastResult={lastNeuroResult} popupsEnabled={true} />
     </div>
   );
 }
