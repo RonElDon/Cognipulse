@@ -216,14 +216,41 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
         )}
       </AnimatePresence>
 
-      {/* Mascot button — simple brain icon, no distracting animation */}
+      {/* Mascot button — cute cartoon brain SVG */}
       <motion.button
         onClick={() => open ? setOpen(false) : handleOpen()}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-300/40 dark:shadow-purple-900/40 flex items-center justify-center border-2 border-white/30"
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-16 h-16 rounded-full flex items-center justify-center shadow-xl shadow-purple-400/40"
+        style={{ background: 'radial-gradient(circle at 40% 35%, #f0abfc, #a855f7 60%, #7c3aed)' }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.93 }}
       >
-        <span className="text-2xl">🧠</span>
+        <svg viewBox="0 0 64 56" width="42" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Brain body — bumpy cloud shape */}
+          <path d="M10 34 Q6 28 10 22 Q10 14 18 12 Q22 6 30 8 Q34 6 38 8 Q46 6 50 14 Q57 16 57 24 Q60 30 56 36 Q54 44 46 44 Q42 48 36 46 Q32 50 28 46 Q22 48 18 44 Q10 44 10 34Z" fill="#f0abfc" stroke="#7c3aed" strokeWidth="2.2" strokeLinejoin="round"/>
+          {/* Brain top bumps */}
+          <path d="M22 12 Q22 6 28 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+          <path d="M32 8 Q34 4 38 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+          {/* Left bumps */}
+          <path d="M10 22 Q6 20 8 14 Q12 10 18 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+          <path d="M10 34 Q4 32 6 26 Q8 20 12 20" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+          {/* Right bumps */}
+          <path d="M54 22 Q58 18 56 14 Q52 10 48 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+          <path d="M56 34 Q60 30 58 24 Q55 19 52 21" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+          {/* Center crease */}
+          <path d="M32 12 Q32 22 32 32" stroke="#c084fc" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
+          {/* Left eye */}
+          <circle cx="24" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
+          <circle cx="25" cy="28" r="2.5" fill="#6d28d9"/>
+          <circle cx="25.8" cy="27" r="0.9" fill="white"/>
+          {/* Right eye */}
+          <circle cx="40" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
+          <circle cx="41" cy="28" r="2.5" fill="#6d28d9"/>
+          <circle cx="41.8" cy="27" r="0.9" fill="white"/>
+          {/* Smile */}
+          <path d="M27 35 Q32 39 37 35" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+          {/* Tiny tongue/lip hint */}
+          <ellipse cx="32" cy="37" rx="2.5" ry="1.2" fill="#f9a8d4" opacity="0.8"/>
+        </svg>
       </motion.button>
 
       {/* Chat panel */}
