@@ -15,6 +15,7 @@ const NAV_ITEMS = [
 export default function AppLayout({ lang = 'de' }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
 
   const DarkToggle = () => (
@@ -44,9 +45,9 @@ export default function AppLayout({ lang = 'de' }) {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 flex relative">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-slate-900 dark:bg-slate-950 text-white fixed h-full z-40">
+      <aside className={`hidden md:flex flex-col w-64 bg-slate-900 dark:bg-slate-950 text-white fixed h-full z-40 transition-all duration-300 ${!sidebarOpen ? '-translate-x-full' : ''}`}>
         <div className="p-6 border-b border-slate-700">
           <Link to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)` }}>
@@ -129,8 +130,30 @@ export default function AppLayout({ lang = 'de' }) {
         </div>
       )}
 
+      {/* Sidebar Toggle Button */}
+      {!sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="hidden md:flex fixed left-0 top-4 z-30 w-10 h-10 items-center justify-center bg-slate-900 text-white rounded-r-lg hover:bg-slate-800 transition-colors"
+          title="Menü öffnen"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* Close button in sidebar header */}
+      {sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(false)}
+          className="hidden md:flex absolute right-2 top-6 p-2 text-slate-400 hover:text-white z-50 transition-colors"
+          title="Menü schließen"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
+
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 pt-16 md:pt-0 min-h-screen">
+      <main className={`flex-1 pt-16 md:pt-0 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-0'}`}>
         <Outlet />
       </main>
 
