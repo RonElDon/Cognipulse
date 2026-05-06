@@ -74,8 +74,11 @@ export default function Train() {
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
         {selectedDomain !== 'all' && DOMAINS[selectedDomain] && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
+            key={selectedDomain}
+            initial={{ opacity: 0, filter: 'blur(12px)', y: 20 }}
+            animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+            exit={{ opacity: 0, filter: 'blur(12px)', y: -20 }}
+            transition={{ duration: 0.6, ease: 'easeInOut' }}
             className={`rounded-2xl p-5 text-white ${DOMAINS[selectedDomain].gradient} shadow-lg relative overflow-hidden`}
             style={{
               backgroundImage: selectedDomain === 'attention' 
@@ -95,11 +98,15 @@ export default function Train() {
               backgroundPosition: 'center',
             }}
           >
-            <div className="relative z-10">
+            <motion.div 
+              className="relative z-10"
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
+            >
               <div className="text-3xl mb-2">{DOMAINS[selectedDomain].icon}</div>
               <h2 className="text-xl font-black">{DOMAINS[selectedDomain].name}</h2>
               <p className="text-white/90 text-sm mt-1">{DOMAINS[selectedDomain].description}</p>
-            </div>
+            </motion.div>
           </motion.div>
         )}
 
