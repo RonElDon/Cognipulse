@@ -47,14 +47,14 @@ export default function AppLayout({ lang = 'de' }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 flex relative">
       {/* Desktop Sidebar */}
-      <aside className={`hidden md:flex flex-col w-64 bg-slate-900 dark:bg-slate-950 text-white fixed h-full z-40 transition-all duration-300 ${!sidebarOpen ? '-translate-x-full' : ''}`}>
-        <div className="p-6 border-b border-slate-700">
+      <aside className={`hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 text-slate-900 dark:text-white fixed h-full z-40 transition-all duration-300 border-r border-slate-200 dark:border-slate-800 ${!sidebarOpen ? '-translate-x-full' : ''}`}>
+        <div className="p-6 border-b border-slate-200 dark:border-slate-700">
           <Link to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)` }}>
               <Zap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <span className="text-xl font-black text-white">Brain</span>
+              <span className="text-xl font-black text-slate-900 dark:text-white">Brain</span>
               <span className="text-xl font-black" style={{ color: accentColor }}>Boost</span>
             </div>
           </Link>
@@ -67,7 +67,7 @@ export default function AppLayout({ lang = 'de' }) {
                 key={item.path}
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                  active ? 'text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  active ? 'text-white shadow-lg dark:shadow-lg' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
                 style={active ? { backgroundColor: accentColor, boxShadow: `0 4px 15px ${accentColor}55` } : {}}
               >
@@ -77,9 +77,9 @@ export default function AppLayout({ lang = 'de' }) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-slate-700 space-y-3">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
           <DarkToggle />
-          <div className="text-xs text-slate-500 text-center">BrainBoost v1.0</div>
+          <div className="text-xs text-slate-400 dark:text-slate-500 text-center">BrainBoost v1.0</div>
         </div>
       </aside>
 
@@ -133,10 +133,10 @@ export default function AppLayout({ lang = 'de' }) {
       {/* Sidebar Toggle Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className={`hidden md:flex fixed left-0 top-4 z-30 w-10 h-10 items-center justify-center bg-slate-900 text-white rounded-r-lg hover:bg-slate-800 transition-all ${sidebarOpen ? 'left-56' : ''}`}
+        className={`hidden md:flex fixed top-4 z-30 w-12 h-12 items-center justify-center bg-slate-900 dark:bg-slate-800 text-white rounded-r-xl hover:bg-slate-800 dark:hover:bg-slate-700 transition-all shadow-lg ${sidebarOpen ? 'left-56' : 'left-0'}`}
         title={sidebarOpen ? "Menü schließen" : "Menü öffnen"}
       >
-        {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+        {sidebarOpen ? <ChevronLeft className="w-6 h-6" /> : <ChevronRight className="w-6 h-6" />}
       </button>
 
       {/* Main Content */}
