@@ -63,7 +63,7 @@ function AttentionGame({ onComplete, level }) {
       </div>
       <div ref={gameRef} className="relative bg-slate-100 rounded-2xl overflow-hidden" style={{ height: '350px' }}>
         <div className="absolute inset-0 flex items-center justify-center text-slate-300 text-sm font-semibold">
-          Tap the circles!
+          Kreise antippen!
         </div>
         {targets.map(t => (
           <button
@@ -128,8 +128,8 @@ function MemoryGame({ onComplete, level }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between text-sm font-bold text-slate-600">
-        <span>🎯 {matchCount}/{pairs} matched</span>
-        <span>🔄 {moves} moves</span>
+      <span>🎯 {matchCount}/{pairs} gefunden</span>
+      <span>🔄 {moves} Züge</span>
       </div>
       <div className={`grid gap-2`} style={{ gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(totalCards))}, 1fr)` }}>
         {cards.map(card => (
@@ -196,7 +196,7 @@ function ReactionGame({ onComplete, level }) {
 
   return (
     <div className="space-y-4">
-      <div className="text-center text-sm font-bold text-slate-600">Round {Math.min(round + 1, totalRounds)} of {totalRounds}</div>
+      <div className="text-center text-sm font-bold text-slate-600">Runde {Math.min(round + 1, totalRounds)} von {totalRounds}</div>
       {reactions.length > 0 && (
         <div className="flex gap-2 justify-center flex-wrap">
           {reactions.map((r, i) => (
@@ -218,7 +218,7 @@ function ReactionGame({ onComplete, level }) {
           {phase === 'go' ? '⚡' : phase === 'waiting' ? '⏳' : phase === 'tooEarly' ? '❌' : phase === 'hit' ? '✅' : '🏁'}
         </div>
         <div className="text-xl font-black text-slate-700">
-          {phase === 'go' ? 'TAP NOW!' : phase === 'waiting' ? 'Wait...' : phase === 'tooEarly' ? 'Too early!' : phase === 'hit' ? 'Great!' : 'Done!'}
+          {phase === 'go' ? 'JETZT TIPPEN!' : phase === 'waiting' ? 'Warten...' : phase === 'tooEarly' ? 'Zu früh!' : phase === 'hit' ? 'Super!' : 'Fertig!'}
         </div>
       </button>
     </div>
@@ -254,14 +254,14 @@ function PatternGame({ onComplete, level }) {
       <div className="bg-slate-50 rounded-2xl p-5 min-h-24">
         {showPattern ? (
           <div>
-            <p className="text-sm font-bold text-slate-500 mb-3 text-center">Memorize this pattern:</p>
+            <p className="text-sm font-bold text-slate-500 mb-3 text-center">Muster einprägen:</p>
             <div className="flex gap-2 justify-center flex-wrap">
               {pattern.map((e, i) => <span key={i} className="text-3xl">{e}</span>)}
             </div>
           </div>
         ) : (
           <div>
-            <p className="text-sm font-bold text-slate-500 mb-3 text-center">Reproduce the pattern ({userInput.length}/{pattern.length}):</p>
+            <p className="text-sm font-bold text-slate-500 mb-3 text-center">Muster wiederholen ({userInput.length}/{pattern.length}):</p>
             <div className="flex gap-2 justify-center flex-wrap min-h-10">
               {userInput.map((e, i) => <span key={i} className="text-3xl">{e}</span>)}
               {Array.from({ length: pattern.length - userInput.length }).map((_, i) => (
@@ -306,7 +306,7 @@ export default function Exercise() {
   const [saving, setSaving] = useState(false);
   const [level, setLevel] = useState(exercise?.difficulty || 1);
 
-  if (!exercise) return <div className="p-8 text-center text-slate-500">Exercise not found</div>;
+  if (!exercise) return <div className="p-8 text-center text-slate-500">Übung nicht gefunden</div>;
 
   const domain = DOMAINS[exercise.domain];
   const GameComponent = GAME_COMPONENTS[id];
@@ -347,7 +347,7 @@ export default function Exercise() {
       <div className={`${domain.gradient} px-4 pt-6 pb-8`}>
         <div className="max-w-lg mx-auto">
           <button onClick={() => navigate('/train')} className="flex items-center gap-2 text-white/80 hover:text-white mb-4 font-semibold transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Back
+            <ArrowLeft className="w-4 h-4" /> Zurück
           </button>
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-3xl">
@@ -385,7 +385,7 @@ export default function Exercise() {
                       }`}
                       style={level === l ? { backgroundColor: domain.color } : {}}
                     >
-                      {l === 1 ? '😊 Easy' : l === 2 ? '😤 Medium' : '🔥 Hard'}
+                      {l === 1 ? '😊 Leicht' : l === 2 ? '😤 Mittel' : '🔥 Schwer'}
                     </button>
                   ))}
                 </div>
@@ -393,7 +393,7 @@ export default function Exercise() {
                   onClick={() => setPhase('playing')}
                   className={`w-full py-4 rounded-2xl text-white font-black text-lg shadow-lg transition-transform hover:scale-105 active:scale-95 ${domain.gradient}`}
                 >
-                  Start Exercise! 🚀
+                  Übung starten! 🚀
                 </button>
               </motion.div>
             )}
@@ -412,14 +412,14 @@ export default function Exercise() {
                 <div>
                   <div className="text-4xl font-black" style={{ color: domain.color }}>{result.score}%</div>
                   <div className="text-slate-500 text-sm font-semibold mt-1">
-                    {result.score >= 80 ? 'Excellent!' : result.score >= 60 ? 'Good job!' : result.score >= 40 ? 'Keep going!' : 'Practice makes perfect!'}
+                    {result.score >= 80 ? 'Ausgezeichnet!' : result.score >= 60 ? 'Gute Arbeit!' : result.score >= 40 ? 'Weiter so!' : 'Übung macht den Meister!'}
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { label: 'Score', value: `${result.score}%`, icon: '🎯' },
-                    { label: 'Accuracy', value: `${result.accuracy}%`, icon: '✅' },
-                    { label: 'XP Earned', value: `+${Math.round(exercise.xpReward * result.score / 100)}`, icon: '⚡' },
+                    { label: 'Ergebnis', value: `${result.score}%`, icon: '🎯' },
+                    { label: 'Genauigkeit', value: `${result.accuracy}%`, icon: '✅' },
+                    { label: 'XP erhalten', value: `+${Math.round(exercise.xpReward * result.score / 100)}`, icon: '⚡' },
                   ].map(s => (
                     <div key={s.label} className="bg-slate-50 rounded-2xl p-3">
                       <div className="text-lg">{s.icon}</div>
@@ -428,19 +428,19 @@ export default function Exercise() {
                     </div>
                   ))}
                 </div>
-                {saving && <div className="text-xs text-slate-400 font-medium">Saving results...</div>}
+                {saving && <div className="text-xs text-slate-400 font-medium">Ergebnisse werden gespeichert...</div>}
                 <div className="flex gap-3">
                   <button
                     onClick={() => { setPhase('intro'); setResult(null); }}
                     className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-slate-200 font-bold text-slate-700 hover:bg-slate-50 transition-colors"
                   >
-                    <RefreshCw className="w-4 h-4" /> Retry
+                    <RefreshCw className="w-4 h-4" /> Nochmal
                   </button>
                   <button
                     onClick={() => navigate('/train')}
                     className={`flex-1 py-3 rounded-2xl text-white font-bold ${domain.gradient} shadow-md`}
                   >
-                    Next Exercise →
+                    Nächste Übung →
                   </button>
                 </div>
               </motion.div>

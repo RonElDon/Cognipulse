@@ -29,13 +29,13 @@ export default function Train() {
       {/* Header */}
       <div className="bg-white border-b border-slate-100 px-4 pt-6 pb-4 sticky top-0 md:top-0 z-10">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-2xl font-black text-slate-900 mb-4">🧠 Training Library</h1>
+          <h1 className="text-2xl font-black text-slate-900 mb-4">🧠 Trainingsbibliothek</h1>
           {/* Search */}
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search exercises..."
+              placeholder="Übungen suchen..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
@@ -51,7 +51,7 @@ export default function Train() {
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              All
+              Alle
             </button>
             {Object.values(DOMAINS).map(d => (
               <button
@@ -126,7 +126,7 @@ export default function Train() {
                             />
                           ))}
                           <span className="text-xs text-slate-400 ml-1">
-                            {ex.difficulty === 1 ? 'Easy' : ex.difficulty === 2 ? 'Medium' : 'Hard'}
+                            {ex.difficulty === 1 ? 'Leicht' : ex.difficulty === 2 ? 'Mittel' : 'Schwer'}
                           </span>
                         </div>
                       </div>
@@ -139,7 +139,7 @@ export default function Train() {
           {filtered.length === 0 && (
             <div className="text-center py-12 text-slate-400">
               <div className="text-4xl mb-3">🔍</div>
-              <div className="font-semibold">No exercises found</div>
+              <div className="font-semibold">Keine Übungen gefunden</div>
             </div>
           )}
         </div>

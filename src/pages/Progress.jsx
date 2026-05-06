@@ -37,7 +37,7 @@ export default function Progress() {
     const dateStr = d.toISOString().split('T')[0];
     const dayResults = results.filter(r => r.created_date?.startsWith(dateStr));
     return {
-      day: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      day: d.toLocaleDateString('de-DE', { weekday: 'short' }),
       exercises: dayResults.length,
       avgScore: dayResults.length > 0 ? Math.round(dayResults.reduce((s, r) => s + r.score, 0) / dayResults.length) : 0,
     };
@@ -67,9 +67,9 @@ export default function Progress() {
       <div className="bg-gradient-to-br from-indigo-600 to-purple-700 px-4 pt-8 pb-10">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2">
-            <TrendingUp className="w-6 h-6" /> My Progress
+            <TrendingUp className="w-6 h-6" /> Mein Fortschritt
           </h1>
-          <p className="text-white/80 text-sm">Track your cognitive development over time</p>
+          <p className="text-white/80 text-sm">Verfolge deine kognitive Entwicklung</p>
         </div>
       </div>
 
@@ -80,7 +80,7 @@ export default function Progress() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Zap className="w-5 h-5 text-yellow-500" />
-            <h2 className="font-black text-slate-800">XP & Level</h2>
+            <h2 className="font-black text-slate-800">XP & Stufe</h2>
           </div>
           <XPBar xp={xp} />
         </motion.div>
@@ -90,9 +90,9 @@ export default function Progress() {
           className="grid grid-cols-3 gap-3"
         >
           {[
-            { label: 'Exercises', value: totalExercises, icon: '🎯', color: 'bg-purple-50 text-purple-700' },
-            { label: 'Day Streak', value: `${profile?.current_streak || 0}🔥`, icon: '🔥', color: 'bg-orange-50 text-orange-700' },
-            { label: 'Best Domain', value: bestDomain ? bestDomain.icon : '—', icon: '🏆', color: 'bg-amber-50 text-amber-700' },
+            { label: 'Übungen', value: totalExercises, icon: '🎯', color: 'bg-purple-50 text-purple-700' },
+            { label: 'Tages-Serie', value: `${profile?.current_streak || 0}🔥`, icon: '🔥', color: 'bg-orange-50 text-orange-700' },
+            { label: 'Bester Bereich', value: bestDomain ? bestDomain.icon : '—', icon: '🏆', color: 'bg-amber-50 text-amber-700' },
           ].map(s => (
             <div key={s.label} className={`${s.color} rounded-2xl p-3 text-center`}>
               <div className="text-2xl font-black">{s.value}</div>
@@ -108,7 +108,7 @@ export default function Progress() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Brain className="w-5 h-5 text-indigo-600" />
-              <h2 className="font-black text-slate-800">Brain Map</h2>
+              <h2 className="font-black text-slate-800">Gehirnkarte</h2>
             </div>
             <ResponsiveContainer width="100%" height={260}>
               <RadarChart data={radarData}>
@@ -126,7 +126,7 @@ export default function Progress() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Calendar className="w-5 h-5 text-emerald-600" />
-            <h2 className="font-black text-slate-800">This Week</h2>
+            <h2 className="font-black text-slate-800">Diese Woche</h2>
           </div>
           <div className="flex items-end justify-between gap-1 h-24">
             {last7Days.map((d, i) => (
@@ -147,7 +147,7 @@ export default function Progress() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Award className="w-5 h-5 text-amber-500" />
-            <h2 className="font-black text-slate-800">Domain Performance</h2>
+            <h2 className="font-black text-slate-800">Bereichs-Leistung</h2>
           </div>
           <div className="space-y-3">
             {domainStats.map(d => (
@@ -158,7 +158,7 @@ export default function Progress() {
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-sm font-bold text-slate-700">{d.name}</span>
-                    <span className="text-xs font-bold text-slate-500">{d.count} plays</span>
+                    <span className="text-xs font-bold text-slate-500">{d.count} Spiele</span>
                   </div>
                   <div className="bg-slate-100 rounded-full h-2">
                     <div
@@ -180,7 +180,7 @@ export default function Progress() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
             className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
           >
-            <h2 className="font-black text-slate-800 mb-4">Recent Sessions</h2>
+            <h2 className="font-black text-slate-800 mb-4">Letzte Sitzungen</h2>
             <div className="space-y-2">
               {results.slice(0, 10).map(r => {
                 const d = DOMAINS[r.domain];
@@ -192,7 +192,7 @@ export default function Progress() {
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-bold text-slate-700 truncate">{r.exercise_name}</div>
                       <div className="text-xs text-slate-400">
-                        {new Date(r.created_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        {new Date(r.created_date).toLocaleDateString('de-DE', { month: 'short', day: 'numeric' })}
                       </div>
                     </div>
                     <div className="text-right">
@@ -209,8 +209,8 @@ export default function Progress() {
         {results.length === 0 && !loadingResults && (
           <div className="text-center py-12">
             <div className="text-5xl mb-4">🧠</div>
-            <div className="font-black text-slate-600 text-lg">No exercises yet!</div>
-            <p className="text-slate-400 mt-2">Start training to see your progress here.</p>
+            <div className="font-black text-slate-600 text-lg">Noch keine Übungen!</div>
+            <p className="text-slate-400 mt-2">Starte dein Training, um deinen Fortschritt hier zu sehen.</p>
           </div>
         )}
       </div>

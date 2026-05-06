@@ -37,7 +37,7 @@ export default function XPBar({ xp, compact = false }) {
         />
       </div>
       {next && (
-        <div className="text-xs text-slate-500 text-right">{next.minXP - xp} XP to {next.name}</div>
+        <div className="text-xs text-slate-500 text-right">{next.minXP - xp} XP bis {next.name}</div>
       )}
     </div>
   );

@@ -42,8 +42,8 @@ export default function Leaderboard() {
       <div className="bg-gradient-to-br from-amber-500 to-orange-600 px-4 pt-8 pb-12">
         <div className="max-w-lg mx-auto text-center">
           <Trophy className="w-10 h-10 text-white mx-auto mb-3" />
-          <h1 className="text-3xl font-black text-white">Leaderboard</h1>
-          <p className="text-white/80 text-sm mt-1">Who has the sharpest mind? 🧠</p>
+          <h1 className="text-3xl font-black text-white">Rangliste</h1>
+          <p className="text-white/80 text-sm mt-1">Wer hat den schärfsten Verstand? 🧠</p>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export default function Leaderboard() {
             <div className="flex items-center gap-3">
               <div className="text-2xl font-black">#{myRank.rank}</div>
               <div className="flex-1">
-                <div className="font-black">You</div>
+                <div className="font-black">Du</div>
                 <div className="text-white/80 text-sm">{myRank.total_xp || 0} XP</div>
               </div>
               <Zap className="w-6 h-6 text-yellow-300" />
@@ -109,7 +109,7 @@ export default function Leaderboard() {
           className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
         >
           <div className="p-4 border-b border-slate-100">
-            <h2 className="font-black text-slate-800">All Players</h2>
+            <h2 className="font-black text-slate-800">Alle Spieler</h2>
           </div>
           <div className="divide-y divide-slate-50">
             {ranked.map((p, i) => {
@@ -136,7 +136,7 @@ export default function Leaderboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className={`font-black text-sm ${isMe ? 'text-purple-700' : 'text-slate-800'} truncate`}>
-                      {p.display_name || 'Brain Explorer'} {isMe && '(You)'}
+                      {p.display_name || 'Gehirn-Entdecker'} {isMe && '(Du)'}
                     </div>
                     <div className="text-xs font-bold px-1.5 py-0.5 rounded-full inline-block mt-0.5" style={{ backgroundColor: lvl.color + '20', color: lvl.color }}>
                       Lv.{lvl.level} {lvl.name}
@@ -153,7 +153,7 @@ export default function Leaderboard() {
           {ranked.length === 0 && (
             <div className="text-center py-12 text-slate-400">
               <div className="text-4xl mb-3">🏆</div>
-              <div className="font-semibold">Be the first to train!</div>
+              <div className="font-semibold">Sei der Erste, der trainiert!</div>
             </div>
           )}
         </motion.div>

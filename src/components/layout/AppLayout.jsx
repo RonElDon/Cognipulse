@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { path: '/profile', icon: User, label: 'Profile', labelDE: 'Profil' },
 ];
 
-export default function AppLayout({ lang = 'en' }) {
+export default function AppLayout({ lang = 'de' }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 

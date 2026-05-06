@@ -37,17 +37,17 @@ export default function Profile() {
     if (!newName.trim()) return;
     await updateProfile({ display_name: newName.trim() });
     setEditName(false);
-    toast.success('Name updated!');
+    toast.success('Name aktualisiert!');
   };
 
   const handleLanguageChange = async (lang) => {
     await updateProfile({ preferred_language: lang });
-    toast.success(`Language set to ${lang === 'en' ? 'English' : 'Deutsch'}`);
+    toast.success(`Sprache geändert zu ${lang === 'en' ? 'Englisch' : 'Deutsch'}`);
   };
 
   const handleGoalChange = async (daily) => {
     await updateProfile({ goals: { ...profile?.goals, daily_exercises: daily } });
-    toast.success('Goal updated!');
+    toast.success('Ziel aktualisiert!');
   };
 
   const handleLogout = () => {
@@ -76,7 +76,7 @@ export default function Profile() {
                 onChange={e => setNewName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSaveName()}
                 className="bg-white/10 text-white text-lg font-black text-center rounded-xl px-3 py-1 focus:outline-none focus:ring-2 focus:ring-purple-400 border border-white/20"
-                placeholder="Your name"
+                placeholder="Dein Name"
               />
               <button onClick={handleSaveName} className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
                 <Check className="w-4 h-4 text-white" />
@@ -84,7 +84,7 @@ export default function Profile() {
             </div>
           ) : (
             <div className="flex items-center gap-2 justify-center">
-              <h1 className="text-xl font-black text-white">{profile?.display_name || user?.full_name || 'Brain Explorer'}</h1>
+              <h1 className="text-xl font-black text-white">{profile?.display_name || user?.full_name || 'Gehirn-Entdecker'}</h1>
               <button onClick={() => { setNewName(profile?.display_name || ''); setEditName(true); }}
                 className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
                 <Edit2 className="w-3 h-3 text-white/70" />
@@ -93,7 +93,7 @@ export default function Profile() {
           )}
           <p className="text-white/60 text-sm mt-1">{user?.email}</p>
           <div className="mt-2 inline-block text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: lvl.color + '30', color: lvl.color }}>
-            Level {lvl.level} · {lvl.name}
+            Stufe {lvl.level} · {lvl.name}
           </div>
         </div>
       </div>
@@ -110,7 +110,7 @@ export default function Profile() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
         >
-          <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">🏅 Badges ({earnedBadges.length}/{BADGES.length})</h2>
+          <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">🏅 Abzeichen ({earnedBadges.length}/{BADGES.length})</h2>
           <div className="grid grid-cols-4 gap-3">
             {BADGES.map(badge => {
               const earned = badge.condition(badgeStats);
@@ -129,7 +129,7 @@ export default function Profile() {
           className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
         >
           <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">
-            <Globe className="w-5 h-5 text-blue-600" /> Language
+            <Globe className="w-5 h-5 text-blue-600" /> Sprache
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {[{ code: 'en', label: '🇬🇧 English' }, { code: 'de', label: '🇩🇪 Deutsch' }].map(l => (
@@ -153,9 +153,9 @@ export default function Profile() {
           className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
         >
           <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5 text-emerald-600" /> Daily Goal
+            <Target className="w-5 h-5 text-emerald-600" /> Tagesziel
           </h2>
-          <p className="text-sm text-slate-500 mb-3">How many exercises per day?</p>
+          <p className="text-sm text-slate-500 mb-3">Wie viele Übungen pro Tag?</p>
           <div className="grid grid-cols-4 gap-2">
             {[1, 3, 5, 10].map(n => (
               <button
@@ -177,13 +177,13 @@ export default function Profile() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
           className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
         >
-          <h2 className="font-black text-slate-800 mb-4">📊 My Stats</h2>
+          <h2 className="font-black text-slate-800 mb-4">📊 Meine Statistiken</h2>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'Total Exercises', value: totalGames, icon: '🎯' },
-              { label: 'Total XP', value: xp, icon: '⚡' },
-              { label: 'Best Streak', value: `${profile?.longest_streak || 0} days`, icon: '🔥' },
-              { label: 'Domains Tried', value: `${domainsPlayed}/6`, icon: '🧠' },
+              { label: 'Übungen gesamt', value: totalGames, icon: '🎯' },
+              { label: 'Gesamt-XP', value: xp, icon: '⚡' },
+              { label: 'Beste Serie', value: `${profile?.longest_streak || 0} Tage`, icon: '🔥' },
+              { label: 'Bereiche versucht', value: `${domainsPlayed}/6`, icon: '🧠' },
             ].map(s => (
               <div key={s.label} className="bg-slate-50 rounded-2xl p-3">
                 <div className="text-2xl">{s.icon}</div>
@@ -200,7 +200,7 @@ export default function Profile() {
             onClick={handleLogout}
             className="w-full py-3 rounded-2xl border-2 border-red-100 text-red-500 font-bold flex items-center justify-center gap-2 hover:bg-red-50 transition-colors"
           >
-            <LogOut className="w-4 h-4" /> Sign Out
+            <LogOut className="w-4 h-4" /> Abmelden
           </button>
         </motion.div>
       </div>

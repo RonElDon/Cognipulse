@@ -8,11 +8,11 @@ import XPBar from '@/components/ui/XPBar';
 import { Brain, Flame, Trophy, Zap, ChevronRight, PlayCircle, Star } from 'lucide-react';
 
 const MOTIVATIONAL = [
-  "Your brain is a muscle — train it daily! 🧠",
-  "Every rep counts. You got this! 💪",
-  "Sharper mind, better life! ⚡",
-  "5 minutes a day keeps brain fog away! 🌟",
-  "Level up your mind today! 🚀",
+  "Dein Gehirn ist ein Muskel — trainiere es täglich! 🧠",
+  "Jede Wiederholung zählt. Du schaffst das! 💪",
+  "Ein schärferer Geist, ein besseres Leben! ⚡",
+  "5 Minuten täglich halten den Kopf klar! 🌟",
+  "Level up deinen Verstand! 🚀",
 ];
 
 export default function Home() {
@@ -45,6 +45,7 @@ export default function Home() {
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
     </div>
+  
   );
 
   return (
@@ -55,7 +56,7 @@ export default function Home() {
         <div className="relative max-w-2xl mx-auto">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-white/80 text-sm font-semibold mb-1">
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              {new Date().toLocaleDateString('de-DE', { weekday: 'long', month: 'long', day: 'numeric' })}
             </p>
             <h1 className="text-3xl font-black text-white mb-1">
               Hey, {profile?.display_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || 'Champion'}! 👋
@@ -70,7 +71,7 @@ export default function Home() {
           >
             {[
               { icon: Zap, label: 'XP', value: xp, color: 'bg-yellow-400/20 text-yellow-100' },
-              { icon: Flame, label: 'Streak', value: `${streak}d`, color: 'bg-orange-400/20 text-orange-100' },
+              { icon: Flame, label: 'Serie', value: `${streak}T`, color: 'bg-orange-400/20 text-orange-100' },
               { icon: Star, label: 'Level', value: lvl.level, color: 'bg-purple-400/20 text-purple-100' },
             ].map(s => (
               <div key={s.label} className={`${s.color} rounded-2xl p-3 text-center backdrop-blur-sm`}>
@@ -99,10 +100,10 @@ export default function Home() {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
               <PlayCircle className="w-5 h-5 text-purple-600" />
-              Today's Training
+              Heutiges Training
             </h2>
             <Link to="/train" className="text-sm text-purple-600 font-bold flex items-center gap-1 hover:text-purple-700">
-              See all <ChevronRight className="w-4 h-4" />
+              Alle ansehen <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
           <div className="space-y-3">
@@ -137,7 +138,7 @@ export default function Home() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <h2 className="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
             <Brain className="w-5 h-5 text-indigo-600" />
-            Your Brain Domains
+            Deine Gehirnbereiche
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {domainScores.map((d, i) => (
@@ -164,7 +165,7 @@ export default function Home() {
                       <span className="text-xs font-bold" style={{ color: d.color }}>{d.avgScore}%</span>
                     </div>
                   ) : (
-                    <span className="text-xs text-slate-400 font-medium">Not started yet</span>
+                    <span className="text-xs text-slate-400 font-medium">Noch nicht gestartet</span>
                   )}
                 </Link>
               </motion.div>
@@ -178,11 +179,11 @@ export default function Home() {
         >
           <Link to="/leaderboard" className="flex flex-col items-center gap-2 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-2xl p-4 shadow-lg shadow-amber-200/50 hover:scale-105 transition-transform">
             <Trophy className="w-6 h-6" />
-            <span className="font-bold text-sm">Leaderboard</span>
+            <span className="font-bold text-sm">Rangliste</span>
           </Link>
           <Link to="/progress" className="flex flex-col items-center gap-2 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl p-4 shadow-lg shadow-indigo-200/50 hover:scale-105 transition-transform">
             <Brain className="w-6 h-6" />
-            <span className="font-bold text-sm">My Progress</span>
+            <span className="font-bold text-sm">Mein Fortschritt</span>
           </Link>
         </motion.div>
       </div>
