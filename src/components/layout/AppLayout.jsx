@@ -1,6 +1,6 @@
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useState } from 'react';
-import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor } from 'lucide-react';
+import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
 import NeuroMascot from '@/components/mascot/NeuroMascot';
 
@@ -131,26 +131,13 @@ export default function AppLayout({ lang = 'de' }) {
       )}
 
       {/* Sidebar Toggle Button */}
-      {!sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="hidden md:flex fixed left-0 top-4 z-30 w-10 h-10 items-center justify-center bg-slate-900 text-white rounded-r-lg hover:bg-slate-800 transition-colors"
-          title="Menü öffnen"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-      )}
-
-      {/* Close button in sidebar header */}
-      {sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(false)}
-          className="hidden md:flex absolute right-2 top-6 p-2 text-slate-400 hover:text-white z-50 transition-colors"
-          title="Menü schließen"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      )}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className={`hidden md:flex fixed left-0 top-4 z-30 w-10 h-10 items-center justify-center bg-slate-900 text-white rounded-r-lg hover:bg-slate-800 transition-all ${sidebarOpen ? 'left-56' : ''}`}
+        title={sidebarOpen ? "Menü schließen" : "Menü öffnen"}
+      >
+        {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+      </button>
 
       {/* Main Content */}
       <main className={`flex-1 pt-16 md:pt-0 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-0'}`}>
