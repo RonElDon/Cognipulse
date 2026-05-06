@@ -238,11 +238,25 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-3 flex items-center gap-3 flex-shrink-0">
-              <div className="-my-1 flex-shrink-0">
-                <NeuroCharacter
-                  emotion={face === 'happy' ? 'happy' : face === 'excited' ? 'excited' : face === 'proud' ? 'proud' : face === 'thinking' ? 'thinking' : face === 'sad' ? 'sad' : face === 'sleeping' ? 'sleeping' : face === 'party' ? 'excited' : face === 'challenge' ? 'encouraging' : 'happy'}
-                  size={44}
-                />
+              <div className="-my-1 flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'radial-gradient(circle at 40% 35%, #f0abfc, #a855f7 60%, #7c3aed)' }}>
+                <svg viewBox="0 0 64 56" width="30" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 34 Q6 28 10 22 Q10 14 18 12 Q22 6 30 8 Q34 6 38 8 Q46 6 50 14 Q57 16 57 24 Q60 30 56 36 Q54 44 46 44 Q42 48 36 46 Q32 50 28 46 Q22 48 18 44 Q10 44 10 34Z" fill="#f0abfc" stroke="#7c3aed" strokeWidth="2.2" strokeLinejoin="round"/>
+                  <path d="M22 12 Q22 6 28 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                  <path d="M32 8 Q34 4 38 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                  <path d="M10 22 Q6 20 8 14 Q12 10 18 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                  <path d="M10 34 Q4 32 6 26 Q8 20 12 20" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                  <path d="M54 22 Q58 18 56 14 Q52 10 48 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                  <path d="M56 34 Q60 30 58 24 Q55 19 52 21" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                  <path d="M32 12 Q32 22 32 32" stroke="#c084fc" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
+                  <circle cx="24" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
+                  <circle cx="25" cy="28" r="2.5" fill="#6d28d9"/>
+                  <circle cx="25.8" cy="27" r="0.9" fill="white"/>
+                  <circle cx="40" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
+                  <circle cx="41" cy="28" r="2.5" fill="#6d28d9"/>
+                  <circle cx="41.8" cy="27" r="0.9" fill="white"/>
+                  <path d="M27 35 Q32 39 37 35" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                  <ellipse cx="32" cy="37" rx="2.5" ry="1.2" fill="#f9a8d4" opacity="0.8"/>
+                </svg>
               </div>
               <div className="flex-1">
                 <div className="font-black text-white text-sm flex items-center gap-1.5">
@@ -260,7 +274,26 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
               {messages.length === 0 && !loading && (
                 <div className="text-center py-2">
                   <div className="flex justify-center mb-3">
-                    <NeuroCharacter emotion="happy" size={72} />
+                    <div className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'radial-gradient(circle at 40% 35%, #f0abfc, #a855f7 60%, #7c3aed)' }}>
+                      <svg viewBox="0 0 64 56" width="48" height="42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 34 Q6 28 10 22 Q10 14 18 12 Q22 6 30 8 Q34 6 38 8 Q46 6 50 14 Q57 16 57 24 Q60 30 56 36 Q54 44 46 44 Q42 48 36 46 Q32 50 28 46 Q22 48 18 44 Q10 44 10 34Z" fill="#f0abfc" stroke="#7c3aed" strokeWidth="2.2" strokeLinejoin="round"/>
+                        <path d="M22 12 Q22 6 28 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                        <path d="M32 8 Q34 4 38 8" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                        <path d="M10 22 Q6 20 8 14 Q12 10 18 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                        <path d="M10 34 Q4 32 6 26 Q8 20 12 20" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                        <path d="M54 22 Q58 18 56 14 Q52 10 48 12" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                        <path d="M56 34 Q60 30 58 24 Q55 19 52 21" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                        <path d="M32 12 Q32 22 32 32" stroke="#c084fc" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7"/>
+                        <circle cx="24" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
+                        <circle cx="25" cy="28" r="2.5" fill="#6d28d9"/>
+                        <circle cx="25.8" cy="27" r="0.9" fill="white"/>
+                        <circle cx="40" cy="28" r="5" fill="white" stroke="#7c3aed" strokeWidth="1.5"/>
+                        <circle cx="41" cy="28" r="2.5" fill="#6d28d9"/>
+                        <circle cx="41.8" cy="27" r="0.9" fill="white"/>
+                        <path d="M27 35 Q32 39 37 35" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                        <ellipse cx="32" cy="37" rx="2.5" ry="1.2" fill="#f9a8d4" opacity="0.8"/>
+                      </svg>
+                    </div>
                   </div>
                   <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3">
                     Hey! Ich bin Neuro, dein persönlicher Trainingsbegleiter. Ich analysiere deine Stärken und Schwächen und empfehle dir die richtigen Übungen. 🧠
