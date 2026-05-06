@@ -89,6 +89,31 @@ export function ThemeProvider({ children }) {
 
   const heroClass = selectedGradient === 'auto' ? 'hero-gradient' : '';
 
+  // Apply theme from external source (e.g. Neuro agent)
+  const applyExternalTheme = ({ darkMode: dm, accentColor: ac, gradient: gr }) => {
+    if (dm !== undefined) {
+      setDarkMode(dm);
+      setAutoDark(false);
+      localStorage.setItem('dark_mode', dm);
+      localStorage.setItem('auto_dark', 'false');
+    }
+    if (ac !== undefined) {
+      setCustomColor(ac);
+      localStorage.setItem('hero_custom_color', ac);
+      selectGradient('custom');
+    }
+    if (gr !== undefined) {
+      if (gr.startsWith('custom:')) {
+        const color = gr.split(':')[1];
+        setCustomColor(color);
+        localStorage.setItem('hero_custom_color', color);
+        selectGradient('custom');
+      } else {
+        selectGradient(gr);
+      }
+    }
+  };
+
   return (
     <ThemeContext.Provider value={{
       darkMode, toggleDark, autoDark, enableAutoDark,
@@ -96,6 +121,7 @@ export function ThemeProvider({ children }) {
       customColor, setCustomColorValue,
       accentColor, heroStyle, heroClass,
       GRADIENT_PRESETS,
+      applyExternalTheme,
     }}>
       {children}
     </ThemeContext.Provider>
