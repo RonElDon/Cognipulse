@@ -2,6 +2,7 @@ import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useState } from 'react';
 import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
+import { base44 } from '@/api/base44Client';
 import NeuroMascot from '@/components/mascot/NeuroMascot';
 
 const NAV_ITEMS = [
@@ -18,29 +19,65 @@ export default function AppLayout({ lang = 'de' }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
 
+  const { accentColor } = useTheme();
+  const ACCENT_COLORS = [
+    { name: 'Purple', value: '#8b5cf6' },
+    { name: 'Rose', value: '#ec4899' },
+    { name: 'Cyan', value: '#06b6d4' },
+    { name: 'Emerald', value: '#10b981' },
+    { name: 'Amber', value: '#f59e0b' },
+    { name: 'Orange', value: '#f97316' },
+  ];
+
+  const handleColorChange = async (color) => {
+    if (accentColor === color) return;
+    try {
+      const user = await base44.auth.me();
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      if (profiles.length > 0) {
+        await base44.entities.UserProfile.update(profiles[0].id, { theme_accent_color: color });
+      }
+    } catch (e) {
+      console.error('Farb-Update fehlgeschlagen:', e);
+    }
+  };
+
   const DarkToggle = () => (
-    <div className="flex items-center gap-1 bg-slate-800 dark:bg-slate-700 rounded-xl p-1">
-      <button
-        onClick={enableAutoDark}
-        title="Automatisch"
-        className={`p-1.5 rounded-lg transition-all ${autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-      >
-        <Monitor className="w-3.5 h-3.5" />
-      </button>
-      <button
-        onClick={() => { if (darkMode) toggleDark(); }}
-        title="Hell"
-        className={`p-1.5 rounded-lg transition-all ${!darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-      >
-        <Sun className="w-3.5 h-3.5" />
-      </button>
-      <button
-        onClick={() => { if (!darkMode) toggleDark(); }}
-        title="Dunkel"
-        className={`p-1.5 rounded-lg transition-all ${darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-      >
-        <Moon className="w-3.5 h-3.5" />
-      </button>
+    <div className="space-y-2">
+      <div className="flex items-center gap-1 bg-slate-800 dark:bg-slate-700 rounded-xl p-1">
+        <button
+          onClick={enableAutoDark}
+          title="Automatisch"
+          className={`p-1.5 rounded-lg transition-all ${autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+        >
+          <Monitor className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={() => { if (darkMode) toggleDark(); }}
+          title="Hell"
+          className={`p-1.5 rounded-lg transition-all ${!darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+        >
+          <Sun className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={() => { if (!darkMode) toggleDark(); }}
+          title="Dunkel"
+          className={`p-1.5 rounded-lg transition-all ${darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+        >
+          <Moon className="w-3.5 h-3.5" />
+        </button>
+      </div>
+      <div className="flex gap-1.5 flex-wrap">
+        {ACCENT_COLORS.map(c => (
+          <button
+            key={c.value}
+            onClick={() => handleColorChange(c.value)}
+            title={c.name}
+            className="w-5 h-5 rounded-lg transition-all hover:scale-110 border-2 border-white/20"
+            style={{ backgroundColor: c.value }}
+          />
+        ))}
+      </div>
     </div>
   );
 
