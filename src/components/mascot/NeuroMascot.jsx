@@ -320,7 +320,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed bottom-36 right-4 md:bottom-24 md:right-6 z-50 w-96 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 flex flex-col overflow-hidden"
+            className="fixed top-20 right-4 md:top-24 md:right-6 z-50 w-96 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 flex flex-col overflow-hidden"
             style={{ height: '480px' }}
           >
             {/* Header */}
