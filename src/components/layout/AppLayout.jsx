@@ -133,7 +133,7 @@ export default function AppLayout({ lang = 'de' }) {
       {/* Sidebar Toggle Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className={`hidden md:flex fixed top-4 z-30 w-12 h-12 items-center justify-center bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-r-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-lg border border-slate-200 dark:border-slate-700 ${sidebarOpen ? 'left-56' : 'left-0'}`}
+        className={`hidden md:flex fixed top-4 z-50 w-12 h-12 items-center justify-center bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-r-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-lg border border-slate-200 dark:border-slate-700 ${sidebarOpen ? 'left-56' : 'left-0'}`}
         title={sidebarOpen ? "Menü schließen" : "Menü öffnen"}
       >
         {sidebarOpen ? <ChevronLeft className="w-6 h-6" /> : <ChevronRight className="w-6 h-6" />}
