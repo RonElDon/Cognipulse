@@ -5,7 +5,8 @@ import { DOMAINS, EXERCISES, getLevel } from '@/lib/exercises';
 import { useProfile } from '@/lib/useProfile';
 import XPBar from '@/components/ui/XPBar';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { TrendingUp, Calendar, Zap, Brain, Award } from 'lucide-react';
+import { TrendingUp, Calendar, Zap, Brain, Award, History } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Progress() {
   const { profile, loading } = useProfile();
@@ -66,10 +67,17 @@ export default function Progress() {
       {/* Header */}
       <div className="bg-gradient-to-br from-indigo-600 to-purple-700 px-4 pt-8 pb-10">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2">
-            <TrendingUp className="w-6 h-6" /> Mein Fortschritt
-          </h1>
-          <p className="text-white/80 text-sm">Verfolge deine kognitive Entwicklung</p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-2xl font-black text-white mb-1 flex items-center gap-2">
+                <TrendingUp className="w-6 h-6" /> Mein Fortschritt
+              </h1>
+              <p className="text-white/80 text-sm">Verfolge deine kognitive Entwicklung</p>
+            </div>
+            <Link to="/history" className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-2 rounded-full transition-all">
+              <History className="w-3.5 h-3.5" /> Detaillierte Historie
+            </Link>
+          </div>
         </div>
       </div>
 

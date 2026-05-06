@@ -13,6 +13,7 @@ import Exercise from './pages/Exercise';
 import Progress from './pages/Progress';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
+import History from './pages/History';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -47,6 +48,7 @@ const AuthenticatedApp = () => {
         <Route path="/progress" element={<Progress />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/history" element={<History />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
