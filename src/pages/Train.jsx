@@ -76,11 +76,30 @@ export default function Train() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`rounded-2xl p-5 text-white ${DOMAINS[selectedDomain].gradient} shadow-lg`}
+            className={`rounded-2xl p-5 text-white ${DOMAINS[selectedDomain].gradient} shadow-lg relative overflow-hidden`}
+            style={{
+              backgroundImage: selectedDomain === 'attention' 
+                ? "url('data:image/svg+xml,<svg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"100\" cy=\"100\" r=\"60\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.2\"/><circle cx=\"100\" cy=\"100\" r=\"35\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.15\"/><circle cx=\"100\" cy=\"100\" r=\"15\" fill=\"white\" opacity=\"0.1\"/><line x1=\"100\" y1=\"20\" x2=\"100\" y2=\"180\" stroke=\"white\" opacity=\"0.1\"/><line x1=\"20\" y1=\"100\" x2=\"180\" y2=\"100\" stroke=\"white\" opacity=\"0.1\"/></svg>')"
+                : selectedDomain === 'memory'
+                ? "url('data:image/svg+xml,<svg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"30\" y=\"30\" width=\"25\" height=\"25\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.15\"/><rect x=\"75\" y=\"30\" width=\"25\" height=\"25\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.15\"/><rect x=\"120\" y=\"30\" width=\"25\" height=\"25\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.15\"/><rect x=\"30\" y=\"75\" width=\"25\" height=\"25\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.15\"/><rect x=\"75\" y=\"75\" width=\"25\" height=\"25\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.15\"/></svg>')"
+                : selectedDomain === 'executive'
+                ? "url('data:image/svg+xml,<svg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"><polygon points=\"100,30 170,80 170,150 100,180 30,150 30,80\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.15\"/><polygon points=\"100,60 140,85 140,135 100,155 60,135 60,85\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.1\"/></svg>')"
+                : selectedDomain === 'visuomotor'
+                ? "url('data:image/svg+xml,<svg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0,0 L200,200\" stroke=\"white\" stroke-width=\"1.5\" opacity=\"0.1\"/><path d=\"M0,40 L200,240\" stroke=\"white\" stroke-width=\"1.5\" opacity=\"0.1\"/><path d=\"M40,0 L240,200\" stroke=\"white\" stroke-width=\"1.5\" opacity=\"0.1\"/><circle cx=\"100\" cy=\"100\" r=\"8\" fill=\"white\" opacity=\"0.2\"/><circle cx=\"50\" cy=\"50\" r=\"4\" fill=\"white\" opacity=\"0.12\"/></svg>')"
+                : selectedDomain === 'processing'
+                ? "url('data:image/svg+xml,<svg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"30\" y=\"30\" width=\"25\" height=\"25\" fill=\"white\" opacity=\"0.15\"/><polygon points=\"110,40 145,70 130,120 80,120 65,70\" fill=\"white\" opacity=\"0.1\"/><circle cx=\"160\" cy=\"100\" r=\"20\" fill=\"white\" opacity=\"0.12\"/></svg>')"
+                : selectedDomain === 'reasoning'
+                ? "url('data:image/svg+xml,<svg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M50 50 L100 50 L100 100 L50 100 Z\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.1\"/><path d=\"M120 50 L170 50 L170 100 L120 100 Z\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.1\"/><path d=\"M85 130 L115 130 L115 160 L85 160 Z\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" opacity=\"0.1\"/><line x1=\"100\" y1=\"100\" x2=\"100\" y2=\"130\" stroke=\"white\" stroke-width=\"1\" opacity=\"0.08\"/></svg>')"
+                : 'none',
+              backgroundSize: '300px 300px',
+              backgroundPosition: 'center',
+            }}
           >
-            <div className="text-3xl mb-2">{DOMAINS[selectedDomain].icon}</div>
-            <h2 className="text-xl font-black">{DOMAINS[selectedDomain].name}</h2>
-            <p className="text-white/90 text-sm mt-1">{DOMAINS[selectedDomain].description}</p>
+            <div className="relative z-10">
+              <div className="text-3xl mb-2">{DOMAINS[selectedDomain].icon}</div>
+              <h2 className="text-xl font-black">{DOMAINS[selectedDomain].name}</h2>
+              <p className="text-white/90 text-sm mt-1">{DOMAINS[selectedDomain].description}</p>
+            </div>
           </motion.div>
         )}
 
