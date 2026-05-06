@@ -16,12 +16,10 @@ const FACES = {
 };
 
 const QUICK_ACTIONS = [
-  { label: '💪 Challenge mich!', msg: 'Gib mir eine besondere Herausforderung für heute!' },
-  { label: '🎯 Was jetzt?', msg: 'Was empfiehlst du mir als nächste Übung?' },
-  { label: '📊 Mein Fortschritt', msg: 'Analysiere meinen Fortschritt.' },
-  { label: '⚙️ Einstellungen', msg: 'Was kann ich über dich alles einstellen?' },
-  { label: '🌙 Dark Mode an', msg: 'Schalte den Dark Mode ein.' },
-  { label: '🎨 Neue Farbe', msg: 'Überrasche mich mit einer neuen Akzentfarbe!' },
+  { label: '💪 Herausforderung', msg: 'Gib mir eine Übung, die ich heute noch nicht gemacht habe und die mich wirklich fordert.' },
+  { label: '🎯 Was jetzt?', msg: 'Was empfiehlst du mir als nächste Übung basierend auf meinem Fortschritt?' },
+  { label: '📊 Mein Fortschritt', msg: 'Analysiere meinen Trainingsfortschritt — was läuft gut, was sollte ich verbessern?' },
+  { label: '❓ Wie funktionierts?', msg: 'Erkläre mir kurz wie das Gehirntraining hier aufgebaut ist und was die Domains bedeuten.' },
 ];
 
 export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
@@ -252,7 +250,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
                 <div className="font-black text-white text-sm flex items-center gap-1.5">
                   Neuro <Sparkles className="w-3 h-3 text-yellow-300" />
                 </div>
-                <div className="text-white/70 text-xs">KI-Begleiter · Einstellungen · Easter Eggs 🥚</div>
+                <div className="text-white/70 text-xs">Persönlicher Trainingsbegleiter</div>
               </div>
               <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white transition-colors">
                 <X className="w-4 h-4" />
@@ -265,7 +263,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
                 <div className="text-center py-2">
                   <div className="text-3xl mb-2">🧠</div>
                   <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3">
-                    Hey! Ich bin Neuro. Ich kann trainieren, Fortschritt analysieren, <strong>alle Einstellungen ändern</strong> — und ich kenne ein paar Geheimnisse... 🥚
+                    Hey! Ich bin Neuro, dein persönlicher Trainingsbegleiter. Ich analysiere deine Stärken und Schwächen und empfehle dir die richtigen Übungen. 🧠
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">
                     {QUICK_ACTIONS.map(a => (
@@ -316,11 +314,9 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
             {messages.length > 0 && (
               <div className="px-3 pb-1 flex gap-1.5 overflow-x-auto scrollbar-hide flex-shrink-0">
                 {[
-                  { label: '🌙 Dark', msg: 'Schalte den Dark Mode ein.' },
-                  { label: '☀️ Hell', msg: 'Schalte auf hellen Modus.' },
-                  { label: '🎨 Farbe', msg: 'Überrasche mich mit einer neuen Akzentfarbe!' },
-                  { label: '💪 Challenge', msg: 'Gib mir die härteste Herausforderung!' },
-                  { label: '🥚 Easter Egg', msg: 'Zeig mir ein Easter Egg!' },
+                  { label: '🎯 Nächste Übung', msg: 'Was empfiehlst du mir als nächste Übung?' },
+                  { label: '📊 Analyse', msg: 'Analysiere meinen Trainingsfortschritt.' },
+                  { label: '💪 Challenge', msg: 'Gib mir eine wirklich fordernde Übung für heute!' },
                 ].map(c => (
                   <button
                     key={c.label}

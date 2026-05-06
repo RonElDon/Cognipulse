@@ -4,15 +4,11 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useProfile } from '@/lib/useProfile';
-import { DOMAINS, EXERCISES, getLevel } from '@/lib/exercises';
+import { DOMAINS, getLevel } from '@/lib/exercises';
 import XPBar from '@/components/ui/XPBar';
-import { Brain, Flame, Trophy, Zap, ChevronRight, PlayCircle, Star, Palette } from 'lucide-react';
+import { Brain, Flame, Trophy, Zap, ChevronRight, Star, TrendingUp, Target } from 'lucide-react';
 import DailyPlanCard from '@/components/training/DailyPlanCard';
-import { useTheme, GRADIENT_PRESETS } from '@/lib/ThemeContext';
-
-const PRESET_DOTS = [
-  '#764ba2', '#f43f5e', '#06b6d4', '#10b981', '#f59e0b', '#0f172a',
-];
+import { useTheme } from '@/lib/ThemeContext';
 
 const MOTIVATIONAL = [
   "Dein Gehirn ist ein Muskel — trainiere es täglich! 🧠",
@@ -26,38 +22,30 @@ export default function Home() {
   const { profile, loading } = useProfile();
   const [recentResults, setRecentResults] = useState([]);
   const [user, setUser] = useState(null);
-  const [showPicker, setShowPicker] = useState(false);
-  const { selectedGradient, selectGradient, customColor, setCustomColorValue, heroStyle, heroClass } = useTheme();
+  const { heroStyle, heroClass } = useTheme();
   const quote = MOTIVATIONAL[new Date().getDay() % MOTIVATIONAL.length];
-
-  const handleSelectGradient = (id) => {
-    selectGradient(id);
-    setShowPicker(false);
-  };
-
-  const handleCustomColor = (color) => {
-    setCustomColorValue(color);
-  };
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
-    base44.entities.ExerciseResult.list('-created_date', 3).then(setRecentResults).catch(() => {});
+    base44.entities.ExerciseResult.list('-created_date', 10).then(setRecentResults).catch(() => {});
   }, []);
 
   const xp = profile?.total_xp || 0;
   const { current: lvl } = getLevel(xp);
   const streak = profile?.current_streak || 0;
 
-  // Domain scores from recent results (simplified)
+  // Domain scores: which areas need attention?
   const domainScores = Object.keys(DOMAINS).map(key => {
     const domainResults = recentResults.filter(r => r.domain === key);
     const avg = domainResults.length > 0
       ? Math.round(domainResults.reduce((s, r) => s + (r.score || 0), 0) / domainResults.length)
       : null;
-    return { ...DOMAINS[key], avgScore: avg };
+    return { ...DOMAINS[key], avgScore: avg, count: domainResults.length };
+  }).sort((a, b) => {
+    if (a.avgScore === null && b.avgScore !== null) return -1;
+    if (b.avgScore === null && a.avgScore !== null) return 1;
+    return (a.avgScore ?? 0) - (b.avgScore ?? 0);
   });
-
-  const todayExercises = EXERCISES.slice(0, 3);
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -70,63 +58,7 @@ export default function Home() {
     <div className="min-h-screen pb-24 md:pb-8">
       {/* Hero Header */}
       <div className={`${heroClass} px-6 pt-8 pb-12 relative overflow-hidden`} style={heroStyle}>
-        <div className="absolute inset-0 bg-black/10" />
-        {/* Color Picker Button */}
-        <div className="relative z-10 flex justify-end max-w-2xl mx-auto mb-1">
-          <button
-            onClick={() => setShowPicker(v => !v)}
-            className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full transition-all"
-          >
-            <Palette className="w-3.5 h-3.5" /> Farbe
-          </button>
-          {showPicker && (
-            <div className="absolute top-9 right-0 bg-white rounded-2xl shadow-2xl p-4 z-50 w-56">
-              <div className="text-xs font-black text-slate-700 mb-3">Hintergrundfarbe wählen</div>
-              <div className="grid grid-cols-4 gap-2 mb-3">
-                {/* Auto animated */}
-                <button
-                  onClick={() => handleSelectGradient('auto')}
-                  className={`h-9 rounded-xl overflow-hidden border-2 transition-all ${selectedGradient === 'auto' ? 'border-slate-800 scale-110' : 'border-transparent'}`}
-                  title="Animiert"
-                >
-                  <div className="w-full h-full hero-gradient" />
-                </button>
-                {/* Preset colors */}
-                {PRESET_DOTS.map((color, i) => (
-                  <button
-                    key={color}
-                    onClick={() => handleSelectGradient(GRADIENT_PRESETS[i + 1].id)}
-                    className={`h-9 rounded-xl border-2 transition-all ${selectedGradient === GRADIENT_PRESETS[i + 1].id ? 'border-slate-800 scale-110' : 'border-transparent'}`}
-                    style={{ background: GRADIENT_PRESETS[i + 1].style }}
-                    title={GRADIENT_PRESETS[i + 1].label}
-                  />
-                ))}
-                {/* Custom color swatch */}
-                <button
-                  className={`h-9 rounded-xl border-2 transition-all flex items-center justify-center overflow-hidden ${selectedGradient === 'custom' ? 'border-slate-800 scale-110' : 'border-slate-200'}`}
-                  style={{ backgroundColor: customColor }}
-                  title="Eigene Farbe"
-                  onClick={() => document.getElementById('hero-color-input').click()}
-                >
-                  <span className="text-white text-lg font-black">+</span>
-                </button>
-              </div>
-              <input
-                id="hero-color-input"
-                type="color"
-                value={customColor}
-                onChange={e => handleCustomColor(e.target.value)}
-                className="sr-only"
-              />
-              <button
-                onClick={() => document.getElementById('hero-color-input').click()}
-                className="w-full py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-colors"
-              >
-                🎨 Eigene Farbe wählen
-              </button>
-            </div>
-          )}
-        </div>
+        <div className="absolute inset-0 bg-black/20" />
         <div className="relative max-w-2xl mx-auto">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-white/80 text-sm font-semibold mb-1">
@@ -166,101 +98,73 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-6">
-        {/* Daily Training Plan by Neuro */}
+      <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-5">
+
+        {/* Daily Training Plan by Neuro — primary focus */}
         <DailyPlanCard />
 
-        {/* Today's Exercises */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-5 border border-slate-100"
-        >
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
-              <PlayCircle className="w-5 h-5 text-purple-600" />
-              Heutiges Training
+        {/* Cognitive Focus Areas — sorted by weakest first */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <Target className="w-4 h-4 text-indigo-500" />
+              Kognitive Bereiche
             </h2>
-            <Link to="/train" className="text-sm text-purple-600 font-bold flex items-center gap-1 hover:text-purple-700">
-              Alle ansehen <ChevronRight className="w-4 h-4" />
+            <Link to="/train" className="text-xs text-purple-600 font-bold flex items-center gap-1 hover:text-purple-700">
+              Alle Übungen <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
-          <div className="space-y-3">
-            {todayExercises.map((ex, i) => {
-              const domain = DOMAINS[ex.domain];
-              return (
-                <Link
-                  key={ex.id}
-                  to={`/exercise/${ex.id}`}
-                  className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-colors group border border-transparent hover:border-slate-100"
-                >
-                  <div className={`w-12 h-12 rounded-2xl ${domain.gradient} flex items-center justify-center text-2xl shadow-md`}>
-                    {ex.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-slate-800 text-sm">{ex.name}</div>
-                    <div className="text-xs text-slate-500 mt-0.5">{domain.name} · +{ex.xpReward} XP</div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: ex.difficulty }).map((_, j) => (
-                      <div key={j} className="w-1.5 h-4 rounded-full" style={{ backgroundColor: domain.color }} />
-                    ))}
-                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 ml-2 transition-colors" />
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </motion.div>
-
-        {/* Domain Overview */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <h2 className="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
-            <Brain className="w-5 h-5 text-indigo-600" />
-            Deine Gehirnbereiche
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            {domainScores.map((d, i) => (
+          <div className="space-y-2">
+            {domainScores.slice(0, 5).map((d, i) => (
               <motion.div
                 key={d.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 + i * 0.05 }}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 + i * 0.04 }}
               >
                 <Link
                   to={`/train?domain=${d.id}`}
-                  className="block bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                  className="flex items-center gap-3 bg-white dark:bg-slate-800 rounded-2xl p-3 border border-slate-100 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
                 >
-                  <div className={`w-10 h-10 rounded-xl ${d.gradient} flex items-center justify-center text-xl mb-3 shadow-sm`}>
+                  <div className={`w-10 h-10 rounded-xl ${d.gradient} flex items-center justify-center text-xl shadow-sm flex-shrink-0`}>
                     {d.icon}
                   </div>
-                  <div className="font-bold text-slate-800 text-sm">{d.name}</div>
-                  <div className="text-xs text-slate-500 mt-0.5 mb-2">{d.description.split(',')[0]}</div>
-                  {d.avgScore !== null ? (
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-slate-100 rounded-full h-1.5">
-                        <div className="h-1.5 rounded-full transition-all" style={{ width: `${d.avgScore}%`, backgroundColor: d.color }} />
-                      </div>
-                      <span className="text-xs font-bold" style={{ color: d.color }}>{d.avgScore}%</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{d.nameDE || d.name}</span>
+                      {d.avgScore !== null
+                        ? <span className="text-xs font-black" style={{ color: d.color }}>{d.avgScore}%</span>
+                        : <span className="text-xs font-semibold text-slate-400">Neu</span>
+                      }
                     </div>
-                  ) : (
-                    <span className="text-xs text-slate-400 font-medium">Noch nicht gestartet</span>
-                  )}
+                    <div className="mt-1.5 bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                      <motion.div
+                        className="h-1.5 rounded-full"
+                        style={{ backgroundColor: d.color }}
+                        initial={{ width: 0 }}
+                        animate={{ width: d.avgScore !== null ? `${d.avgScore}%` : '0%' }}
+                        transition={{ duration: 0.7, delay: 0.3 + i * 0.05 }}
+                      />
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 flex-shrink-0 transition-colors" />
                 </Link>
               </motion.div>
             ))}
           </div>
         </motion.div>
 
-        {/* Quick Actions */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-          className="grid grid-cols-2 gap-3"
+        {/* Bottom nav cards */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          className="grid grid-cols-2 gap-3 pb-2"
         >
-          <Link to="/leaderboard" className="flex flex-col items-center gap-2 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-2xl p-4 shadow-lg shadow-amber-200/50 hover:scale-105 transition-transform">
-            <Trophy className="w-6 h-6" />
-            <span className="font-bold text-sm">Rangliste</span>
-          </Link>
-          <Link to="/progress" className="flex flex-col items-center gap-2 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl p-4 shadow-lg shadow-indigo-200/50 hover:scale-105 transition-transform">
-            <Brain className="w-6 h-6" />
+          <Link to="/progress" className="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <TrendingUp className="w-5 h-5 text-indigo-500 flex-shrink-0" />
             <span className="font-bold text-sm">Mein Fortschritt</span>
+          </Link>
+          <Link to="/leaderboard" className="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <Trophy className="w-5 h-5 text-amber-500 flex-shrink-0" />
+            <span className="font-bold text-sm">Rangliste</span>
           </Link>
         </motion.div>
       </div>
