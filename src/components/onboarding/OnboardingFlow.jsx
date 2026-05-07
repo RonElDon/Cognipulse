@@ -129,7 +129,7 @@ export default function OnboardingFlow({ onComplete }) {
   const handleAnswer = async (value) => {
     if (!value && value !== 0) return;
     
-    setAnswers(prev => ({ ...prev, [currentQuestion.id]: value }));
+    setAnswers(prev => ({ ...prev, [currentQuestion.id]: String(value) }));
     setInput('');
     
     // Add user message with emoji
@@ -159,7 +159,7 @@ export default function OnboardingFlow({ onComplete }) {
               gender: answers.gender || null,
               preferred_language: language,
               goals: {
-                daily_exercises: parseInt(answers.dailyExercises) || 3,
+                daily_exercises: parseInt(answers.dailyExercises, 10) || 3,
                 focus_domains: []
               },
               onboarding_completed: true,
