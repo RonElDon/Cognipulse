@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
-  const [focusIdx, setFocusIdx] = useState(0); // 0 = Deutsch, 1 = English, 2 = CTA button
+  const [focusLevel, setFocusLevel] = useState(0); // 0 = Sprachen-Ebene, 1 = Button-Ebene
 
   const text = {
     de: {
@@ -35,21 +35,19 @@ export default function WelcomeScreen({ onStart }) {
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setFocusIdx(prev => (prev > 0 ? prev - 1 : 2));
+      setFocusLevel(0);
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setFocusIdx(prev => (prev < 2 ? prev + 1 : 0));
+      setFocusLevel(1);
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      if (focusIdx === 1) setFocusIdx(0);
+      if (focusLevel === 0) setLang('de');
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      if (focusIdx === 0) setFocusIdx(1);
+      if (focusLevel === 0) setLang('en');
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (focusIdx === 0) setLang('de');
-      else if (focusIdx === 1) setLang('en');
-      else if (focusIdx === 2) onStart(lang);
+      if (focusLevel === 1) onStart(lang);
     }
   };
 
@@ -66,18 +64,17 @@ export default function WelcomeScreen({ onStart }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
+          onKeyDown={handleKeyDown}
+          tabIndex={focusLevel === 0 ? 0 : -1}
           className={`flex gap-2 bg-white/5 border rounded-xl p-1 transition-all ${
-            focusIdx === 0 || focusIdx === 1 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
+            focusLevel === 0 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
           }`}
         >
-          {[{ code: 'de', label: '🇩🇪 Deutsch' }, { code: 'en', label: '🇬🇧 English' }].map((l, idx) => (
+          {[{ code: 'de', label: '🇩🇪 Deutsch' }, { code: 'en', label: '🇬🇧 English' }].map((l) => (
             <button
               key={l.code}
-              onClick={() => { setLang(l.code); setFocusIdx(idx); }}
-              onFocus={() => setFocusIdx(idx)}
-              onKeyDown={handleKeyDown}
-              tabIndex={focusIdx === idx ? 0 : -1}
-              autoFocus={idx === 0}
+              onClick={() => setLang(l.code)}
+              onContextMenu={(e) => { e.preventDefault(); setLang(l.code); }}
               className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
                 lang === l.code
                   ? 'bg-purple-600 text-white shadow'
@@ -134,11 +131,11 @@ export default function WelcomeScreen({ onStart }) {
            whileHover={{ scale: 1.03 }}
            whileTap={{ scale: 0.97 }}
            onClick={() => onStart(lang)}
-           onFocus={() => setFocusIdx(2)}
+           onContextMenu={(e) => { e.preventDefault(); onStart(lang); }}
            onKeyDown={handleKeyDown}
-           tabIndex={focusIdx === 2 ? 0 : -1}
+           tabIndex={focusLevel === 1 ? 0 : -1}
            className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
-             focusIdx === 2 ? 'ring-2 ring-white' : ''
+             focusLevel === 1 ? 'ring-2 ring-white' : ''
            }`}
          >
            {t.cta}
