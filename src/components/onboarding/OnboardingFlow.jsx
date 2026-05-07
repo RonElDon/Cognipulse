@@ -341,10 +341,10 @@ export default function OnboardingFlow({ onComplete }) {
         {phase === 'baseline_waiting' && (
           <div className="border-t border-white/10 p-4 flex-shrink-0">
             <button
-              onClick={() => { setPhase('baseline_done'); checkOnboardingComplete(); }}
+              onClick={() => onComplete?.()}
               className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 font-bold text-sm transition-colors"
             >
-              Ich bin fertig — zurück zu Neuro
+              Ich bin fertig — App starten
             </button>
           </div>
         )}
