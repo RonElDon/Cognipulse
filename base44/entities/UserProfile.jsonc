@@ -10,13 +10,23 @@
       "type": "number",
       "description": "User's age"
     },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "m\u00e4nnlich",
+        "weiblich",
+        "divers",
+        "keine Angabe"
+      ],
+      "description": "Geschlecht des Nutzers"
+    },
     "preferred_language": {
       "type": "string",
       "enum": [
         "en",
         "de"
       ],
-      "default": "en"
+      "default": "de"
     },
     "total_xp": {
       "type": "number",
@@ -67,6 +77,65 @@
     "theme_gradient": {
       "type": "string",
       "description": "Hero gradient preset set by Neuro"
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Ob das initiale Onboarding-Gespr\u00e4ch mit Neuro abgeschlossen wurde"
+    },
+    "baseline_assessment_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Ob das Baseline-Assessment abgeschlossen wurde"
+    },
+    "baseline_results": {
+      "type": "object",
+      "description": "Ergebnisse des initialen Leistungstests: Genauigkeit, Reaktionszeit, Fehlertypen, Domainwerte",
+      "properties": {
+        "overall_accuracy": {
+          "type": "number"
+        },
+        "avg_reaction_time_ms": {
+          "type": "number"
+        },
+        "domain_scores": {
+          "type": "object"
+        },
+        "assessed_at": {
+          "type": "string"
+        },
+        "cognitive_profile": {
+          "type": "string"
+        }
+      }
+    },
+    "adaptive_difficulty": {
+      "type": "object",
+      "description": "Adaptive Schwierigkeitsgrade pro \u00dcbung (exercise_id \u2192 Wert 1.0\u201310.0)",
+      "default": {}
+    },
+    "session_history": {
+      "type": "object",
+      "description": "Kurzzeit-Sitzungsmetriken f\u00fcr Erm\u00fcdungsanalyse",
+      "properties": {
+        "last_session_date": {
+          "type": "string"
+        },
+        "last_session_accuracy": {
+          "type": "number"
+        },
+        "sessions_today": {
+          "type": "number"
+        },
+        "fatigue_score": {
+          "type": "number",
+          "description": "0\u20131, 0=ausgeruht, 1=ersch\u00f6pft"
+        }
+      }
+    },
+    "health_notes": {
+      "type": "string",
+      "description": "Optionale klinische Notizen / Diagnose (nur f\u00fcr Therapeuten-Kontext)"
     }
   },
   "required": []

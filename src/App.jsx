@@ -8,6 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { ThemeProvider } from '@/lib/ThemeContext';
 // Add page imports here
 import AppLayout from './components/layout/AppLayout.jsx';
+import OnboardingGate from './components/onboarding/OnboardingGate';
 import Home from './pages/Home';
 import Train from './pages/Train';
 import Exercise from './pages/Exercise';
@@ -66,7 +67,9 @@ function App() {
       <AuthProvider>
         <QueryClientProvider client={queryClientInstance}>
           <Router>
-            <AuthenticatedApp />
+            <OnboardingGate>
+              <AuthenticatedApp />
+            </OnboardingGate>
           </Router>
           <Toaster />
         </QueryClientProvider>
