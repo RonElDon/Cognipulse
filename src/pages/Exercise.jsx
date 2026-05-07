@@ -14,8 +14,9 @@ export default function Exercise() {
   const { id } = useParams();
   const navigate = useNavigate();
   const exercise = EXERCISES.find(e => e.id === id);
-  const [phase, setPhase] = useState('intro'); // intro, countdown, playing, result
+  const [phase, setPhase] = useState('intro'); // intro, ready, countdown, playing, trial, result
   const [countdown, setCountdown] = useState(3);
+  const [isTrial, setIsTrial] = useState(false);
   const [result, setResult] = useState(null);
   const [lastNeuroResult, setLastNeuroResult] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -26,29 +27,36 @@ export default function Exercise() {
   useEffect(() => {
     if (phase !== 'countdown') return;
     if (countdown === 0) {
-      const t = setTimeout(() => setPhase('playing'), 400);
+      const t = setTimeout(() => setPhase(isTrial ? 'trial' : 'playing'), 400);
       return () => clearTimeout(t);
     }
     const t = setTimeout(() => setCountdown(c => c - 1), 1000);
     return () => clearTimeout(t);
-  }, [phase, countdown]);
+  }, [phase, countdown, isTrial]);
+
+  const goFullscreen = () => {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+  };
+
+  const startReady = (trial = false) => {
+    goFullscreen();
+    setIsTrial(trial);
+    setPhase('ready');
+  };
 
   const startCountdown = () => {
-    // Request fullscreen
-    const el = containerRef.current || document.documentElement;
-    if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
     setCountdown(3);
     setPhase('countdown');
   };
 
-  // Exit fullscreen on result/back
   const exitFullscreen = () => {
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   };
 
   useKeyboard({
     'Enter': () => {
-      if (phase === 'intro') startCountdown();
+      if (phase === 'intro') startReady(false);
+      else if (phase === 'ready') startCountdown();
       else if (phase === 'result') { exitFullscreen(); setPhase('intro'); setResult(null); }
     },
     '1': () => phase === 'intro' && setLevel(1),
@@ -61,7 +69,13 @@ export default function Exercise() {
   const domain = DOMAINS[exercise.domain];
   const GameComponent = GAME_MAP[id];
 
+  const handleTrialComplete = () => {
+    // After trial: go back to ready screen
+    setPhase('ready');
+  };
+
   const handleComplete = async (gameResult) => {
+    if (isTrial) { handleTrialComplete(); return; }
     setResult(gameResult);
     setPhase('result');
     setLastNeuroResult({ ...gameResult, exercise_name: exercise.name, domain: exercise.domain });
@@ -92,10 +106,12 @@ export default function Exercise() {
     setSaving(false);
   };
 
+  const isFullscreenPhase = ['ready', 'countdown', 'playing', 'trial'].includes(phase);
+
   return (
-    <div ref={containerRef} className="min-h-screen pb-24 md:pb-8">
-      {/* Header */}
-      <div className={`${domain.gradient} px-4 pt-6 pb-8`}>
+    <div ref={containerRef} className={`min-h-screen ${isFullscreenPhase ? 'fixed inset-0 z-50 bg-white overflow-auto' : 'pb-24 md:pb-8'}`}>
+      {/* Header — hidden during fullscreen phases */}
+      <div className={`${domain.gradient} px-4 pt-6 pb-8 ${isFullscreenPhase ? 'hidden' : ''}`}>
         <div className="max-w-lg mx-auto">
           <button onClick={() => { exitFullscreen(); navigate('/train'); }} className="flex items-center gap-2 text-white/80 hover:text-white mb-4 font-semibold transition-colors">
             <ArrowLeft className="w-4 h-4" /> Zurück
@@ -116,8 +132,8 @@ export default function Exercise() {
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 -mt-4">
-        <div className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100">
+      <div className={isFullscreenPhase ? 'flex flex-col items-center justify-center min-h-screen px-4 py-6' : 'max-w-lg mx-auto px-4 -mt-4'}>
+        <div className={isFullscreenPhase ? 'w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-8 border border-slate-100' : 'bg-white rounded-3xl shadow-xl p-5 border border-slate-100'}>
           <AnimatePresence mode="wait">
             {phase === 'intro' && (
               <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-4 space-y-5">
@@ -140,13 +156,47 @@ export default function Exercise() {
                     </button>
                   ))}
                 </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => startReady(true)}
+                    className="flex-1 py-4 rounded-2xl border-2 font-black text-base transition-all hover:scale-105 active:scale-95 text-slate-600 border-slate-300 hover:border-slate-400"
+                  >
+                    🧪 Testdurchlauf
+                  </button>
+                  <button
+                    onClick={() => startReady(false)}
+                    className={`flex-1 py-4 rounded-2xl text-white font-black text-base shadow-lg transition-transform hover:scale-105 active:scale-95 ${domain.gradient}`}
+                  >
+                    Übung starten! 🚀
+                  </button>
+                </div>
+                <p className="text-xs text-slate-400 text-center">⌨️ Tasten: 1/2/3 = Schwierigkeitsgrad · Enter = Starten · In Spielen: Ziffern & J/N</p>
+              </motion.div>
+            )}
+
+            {phase === 'ready' && (
+              <motion.div
+                key="ready"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center py-10 space-y-6 text-center"
+              >
+                <div className="text-7xl">{exercise.icon}</div>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800">{exercise.name}</h2>
+                  {isTrial && <div className="mt-2 inline-block bg-amber-100 text-amber-700 text-sm font-bold px-3 py-1 rounded-full">🧪 Testdurchlauf — kein XP</div>}
+                </div>
+                <p className="text-slate-500 text-sm max-w-xs">{exercise.description}</p>
                 <button
                   onClick={startCountdown}
-                  className={`w-full py-4 rounded-2xl text-white font-black text-lg shadow-lg transition-transform hover:scale-105 active:scale-95 ${domain.gradient}`}
+                  className={`px-10 py-4 rounded-2xl text-white font-black text-xl shadow-xl transition-transform hover:scale-105 active:scale-95 ${domain.gradient}`}
                 >
-                  Übung starten! 🚀
+                  Bereit! ✊
                 </button>
-                <p className="text-xs text-slate-400 text-center">⌨️ Tasten: 1/2/3 = Schwierigkeitsgrad · Enter = Starten · In Spielen: Ziffern & J/N</p>
+                <button onClick={() => { exitFullscreen(); setPhase('intro'); }} className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+                  ← Zurück zur Auswahl
+                </button>
               </motion.div>
             )}
 
@@ -177,13 +227,19 @@ export default function Exercise() {
               </motion.div>
             )}
 
-            {phase === 'playing' && GameComponent && (
+            {(phase === 'playing' || phase === 'trial') && GameComponent && (
               <motion.div key="playing" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                {phase === 'trial' && (
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">🧪 Testdurchlauf</span>
+                    <button onClick={() => { setPhase('ready'); }} className="text-xs text-slate-400 hover:text-slate-600">Abbrechen</button>
+                  </div>
+                )}
                 <GameComponent onComplete={handleComplete} level={level} />
               </motion.div>
             )}
 
-            {phase === 'result' && result && (
+            {phase === 'result' && result && !isTrial && (
               <motion.div key="result" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-4 space-y-5">
                 <div className="text-6xl">
                   {result.score >= 80 ? '🏆' : result.score >= 60 ? '🌟' : result.score >= 40 ? '👍' : '💪'}
