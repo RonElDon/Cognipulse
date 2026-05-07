@@ -110,8 +110,6 @@ export default function OnboardingFlow({ onComplete }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [initialized, setInitialized] = useState(false);
   const [emotion, setEmotion] = useState('happy');
   const [phase, setPhase] = useState('welcome');
   const [language, setLanguage] = useState('de');
@@ -119,17 +117,15 @@ export default function OnboardingFlow({ onComplete }) {
   const unsubRef = useRef(null);
   const pollRef = useRef(null);
   const inputRef = useRef(null);
-  const loadingTimeoutRef = useRef(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [messages]);
 
   useEffect(() => {
     return () => {
       if (unsubRef.current) unsubRef.current();
       if (pollRef.current) clearInterval(pollRef.current);
-      if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
     };
   }, []);
 
@@ -149,31 +145,16 @@ export default function OnboardingFlow({ onComplete }) {
         const msgs = data.messages || [];
         setMessages([...msgs]);
         const last = msgs[msgs.length - 1];
-        if (last?.role === 'assistant') {
-          if (last?.content) {
-            clearTimeout(loadingTimeoutRef.current);
-            setLoading(false);
-            const c = last.content.toLowerCase();
-            if (c.includes('fantastisch') || c.includes('perfekt') || c.includes('toll')) setEmotion('proud');
-            else if (c.includes('herausforderung') || c.includes('starten') || c.includes('super')) setEmotion('excited');
-            else setEmotion('happy');
-            if (isBaselinePrompt(last.content)) setPhase('baseline_prompt');
-            setTimeout(() => checkOnboardingComplete(), 0);
-          }
-          // assistant message exists but content still streaming — keep loading
-        } else if (last?.role === 'user') {
-          setLoading(true);
-          // Safety fallback only: if no assistant reply comes within 60s, reset loading
-          clearTimeout(loadingTimeoutRef.current);
-          loadingTimeoutRef.current = setTimeout(() => {
-            setLoading(false);
-            setEmotion('happy');
-          }, 60000);
+        if (last?.role === 'assistant' && last?.content) {
+          const c = last.content.toLowerCase();
+          if (c.includes('fantastisch') || c.includes('perfekt') || c.includes('toll')) setEmotion('proud');
+          else if (c.includes('herausforderung') || c.includes('starten') || c.includes('super')) setEmotion('excited');
+          else setEmotion('happy');
+          if (isBaselinePrompt(last.content)) setPhase('baseline_prompt');
+          checkOnboardingComplete();
         }
       });
 
-      setLoading(true);
-      setEmotion('thinking');
       const langInstruction = lang === 'en'
         ? 'Hi! (1 sentence greeting) What is your name?'
         : 'Hallo! (1 Satz Begrüßung) Wie heißt du?';
@@ -190,9 +171,7 @@ export default function OnboardingFlow({ onComplete }) {
         }
       } catch (err) {
         console.error('Onboarding init error:', err);
-        setLoading(false);
       }
-      setInitialized(true);
     } catch (e) { console.error(e); }
   };
 
@@ -207,7 +186,6 @@ export default function OnboardingFlow({ onComplete }) {
           clearInterval(pollRef.current);
           setConversation(conv => {
             if (conv) {
-              setLoading(true);
               setEmotion('thinking');
               base44.agents.addMessage(conv, { role: 'user', content: 'Ich habe den Einschätzungstest abgeschlossen.' });
             }
@@ -235,12 +213,8 @@ export default function OnboardingFlow({ onComplete }) {
   };
 
   const sendMessage = async (text) => {
-    if (!text.trim() || loading || !conversation) return;
+    if (!text.trim() || !conversation) return;
     setInput('');
-    setLoading(true);
-    setEmotion('thinking');
-    clearTimeout(loadingTimeoutRef.current);
-    loadingTimeoutRef.current = setTimeout(() => setLoading(false), 30000);
     await base44.agents.addMessage(conversation, { role: 'user', content: text });
   };
 
@@ -278,7 +252,7 @@ export default function OnboardingFlow({ onComplete }) {
 
       {/* TOP: Neuro globe — large, centered, floating */}
       <div className="flex flex-col items-center pt-10 pb-2 flex-shrink-0 relative z-10">
-        <NeuroGlobe size={110} emotion={loading ? 'thinking' : emotion} isThinking={loading} />
+        <NeuroGlobe size={110} emotion={emotion} isThinking={false} />
         <motion.div
           key={phase + emotion}
           initial={{ opacity: 0, y: 4 }}
@@ -287,20 +261,13 @@ export default function OnboardingFlow({ onComplete }) {
         >
           <div className="text-white font-black text-xl tracking-tight">Neuro</div>
           <div className="text-white/40 text-xs font-medium mt-0.5">
-            {loading ? 'denkt nach...' : phase === 'baseline_waiting' ? '⏳ Wartet auf deinen Test' : 'Persönlicher Trainingsbegleiter'}
+            {phase === 'baseline_waiting' ? '⏳ Wartet auf deinen Test' : 'Persönlicher Trainingsbegleiter'}
           </div>
         </motion.div>
       </div>
 
       {/* MIDDLE: Chat messages — scrollable */}
       <div className="flex-1 overflow-y-auto px-4 py-2 space-y-3 min-h-0 relative z-10">
-        {!initialized && (
-          <div className="flex items-center justify-center gap-2 text-white/30 text-sm py-6">
-            <div className="w-4 h-4 border-2 border-white/20 border-t-white/50 rounded-full animate-spin" />
-            Neuro startet...
-          </div>
-        )}
-
         <AnimatePresence initial={false}>
           {visibleMessages.map((m, i) => {
             const isUser = m.role === 'user';
@@ -329,24 +296,10 @@ export default function OnboardingFlow({ onComplete }) {
           })}
         </AnimatePresence>
 
-        {/* Typing indicator */}
-        {loading && (
-          <div className="flex items-end gap-2">
-            <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-sm"
-              style={{ background: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)' }}>
-              🧠
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1">
-              {[0,1,2].map(i => (
-                <motion.div key={i} className="w-1.5 h-1.5 rounded-full bg-purple-300"
-                  animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.7, delay: i * 0.15 }} />
-              ))}
-            </div>
-          </div>
-        )}
+
 
         {/* Baseline prompt card */}
-        {phase === 'baseline_prompt' && !loading && (
+        {phase === 'baseline_prompt' && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             className="bg-purple-500/20 border border-purple-400/30 backdrop-blur-sm rounded-2xl p-4 space-y-3"
           >
@@ -400,7 +353,7 @@ export default function OnboardingFlow({ onComplete }) {
             />
             <button
               onClick={() => sendMessage(input)}
-              disabled={!input.trim() || loading || !conversation}
+              disabled={!input.trim() || !conversation}
               className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-30 flex items-center justify-center transition-all flex-shrink-0 shadow-lg"
             >
               <Send className="w-4 h-4 text-white" />
