@@ -22,7 +22,7 @@ export default function AppLayout({ lang = 'de' }) {
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
 
   const handleDebugBack = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   const DarkToggle = () => (
