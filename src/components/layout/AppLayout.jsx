@@ -1,4 +1,4 @@
-import { Link, useLocation, Outlet } from 'react-router-dom';
+import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight, Swords } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
@@ -21,7 +21,7 @@ export default function AppLayout({ lang = 'de' }) {
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
 
   const handleDebugBack = () => {
-    window.history.back();
+    navigate(-1);
   };
 
   const DarkToggle = () => (
