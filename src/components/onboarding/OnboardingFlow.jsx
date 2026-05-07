@@ -80,15 +80,15 @@ function NeuroGlobe({ size = 100, emotion = 'happy' }) {
 const QUESTIONS = {
   de: [
     { id: 'name', question: 'Lass mich dich kennenlernen — wie heißt du? 😊', placeholder: 'Dein Name...', type: 'text' },
-    { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'number' },
-    { id: 'gender', question: 'Was ist dein Geschlecht? ⚧️', options: ['männlich', 'weiblich', 'divers', 'keine Angabe'], type: 'select' },
+    { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'date' },
+    { id: 'gender', question: 'Was ist dein Geschlecht? ⚧️', options: [{ label: 'Männlich', value: 'männlich' }, { label: 'Weiblich', value: 'weiblich' }, { label: 'Divers', value: 'divers' }, { label: 'Keine Angabe', value: 'keine Angabe' }], type: 'select' },
     { id: 'goal', question: 'Was treibt dich an? Was möchtest du mit deinem Gehirn erreichen? 🎯', placeholder: 'z.B. Gedächtnis verbessern, fokussierter werden...', type: 'text' },
     { id: 'dailyExercises', question: 'Wie viel Zeit hast du pro Tag für dein Brain-Workout?', options: ['1', '3', '5', '10'], type: 'select' },
   ],
   en: [
     { id: 'name', question: 'Let me get to know you — what\'s your name? 😊', placeholder: 'Your name...', type: 'text' },
-    { id: 'age', question: 'How many years of brain power do you have? 🧠', placeholder: 'Your age...', type: 'number' },
-    { id: 'gender', question: 'How would you like to be addressed?', options: ['male', 'female', 'diverse', 'prefer not to say'], type: 'select' },
+    { id: 'age', question: 'How many years of brain power do you have? 🧠', placeholder: 'Your age...', type: 'date' },
+    { id: 'gender', question: 'How would you like to be addressed?', options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Diverse', value: 'diverse' }, { label: 'Prefer not to say', value: 'prefer not to say' }], type: 'select' },
     { id: 'goal', question: 'What drives you? What do you want to achieve with your brain? 💪', placeholder: 'e.g. improve memory, better focus...', type: 'text' },
     { id: 'dailyExercises', question: 'How much time do you have for your daily brain training?', options: ['1', '3', '5', '10'], type: 'select' },
   ],
@@ -105,6 +105,8 @@ export default function OnboardingFlow({ onComplete }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [selectedOptionIdx, setSelectedOptionIdx] = useState(0);
+  const [dateInput, setDateInput] = useState({ day: '', month: '', year: '' });
+  const [dateFocus, setDateFocus] = useState('day');
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -133,9 +135,15 @@ export default function OnboardingFlow({ onComplete }) {
     
     setAnswers(prev => ({ ...prev, [currentQuestion.id]: String(value) }));
     setInput('');
+    setDateInput({ day: '', month: '', year: '' });
     
     // Add user message with emoji
-    const displayValue = currentQuestion.type === 'select' ? `${getEmojiForAnswer(value)} ${value}` : String(value);
+    let displayValue = String(value);
+    if (currentQuestion.type === 'select') {
+      const opt = currentQuestion.options.find(o => o.value === value || o === value);
+      const label = opt?.label || opt;
+      displayValue = `${getEmojiForAnswer(label || value)} ${label || value}`;
+    }
     setMessages(prev => [...prev, { role: 'user', content: displayValue }]);
     setEmotion('thinking');
 
@@ -187,6 +195,7 @@ export default function OnboardingFlow({ onComplete }) {
       setCurrentStep(prevStep);
       setSelectedOptionIdx(0);
       setInput('');
+      setDateInput({ day: '', month: '', year: '' });
       const answerKey = questions[prevStep].id;
       setAnswers(prev => {
         const newAnswers = { ...prev };
@@ -204,6 +213,39 @@ export default function OnboardingFlow({ onComplete }) {
     handleAnswer(input);
   };
 
+  const handleDateKeyDown = (e) => {
+    if (e.key === 'Delete') {
+      e.preventDefault();
+      handleBack();
+      return;
+    }
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (dateFocus === 'month') setDateFocus('day');
+      else if (dateFocus === 'year') setDateFocus('month');
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      if (dateFocus === 'day') setDateFocus('month');
+      else if (dateFocus === 'month') setDateFocus('year');
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (dateFocus === 'day') setDateInput(p => ({ ...p, day: String((parseInt(p.day) || 0) + 1).padStart(2, '0') }));
+      else if (dateFocus === 'month') setDateInput(p => ({ ...p, month: String((parseInt(p.month) || 0) + 1).padStart(2, '0') }));
+      else if (dateFocus === 'year') setDateInput(p => ({ ...p, year: String((parseInt(p.year) || new Date().getFullYear()) + 1) }));
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (dateFocus === 'day') setDateInput(p => ({ ...p, day: String(Math.max(0, (parseInt(p.day) || 1) - 1)).padStart(2, '0') }));
+      else if (dateFocus === 'month') setDateInput(p => ({ ...p, month: String(Math.max(0, (parseInt(p.month) || 1) - 1)).padStart(2, '0') }));
+      else if (dateFocus === 'year') setDateInput(p => ({ ...p, year: String((parseInt(p.year) || new Date().getFullYear()) - 1) }));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (dateInput.day && dateInput.month && dateInput.year) {
+        const age = new Date().getFullYear() - parseInt(dateInput.year);
+        handleAnswer(String(age));
+      }
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === 'Delete') {
       e.preventDefault();
@@ -219,7 +261,9 @@ export default function OnboardingFlow({ onComplete }) {
         setSelectedOptionIdx(Math.min(currentQuestion.options.length - 1, selectedOptionIdx + 1));
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        handleAnswer(currentQuestion.options[selectedOptionIdx]);
+        const opt = currentQuestion.options[selectedOptionIdx];
+        const value = opt.value || opt;
+        handleAnswer(value);
       }
     } else if (e.key === 'Enter') {
       e.preventDefault();
@@ -321,12 +365,12 @@ export default function OnboardingFlow({ onComplete }) {
 
       {/* Input */}
       <div className="relative z-10 flex-shrink-0 px-4 pb-6 pt-2">
-        {currentQuestion.type === 'text' || currentQuestion.type === 'number' ? (
+        {currentQuestion.type === 'text' ? (
           <div className="flex gap-2 bg-white/5 backdrop-blur-md border border-white/15 rounded-2xl p-2">
             <input
               ref={inputRef}
               autoFocus
-              type={currentQuestion.type === 'number' ? 'number' : 'text'}
+              type="text"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -341,43 +385,108 @@ export default function OnboardingFlow({ onComplete }) {
               <Send className="w-4 h-4 text-white" />
             </button>
           </div>
+        ) : currentQuestion.type === 'date' ? (
+          <div className="space-y-2">
+            <div className="text-white/50 text-xs font-semibold mb-2">Geburtsdatum (TT/MM/YYYY)</div>
+            <div className="grid grid-cols-3 gap-2">
+              <input
+                autoFocus
+                type="text"
+                placeholder="Tag"
+                value={dateInput.day}
+                onChange={e => setDateInput(p => ({ ...p, day: e.target.value.slice(0, 2) }))}
+                onKeyDown={handleDateKeyDown}
+                onFocus={() => setDateFocus('day')}
+                maxLength="2"
+                className={`py-3 px-3 rounded-2xl text-center font-bold text-white text-lg transition-all border outline-none focus:outline-none ${
+                  dateFocus === 'day'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400'
+                    : 'bg-white/10 border-white/15 hover:bg-white/20'
+                }`}
+              />
+              <input
+                type="text"
+                placeholder="Monat"
+                value={dateInput.month}
+                onChange={e => setDateInput(p => ({ ...p, month: e.target.value.slice(0, 2) }))}
+                onKeyDown={handleDateKeyDown}
+                onFocus={() => setDateFocus('month')}
+                maxLength="2"
+                className={`py-3 px-3 rounded-2xl text-center font-bold text-white text-lg transition-all border outline-none focus:outline-none ${
+                  dateFocus === 'month'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400'
+                    : 'bg-white/10 border-white/15 hover:bg-white/20'
+                }`}
+              />
+              <input
+                type="text"
+                placeholder="Jahr"
+                value={dateInput.year}
+                onChange={e => setDateInput(p => ({ ...p, year: e.target.value.slice(0, 4) }))}
+                onKeyDown={handleDateKeyDown}
+                onFocus={() => setDateFocus('year')}
+                maxLength="4"
+                className={`py-3 px-3 rounded-2xl text-center font-bold text-white text-lg transition-all border outline-none focus:outline-none ${
+                  dateFocus === 'year'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400'
+                    : 'bg-white/10 border-white/15 hover:bg-white/20'
+                }`}
+              />
+            </div>
+            <button
+              onClick={() => {
+                if (dateInput.day && dateInput.month && dateInput.year) {
+                  const age = new Date().getFullYear() - parseInt(dateInput.year);
+                  handleAnswer(String(age));
+                }
+              }}
+              disabled={!dateInput.day || !dateInput.month || !dateInput.year || saving}
+              className="w-full mt-2 py-3 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-30 text-white font-bold transition-all shadow-lg"
+            >
+              Bestätigen
+            </button>
+          </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            {currentQuestion.options.map((opt, idx) => (
-              <button
-                key={opt}
-                onClick={() => handleAnswer(opt)}
-                onKeyDown={(e) => {
-                  const cols = 2;
-                  if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    setSelectedOptionIdx((prev) => prev % cols === 0 ? prev : prev - 1);
-                  } else if (e.key === 'ArrowRight') {
-                    e.preventDefault();
-                    setSelectedOptionIdx((prev) => prev % cols === 1 || prev === currentQuestion.options.length - 1 ? prev : prev + 1);
-                  } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    setSelectedOptionIdx((prev) => prev >= cols ? prev - cols : prev);
-                  } else if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    setSelectedOptionIdx((prev) => prev + cols < currentQuestion.options.length ? prev + cols : prev);
-                  } else if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAnswer(opt);
-                  }
-                }}
-                tabIndex={selectedOptionIdx === idx ? 0 : -1}
-                autoFocus={idx === 0}
-                disabled={saving}
-                className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 text-white border outline-none focus:outline-none ${
-                  selectedOptionIdx === idx
-                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400 shadow-lg'
-                    : 'bg-white/10 hover:bg-white/20 border-white/15'
-                }`}
-              >
-                {getEmojiForAnswer(opt)} {opt}
-              </button>
-            ))}
+            {currentQuestion.options.map((opt, idx) => {
+              const value = opt.value || opt;
+              const label = opt.label || opt;
+              return (
+                <button
+                  key={value}
+                  onClick={() => handleAnswer(value)}
+                  onKeyDown={(e) => {
+                    const cols = 2;
+                    if (e.key === 'ArrowLeft') {
+                      e.preventDefault();
+                      setSelectedOptionIdx((prev) => prev % cols === 0 ? prev : prev - 1);
+                    } else if (e.key === 'ArrowRight') {
+                      e.preventDefault();
+                      setSelectedOptionIdx((prev) => prev % cols === 1 || prev === currentQuestion.options.length - 1 ? prev : prev + 1);
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      setSelectedOptionIdx((prev) => prev >= cols ? prev - cols : prev);
+                    } else if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      setSelectedOptionIdx((prev) => prev + cols < currentQuestion.options.length ? prev + cols : prev);
+                    } else if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAnswer(value);
+                    }
+                  }}
+                  tabIndex={selectedOptionIdx === idx ? 0 : -1}
+                  autoFocus={idx === 0}
+                  disabled={saving}
+                  className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 text-white border outline-none focus:outline-none ${
+                    selectedOptionIdx === idx
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400 shadow-lg'
+                      : 'bg-white/10 hover:bg-white/20 border-white/15'
+                  }`}
+                >
+                  {getEmojiForAnswer(label)} {label}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
