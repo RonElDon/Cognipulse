@@ -307,12 +307,19 @@ export default function OnboardingFlow({ onComplete }) {
                 key={opt}
                 onClick={() => handleAnswer(opt)}
                 onKeyDown={(e) => {
+                  const cols = 2;
                   if (e.key === 'ArrowLeft') {
                     e.preventDefault();
-                    setSelectedOptionIdx((prev) => (prev - 1 + currentQuestion.options.length) % currentQuestion.options.length);
+                    setSelectedOptionIdx((prev) => prev % cols === 0 ? prev + 1 : prev - 1);
                   } else if (e.key === 'ArrowRight') {
                     e.preventDefault();
-                    setSelectedOptionIdx((prev) => (prev + 1) % currentQuestion.options.length);
+                    setSelectedOptionIdx((prev) => prev % cols === 0 ? prev + 1 : prev - 1);
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setSelectedOptionIdx((prev) => (prev - cols + currentQuestion.options.length) % currentQuestion.options.length);
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setSelectedOptionIdx((prev) => (prev + cols) % currentQuestion.options.length);
                   } else if (e.key === 'Enter') {
                     e.preventDefault();
                     handleAnswer(opt);
