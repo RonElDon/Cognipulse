@@ -78,18 +78,18 @@ function NeuroGlobe({ size = 100, emotion = 'happy' }) {
 
 const QUESTIONS = {
   de: [
-    { id: 'name', question: 'Wie heißt du?', placeholder: 'Dein Name...', type: 'text' },
-    { id: 'age', question: 'Wie alt bist du?', placeholder: 'Alter...', type: 'number' },
-    { id: 'gender', question: 'Geschlecht?', options: ['männlich', 'weiblich', 'divers', 'keine Angabe'], type: 'select' },
-    { id: 'goal', question: 'Was ist dein Ziel?', placeholder: 'z.B. Gedächtnis verbessern...', type: 'text' },
-    { id: 'dailyExercises', question: 'Übungen pro Tag?', options: ['1', '3', '5', '10'], type: 'select' },
+    { id: 'name', question: 'Lass mich dich kennenlernen — wie heißt du? 😊', placeholder: 'Dein Name...', type: 'text' },
+    { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'number' },
+    { id: 'gender', question: 'Wie möchtest du angesprochen werden?', options: ['männlich', 'weiblich', 'divers', 'keine Angabe'], type: 'select' },
+    { id: 'goal', question: 'Was treibt dich an? Was möchtest du mit deinem Gehirn erreichen? 💪', placeholder: 'z.B. Gedächtnis verbessern, fokussierter werden...', type: 'text' },
+    { id: 'dailyExercises', question: 'Wie viel Zeit hast du pro Tag für dein Brain-Workout?', options: ['1', '3', '5', '10'], type: 'select' },
   ],
   en: [
-    { id: 'name', question: 'What\'s your name?', placeholder: 'Your name...', type: 'text' },
-    { id: 'age', question: 'How old are you?', placeholder: 'Your age...', type: 'number' },
-    { id: 'gender', question: 'Gender?', options: ['male', 'female', 'diverse', 'prefer not to say'], type: 'select' },
-    { id: 'goal', question: 'What\'s your goal?', placeholder: 'e.g. improve memory...', type: 'text' },
-    { id: 'dailyExercises', question: 'Exercises per day?', options: ['1', '3', '5', '10'], type: 'select' },
+    { id: 'name', question: 'Let me get to know you — what\'s your name? 😊', placeholder: 'Your name...', type: 'text' },
+    { id: 'age', question: 'How many years of brain power do you have? 🧠', placeholder: 'Your age...', type: 'number' },
+    { id: 'gender', question: 'How would you like to be addressed?', options: ['male', 'female', 'diverse', 'prefer not to say'], type: 'select' },
+    { id: 'goal', question: 'What drives you? What do you want to achieve with your brain? 💪', placeholder: 'e.g. improve memory, better focus...', type: 'text' },
+    { id: 'dailyExercises', question: 'How much time do you have for your daily brain training?', options: ['1', '3', '5', '10'], type: 'select' },
   ],
 };
 
@@ -115,8 +115,14 @@ export default function OnboardingFlow({ onComplete }) {
   const handleWelcomeDone = (lang) => {
     setLanguage(lang);
     setPhase('chat');
-    // Start with first question
-    setMessages([{ role: 'assistant', content: QUESTIONS[lang][0].question }]);
+    // Start with welcome message and first question
+    const welcome = lang === 'de'
+      ? 'Willkommen! Ich bin Neuro, dein persönlicher Trainingsbegleiter. 🎉 Lass mich dich gleich ein bisschen besser kennenlernen, dann passe ich alles perfekt auf dich an!'
+      : 'Welcome! I\'m Neuro, your personal training coach. 🎉 Let me get to know you better so I can customize everything perfectly for you!';
+    setMessages([
+      { role: 'assistant', content: welcome },
+      { role: 'assistant', content: QUESTIONS[lang][0].question }
+    ]);
   };
 
   const handleAnswer = async (value) => {
