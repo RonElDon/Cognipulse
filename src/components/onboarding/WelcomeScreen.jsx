@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
-  const [focusIdx, setFocusIdx] = useState(null); // null = lang buttons, 0-1 = lang select, 2 = CTA button
+  const [focusIdx, setFocusIdx] = useState(0); // 0 = Deutsch, 1 = English, 2 = CTA button
 
   const text = {
     de: {
@@ -33,21 +33,17 @@ export default function WelcomeScreen({ onStart }) {
   const t = text[lang];
 
   const handleKeyDown = (e) => {
-    if (focusIdx === null) {
-      // At language selector
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setFocusIdx(2); // Jump to CTA button
-      }
-    } else if (focusIdx === 2) {
-      // At CTA button
-      if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setFocusIdx(0); // Go back to languages
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        onStart(lang);
-      }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setFocusIdx(prev => (prev > 0 ? prev - 1 : 2));
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setFocusIdx(prev => (prev < 2 ? prev + 1 : 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (focusIdx === 0) setLang('de');
+      else if (focusIdx === 1) setLang('en');
+      else if (focusIdx === 2) onStart(lang);
     }
   };
 
@@ -66,14 +62,15 @@ export default function WelcomeScreen({ onStart }) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
           className={`flex gap-2 bg-white/5 border rounded-xl p-1 transition-all ${
-            focusIdx === 0 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
+            focusIdx === 0 || focusIdx === 1 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
           }`}
         >
           {[{ code: 'de', label: '🇩🇪 Deutsch' }, { code: 'en', label: '🇬🇧 English' }].map((l, idx) => (
             <button
               key={l.code}
               onClick={() => setLang(l.code)}
-              onFocus={() => setFocusIdx(0)}
+              onFocus={() => setFocusIdx(idx)}
+              tabIndex={focusIdx === idx ? 0 : -1}
               autoFocus={idx === 0}
               className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
                 lang === l.code
@@ -132,6 +129,7 @@ export default function WelcomeScreen({ onStart }) {
           whileTap={{ scale: 0.97 }}
           onClick={() => onStart(lang)}
           onFocus={() => setFocusIdx(2)}
+          tabIndex={focusIdx === 2 ? 0 : -1}
           className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
             focusIdx === 2 ? 'ring-2 ring-white' : ''
           }`}
