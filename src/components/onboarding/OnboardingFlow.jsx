@@ -242,7 +242,10 @@ export default function OnboardingFlow({ onComplete }) {
     return val;
   };
 
-  const padInput = (val, len) => String(val).padStart(len, '0');
+  const padInput = (val, len) => {
+    const str = String(val);
+    return str.length === len ? str : str.padStart(len, '0');
+  };
 
   const handleDateKeyDown = (e) => {
     if (e.key === 'Delete') {
@@ -485,10 +488,7 @@ export default function OnboardingFlow({ onComplete }) {
                 value={dateInput.year}
                 onChange={e => {
                   let val = e.target.value.replace(/\D/g, '').slice(-4);
-                  const num = parseInt(val) || 0;
-                  if (num >= 1900 && num <= new Date().getFullYear()) {
-                    setDateInput(p => ({ ...p, year: val }));
-                  }
+                  setDateInput(p => ({ ...p, year: val }));
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('year')}
