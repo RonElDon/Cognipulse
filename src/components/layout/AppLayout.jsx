@@ -15,6 +15,7 @@ const NAV_ITEMS = [
 ];
 
 export default function AppLayout({ lang = 'de' }) {
+  const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);

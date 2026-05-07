@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Send } from 'lucide-react';
@@ -94,6 +95,7 @@ const QUESTIONS = {
 };
 
 export default function OnboardingFlow({ onComplete }) {
+  const navigate = useNavigate();
   const [phase, setPhase] = useState('welcome');
   const [language, setLanguage] = useState('de');
   const [currentStep, setCurrentStep] = useState(0);
@@ -169,9 +171,12 @@ export default function OnboardingFlow({ onComplete }) {
           console.error('Onboarding save error:', e);
         }
         setSaving(false);
-        setMessages(prev => [...prev, { role: 'assistant', content: language === 'de' ? 'Perfekt! Viel Erfolg beim Training! 🚀' : 'Perfect! Have fun training! 🚀' }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: language === 'de' ? 'Perfekt! Jetzt ein kurzer Test, damit ich sehe wo du stehst. Los geht\'s! 🚀' : 'Perfect! Now a quick assessment so I can see where you\'re at. Let\'s go! 🚀' }]);
         setEmotion('excited');
-        setTimeout(() => onComplete?.(), 1500);
+        setTimeout(() => {
+          onComplete?.();
+          navigate('/baseline');
+        }, 1500);
       }
     }, 600);
   };
