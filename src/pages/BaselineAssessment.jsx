@@ -6,14 +6,59 @@ import GAME_MAP from '@/components/games/GameMap';
 import { DOMAINS } from '@/lib/exercises';
 import { base44 } from '@/api/base44Client';
 
-const BASELINE_EXERCISES = [
-  { id: 'att_2', domain: 'attention',   name: 'Aufmerksamkeit',          icon: '🎯', nameExercise: 'Zahlenjagd' },
-  { id: 'mem_2', domain: 'memory',      name: 'Gedächtnis',               icon: '🧠', nameExercise: 'Sequenz-Erinnerung' },
-  { id: 'exe_1', domain: 'executive',   name: 'Exekutive Funktionen',     icon: '⚙️', nameExercise: 'Aufgabenwechsel' },
-  { id: 'vis_3', domain: 'visuomotor',  name: 'Visuomotorik',             icon: '👁️', nameExercise: 'Ziel antippen' },
-  { id: 'pro_6', domain: 'processing',  name: 'Verarbeitungsgeschw.',     icon: '⚡', nameExercise: 'Wahr/Falsch-Blitz' },
-  { id: 'rea_1', domain: 'reasoning',   name: 'Logik & Schlussfolgerung', icon: '🔮', nameExercise: 'Muster-Meister' },
-];
+const BASELINE_POOL = {
+  attention:  [
+    { id: 'att_2', nameExercise: 'Zahlenjagd' },
+    { id: 'att_3', nameExercise: 'Farbenwechsel' },
+    { id: 'att_6', nameExercise: 'Ablenkungsschutz' },
+    { id: 'att_7', nameExercise: 'Blitz-Erkennung' },
+  ],
+  memory: [
+    { id: 'mem_2', nameExercise: 'Sequenz-Erinnerung' },
+    { id: 'mem_3', nameExercise: 'Wortliste' },
+    { id: 'mem_5', nameExercise: 'Positionsgedächtnis' },
+    { id: 'mem_7', nameExercise: 'Geschichten-Erinnerung' },
+  ],
+  executive: [
+    { id: 'exe_1', nameExercise: 'Aufgabenwechsel' },
+    { id: 'exe_2', nameExercise: 'Stoppsignal' },
+    { id: 'exe_4', nameExercise: 'Stroop-Herausforderung' },
+    { id: 'exe_8', nameExercise: 'Hemmungs-Rennen' },
+  ],
+  visuomotor: [
+    { id: 'vis_3', nameExercise: 'Ziel antippen' },
+    { id: 'vis_5', nameExercise: 'Bewegtes Ziel' },
+    { id: 'vis_7', nameExercise: 'Raster-Navigator' },
+  ],
+  processing: [
+    { id: 'pro_2', nameExercise: 'Schnellsortierung' },
+    { id: 'pro_6', nameExercise: 'Wahr/Falsch-Blitz' },
+    { id: 'pro_7', nameExercise: 'Farb-Wort-Tempo' },
+  ],
+  reasoning: [
+    { id: 'rea_1', nameExercise: 'Muster-Meister' },
+    { id: 'rea_2', nameExercise: 'Zahlenfolgen' },
+    { id: 'rea_5', nameExercise: 'Analogie-Training' },
+  ],
+};
+
+const DOMAIN_META = {
+  attention:  { name: 'Aufmerksamkeit',          icon: '🎯' },
+  memory:     { name: 'Gedächtnis',               icon: '🧠' },
+  executive:  { name: 'Exekutive Funktionen',     icon: '⚙️' },
+  visuomotor: { name: 'Visuomotorik',             icon: '👁️' },
+  processing: { name: 'Verarbeitungsgeschw.',     icon: '⚡' },
+  reasoning:  { name: 'Logik & Schlussfolgerung', icon: '🔮' },
+};
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const BASELINE_EXERCISES = Object.entries(BASELINE_POOL).map(([domain, pool]) => {
+  const picked = pickRandom(pool);
+  return { ...picked, domain, ...DOMAIN_META[domain] };
+});
 
 export default function BaselineAssessment() {
   const navigate = useNavigate();
