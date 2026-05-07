@@ -438,7 +438,6 @@ export default function OnboardingFlow({ onComplete }) {
                   val = val.slice(-2);
                   const validated = validateDay(val);
                   setDateInput(p => ({ ...p, day: validated }));
-                  if (validated.length === 2 && parseInt(validated) > 0) setDateFocus('month');
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('day')}
@@ -459,7 +458,6 @@ export default function OnboardingFlow({ onComplete }) {
                   val = val.slice(-2);
                   const validated = validateMonth(val);
                   setDateInput(p => ({ ...p, month: validated }));
-                  if (validated.length === 2 && parseInt(validated) > 0) setDateFocus('year');
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('month')}
