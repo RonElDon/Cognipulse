@@ -132,7 +132,10 @@ export default function OnboardingFlow({ onComplete }) {
 
       setLoading(true);
       setEmotion('thinking');
-      await base44.agents.addMessage(conv, { role: 'user', content: '__onboarding_start__' });
+      await base44.agents.addMessage(conv, {
+        role: 'user',
+        content: 'Starte das Onboarding. Begrüße mich kurz (1 Satz) und frage sofort nach meinem Namen.',
+      });
       setInitialized(true);
     } catch (e) {
       console.error(e);
@@ -188,7 +191,7 @@ export default function OnboardingFlow({ onComplete }) {
     await base44.agents.addMessage(conversation, { role: 'user', content: text });
   };
 
-  const visibleMessages = messages.filter(m => m.content && m.content !== '__onboarding_start__');
+  const visibleMessages = messages.filter(m => m.role !== 'user' || (!m.content.startsWith('Starte das Onboarding')));
 
   if (phase === 'welcome') return <WelcomeScreen onStart={handleWelcomeDone} />;
 
