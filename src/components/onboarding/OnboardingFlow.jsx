@@ -440,11 +440,9 @@ export default function OnboardingFlow({ onComplete }) {
                 placeholder="TT"
                 value={padInput(dateInput.day, 2)}
                 onChange={e => {
-                  let val = e.target.value.replace(/\D/g, '');
-                  val = val.slice(-2);
-                  const validated = validateDay(val);
-                  setDateInput(p => ({ ...p, day: validated }));
-                  if (validated.length === 2 && parseInt(validated) > 0) {
+                  let val = e.target.value.replace(/\D/g, '').slice(-2);
+                  setDateInput(p => ({ ...p, day: val }));
+                  if (val.length === 2 && parseInt(val) > 0 && parseInt(val) <= 31) {
                     setDateFocus('month');
                   }
                 }}
@@ -464,11 +462,9 @@ export default function OnboardingFlow({ onComplete }) {
                 placeholder="MM"
                 value={padInput(dateInput.month, 2)}
                 onChange={e => {
-                  let val = e.target.value.replace(/\D/g, '');
-                  val = val.slice(-2);
-                  const validated = validateMonth(val);
-                  setDateInput(p => ({ ...p, month: validated }));
-                  if (validated.length === 2 && parseInt(validated) > 0) {
+                  let val = e.target.value.replace(/\D/g, '').slice(-2);
+                  setDateInput(p => ({ ...p, month: val }));
+                  if (val.length === 2 && parseInt(val) > 0 && parseInt(val) <= 12) {
                     setDateFocus('year');
                   }
                 }}
@@ -488,10 +484,11 @@ export default function OnboardingFlow({ onComplete }) {
                 placeholder="YYYY"
                 value={dateInput.year}
                 onChange={e => {
-                  let val = e.target.value.replace(/\D/g, '');
-                  val = val.slice(-4);
-                  const validated = validateYear(val);
-                  setDateInput(p => ({ ...p, year: validated }));
+                  let val = e.target.value.replace(/\D/g, '').slice(-4);
+                  const num = parseInt(val) || 0;
+                  if (num >= 1900 && num <= new Date().getFullYear()) {
+                    setDateInput(p => ({ ...p, year: val }));
+                  }
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('year')}
