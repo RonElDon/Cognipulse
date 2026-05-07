@@ -55,8 +55,8 @@ export default function AppLayout({ lang = 'de' }) {
               <Zap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <span className="text-xl font-black text-slate-900 dark:text-white">Brain</span>
-              <span className="text-xl font-black" style={{ color: accentColor }}>Boost</span>
+              <span className="text-xl font-black text-slate-900 dark:text-white">Cogni</span>
+              <span className="text-xl font-black" style={{ color: accentColor }}>Pulse</span>
             </div>
           </Link>
         </div>
@@ -80,7 +80,7 @@ export default function AppLayout({ lang = 'de' }) {
         </nav>
         <div className="p-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
           <DarkToggle />
-          <div className="text-xs text-slate-400 dark:text-slate-500 text-center">BrainBoost v1.0</div>
+          <div className="text-xs text-slate-400 dark:text-slate-500 text-center">CogniPulse v1.0</div>
         </div>
       </aside>
 
@@ -91,8 +91,8 @@ export default function AppLayout({ lang = 'de' }) {
             <Zap className="w-4 h-4 text-white" />
           </div>
           <span className="text-lg font-black">
-            <span className="text-white">Brain</span>
-            <span style={{ color: accentColor }}>Boost</span>
+            <span className="text-white">Cogni</span>
+            <span style={{ color: accentColor }}>Pulse</span>
           </span>
         </Link>
         <div className="flex items-center gap-2">

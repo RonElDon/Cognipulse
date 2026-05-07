@@ -27,6 +27,7 @@ export default function Home() {
   const { heroStyle, heroClass } = useTheme();
   const quote = MOTIVATIONAL[new Date().getDay() % MOTIVATIONAL.length];
 
+
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
     base44.entities.ExerciseResult.list('-created_date', 10).then(setRecentResults).catch(() => {});
