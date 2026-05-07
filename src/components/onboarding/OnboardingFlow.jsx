@@ -251,13 +251,23 @@ export default function OnboardingFlow({ onComplete }) {
       return;
     }
     if (e.key === 'Backspace') {
-      // Wenn das Feld leer ist, zurück zum vorherigen Feld
-      if (dateFocus === 'month' && !dateInput.month) {
-        e.preventDefault();
-        setDateFocus('day');
-      } else if (dateFocus === 'year' && !dateInput.year) {
-        e.preventDefault();
-        setDateFocus('month');
+      e.preventDefault();
+      if (dateFocus === 'day') {
+        setDateInput(p => ({ ...p, day: p.day.slice(0, -1) }));
+      } else if (dateFocus === 'month') {
+        if (dateInput.month) {
+          setDateInput(p => ({ ...p, month: p.month.slice(0, -1) }));
+        } else {
+          setDateFocus('day');
+          setDateInput(p => ({ ...p, day: p.day.slice(0, -1) }));
+        }
+      } else if (dateFocus === 'year') {
+        if (dateInput.year) {
+          setDateInput(p => ({ ...p, year: p.year.slice(0, -1) }));
+        } else {
+          setDateFocus('month');
+          setDateInput(p => ({ ...p, month: p.month.slice(0, -1) }));
+        }
       }
       return;
     }
