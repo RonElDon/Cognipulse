@@ -516,39 +516,37 @@ export default function OnboardingFlow({ onComplete }) {
               const label = opt.label || opt;
               return (
                 <button
-                  key={value}
-                  onClick={() => handleAnswer(value)}
-                  onKeyDown={(e) => {
-                    const cols = 2;
-                    if (e.key === 'ArrowLeft') {
-                      e.preventDefault();
-                      setSelectedOptionIdx((prev) => prev % cols === 0 ? prev : prev - 1);
-                    } else if (e.key === 'ArrowRight') {
-                      e.preventDefault();
-                      setSelectedOptionIdx((prev) => prev % cols === 1 || prev === currentQuestion.options.length - 1 ? prev : prev + 1);
-                    } else if (e.key === 'ArrowUp') {
-                      e.preventDefault();
-                      setSelectedOptionIdx((prev) => prev >= cols ? prev - cols : prev);
-                    } else if (e.key === 'ArrowDown') {
-                      e.preventDefault();
-                      setSelectedOptionIdx((prev) => prev + cols < currentQuestion.options.length ? prev + cols : prev);
-                    } else if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAnswer(value);
-                    }
-                  }}
-                  tabIndex={selectedOptionIdx === idx ? 0 : -1}
-                  autoFocus={currentQuestion.type === 'select' && idx === 0}
-                  disabled={saving}
-                  onFocus={() => setSelectedOptionIdx(idx)}
-                  className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 text-white border outline-none focus:outline-none ${
-                    selectedOptionIdx === idx
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400 shadow-lg'
-                      : 'bg-white/10 hover:bg-white/20 border-white/15'
-                  }`}
-                >
-                  {getEmojiForAnswer(label)} {label}
-                </button>
+                   key={value}
+                   onClick={() => handleAnswer(value)}
+                   onKeyDown={(e) => {
+                     const cols = 2;
+                     if (e.key === 'ArrowLeft') {
+                       e.preventDefault();
+                       setSelectedOptionIdx((prev) => prev % cols === 0 ? prev : prev - 1);
+                     } else if (e.key === 'ArrowRight') {
+                       e.preventDefault();
+                       setSelectedOptionIdx((prev) => prev % cols === 1 || prev === currentQuestion.options.length - 1 ? prev : prev + 1);
+                     } else if (e.key === 'ArrowUp') {
+                       e.preventDefault();
+                       setSelectedOptionIdx((prev) => prev >= cols ? prev - cols : prev);
+                     } else if (e.key === 'ArrowDown') {
+                       e.preventDefault();
+                       setSelectedOptionIdx((prev) => prev + cols < currentQuestion.options.length ? prev + cols : prev);
+                     } else if (e.key === 'Enter') {
+                       e.preventDefault();
+                       handleAnswer(value);
+                     }
+                   }}
+                   autoFocus={currentQuestion.type === 'select' && idx === 0}
+                   disabled={saving}
+                   className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 text-white border outline-none focus:outline-none cursor-pointer ${
+                     selectedOptionIdx === idx
+                       ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400 shadow-lg'
+                       : 'bg-white/10 hover:bg-white/20 border-white/15'
+                   }`}
+                 >
+                   {getEmojiForAnswer(label)} {label}
+                 </button>
               );
             })}
           </div>
