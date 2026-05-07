@@ -60,6 +60,19 @@ export default function Profile() {
     base44.auth.logout();
   };
 
+  const handleResetOnboarding = async () => {
+    try {
+      const user = await base44.auth.me();
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      if (profiles.length > 0) {
+        await base44.entities.UserProfile.update(profiles[0].id, { onboarding_completed: false });
+        window.location.reload();
+      }
+    } catch (e) {
+      console.error('Reset failed:', e);
+    }
+  };
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
@@ -210,8 +223,14 @@ export default function Profile() {
           <AppearanceSettings />
         </motion.div>
 
-        {/* Logout */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+        {/* Reset & Logout */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="space-y-3">
+          <button
+            onClick={handleResetOnboarding}
+            className="w-full py-3 rounded-2xl border-2 border-amber-100 dark:border-amber-900/40 text-amber-600 font-bold flex items-center justify-center gap-2 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors text-sm"
+          >
+            🔄 Onboarding neu starten
+          </button>
           <button
             onClick={handleLogout}
             className="w-full py-3 rounded-2xl border-2 border-red-100 dark:border-red-900/40 text-red-500 font-bold flex items-center justify-center gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
