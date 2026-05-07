@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
@@ -14,13 +14,47 @@ export default function Exercise() {
   const { id } = useParams();
   const navigate = useNavigate();
   const exercise = EXERCISES.find(e => e.id === id);
-  const [phase, setPhase] = useState('intro'); // intro, playing, result
+  const [phase, setPhase] = useState('intro'); // intro, countdown, playing, result
+  const [countdown, setCountdown] = useState(3);
   const [result, setResult] = useState(null);
   const [lastNeuroResult, setLastNeuroResult] = useState(null);
   const [saving, setSaving] = useState(false);
   const [level, setLevel] = useState(exercise?.difficulty || 1);
+  const containerRef = useRef(null);
 
-  useKeyboard({ 'Enter': () => { if (phase === 'intro') setPhase('playing'); else if (phase === 'result') { setPhase('intro'); setResult(null); } }, '1': () => phase === 'intro' && setLevel(1), '2': () => phase === 'intro' && setLevel(2), '3': () => phase === 'intro' && setLevel(3) }, [phase]);
+  // Countdown logic
+  useEffect(() => {
+    if (phase !== 'countdown') return;
+    if (countdown === 0) {
+      const t = setTimeout(() => setPhase('playing'), 400);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => setCountdown(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [phase, countdown]);
+
+  const startCountdown = () => {
+    // Request fullscreen
+    const el = containerRef.current || document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+    setCountdown(3);
+    setPhase('countdown');
+  };
+
+  // Exit fullscreen on result/back
+  const exitFullscreen = () => {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  };
+
+  useKeyboard({
+    'Enter': () => {
+      if (phase === 'intro') startCountdown();
+      else if (phase === 'result') { exitFullscreen(); setPhase('intro'); setResult(null); }
+    },
+    '1': () => phase === 'intro' && setLevel(1),
+    '2': () => phase === 'intro' && setLevel(2),
+    '3': () => phase === 'intro' && setLevel(3),
+  }, [phase]);
 
   if (!exercise) return <div className="p-8 text-center text-slate-500">Übung nicht gefunden</div>;
 
@@ -59,11 +93,11 @@ export default function Exercise() {
   };
 
   return (
-    <div className="min-h-screen pb-24 md:pb-8">
+    <div ref={containerRef} className="min-h-screen pb-24 md:pb-8">
       {/* Header */}
       <div className={`${domain.gradient} px-4 pt-6 pb-8`}>
         <div className="max-w-lg mx-auto">
-          <button onClick={() => navigate('/train')} className="flex items-center gap-2 text-white/80 hover:text-white mb-4 font-semibold transition-colors">
+          <button onClick={() => { exitFullscreen(); navigate('/train'); }} className="flex items-center gap-2 text-white/80 hover:text-white mb-4 font-semibold transition-colors">
             <ArrowLeft className="w-4 h-4" /> Zurück
           </button>
           <div className="flex items-center gap-4">
@@ -107,12 +141,39 @@ export default function Exercise() {
                   ))}
                 </div>
                 <button
-                  onClick={() => setPhase('playing')}
+                  onClick={startCountdown}
                   className={`w-full py-4 rounded-2xl text-white font-black text-lg shadow-lg transition-transform hover:scale-105 active:scale-95 ${domain.gradient}`}
                 >
                   Übung starten! 🚀
                 </button>
                 <p className="text-xs text-slate-400 text-center">⌨️ Tasten: 1/2/3 = Schwierigkeitsgrad · Enter = Starten · In Spielen: Ziffern & J/N</p>
+              </motion.div>
+            )}
+
+            {phase === 'countdown' && (
+              <motion.div
+                key="countdown"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center py-16 space-y-4"
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={countdown}
+                    initial={{ scale: 0.3, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 1.5, opacity: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                    className="text-9xl font-black"
+                    style={{ color: countdown > 0 ? domain.color : '#10b981' }}
+                  >
+                    {countdown === 0 ? '🚀' : countdown}
+                  </motion.div>
+                </AnimatePresence>
+                <div className="text-slate-500 font-bold text-lg">
+                  {countdown === 0 ? 'Los!' : countdown === 1 ? 'Bereit?' : 'Gleich geht\'s los...'}
+                </div>
               </motion.div>
             )}
 
@@ -149,13 +210,13 @@ export default function Exercise() {
                 {saving && <div className="text-xs text-slate-400 font-medium">Ergebnisse werden gespeichert...</div>}
                 <div className="flex gap-3">
                   <button
-                    onClick={() => { setPhase('intro'); setResult(null); }}
+                    onClick={() => { exitFullscreen(); setPhase('intro'); setResult(null); }}
                     className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-slate-200 font-bold text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     <RefreshCw className="w-4 h-4" /> Nochmal
                   </button>
                   <button
-                    onClick={() => navigate('/train')}
+                    onClick={() => { exitFullscreen(); navigate('/train'); }}
                     className={`flex-1 py-3 rounded-2xl text-white font-bold ${domain.gradient} shadow-md`}
                   >
                     Nächste Übung →
