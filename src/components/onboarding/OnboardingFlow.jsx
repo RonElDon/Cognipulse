@@ -307,6 +307,7 @@ export default function OnboardingFlow({ onComplete }) {
                 onClick={() => handleAnswer(opt)}
                 onFocus={() => setSelectedOptionIdx(idx)}
                 onKeyDown={handleKeyDown}
+                tabIndex={selectedOptionIdx === idx ? 0 : -1}
                 autoFocus={idx === 0}
                 disabled={saving}
                 className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 ${
