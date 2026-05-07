@@ -218,24 +218,25 @@ export default function OnboardingFlow({ onComplete }) {
     return new Date(parseInt(year), parseInt(month), 0).getDate();
   };
 
-  const validateDay = (val, month, year) => {
+  const validateDay = (val) => {
     const num = parseInt(val) || 0;
-    const maxDays = getDaysInMonth(month, year);
-    if (num === 0 || num > maxDays) return '';
-    return String(num).padStart(2, '0');
+    if (num < 0 || num > 31) return val.slice(0, -1);
+    return val;
   };
 
   const validateMonth = (val) => {
     const num = parseInt(val) || 0;
-    if (num === 0 || num > 12) return '';
-    return String(num).padStart(2, '0');
+    if (num < 0 || num > 12) return val.slice(0, -1);
+    return val;
   };
 
   const validateYear = (val) => {
     const num = parseInt(val) || 0;
-    if (num < 1900 || num > new Date().getFullYear()) return '';
-    return String(num);
+    if (num < 1900 || num > new Date().getFullYear()) return val.slice(0, -1);
+    return val;
   };
+
+  const padInput = (val, len) => String(val).padStart(len, '0');
 
   const handleDateKeyDown = (e) => {
     if (e.key === 'Delete') {
@@ -431,12 +432,11 @@ export default function OnboardingFlow({ onComplete }) {
                 type="number"
                 inputMode="numeric"
                 placeholder="TT"
-                value={dateInput.day}
+                value={padInput(dateInput.day, 2)}
                 onChange={e => {
-                  const val = e.target.value.slice(0, 2);
-                  const validated = validateDay(val, dateInput.month, dateInput.year);
-                  setDateInput(p => ({ ...p, day: validated }));
-                  if (validated && validated.length === 2) setDateFocus('month');
+                  const val = validateDay(e.target.value.slice(0, 2));
+                  setDateInput(p => ({ ...p, day: val }));
+                  if (val.length === 2 && parseInt(val) > 0) setDateFocus('month');
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('day')}
@@ -452,12 +452,11 @@ export default function OnboardingFlow({ onComplete }) {
                 type="number"
                 inputMode="numeric"
                 placeholder="MM"
-                value={dateInput.month}
+                value={padInput(dateInput.month, 2)}
                 onChange={e => {
-                  const val = e.target.value.slice(0, 2);
-                  const validated = validateMonth(val);
-                  setDateInput(p => ({ ...p, month: validated }));
-                  if (validated && validated.length === 2) setDateFocus('year');
+                  const val = validateMonth(e.target.value.slice(0, 2));
+                  setDateInput(p => ({ ...p, month: val }));
+                  if (val.length === 2 && parseInt(val) > 0) setDateFocus('year');
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('month')}
@@ -475,9 +474,8 @@ export default function OnboardingFlow({ onComplete }) {
                 placeholder="YYYY"
                 value={dateInput.year}
                 onChange={e => {
-                  const val = e.target.value.slice(0, 4);
-                  const validated = validateYear(val);
-                  setDateInput(p => ({ ...p, year: validated }));
+                  const val = validateYear(e.target.value.slice(0, 4));
+                  setDateInput(p => ({ ...p, year: val }));
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('year')}
