@@ -80,7 +80,7 @@ const QUESTIONS = {
   de: [
     { id: 'name', question: 'Lass mich dich kennenlernen — wie heißt du? 😊', placeholder: 'Dein Name...', type: 'text' },
     { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'number' },
-    { id: 'gender', question: 'Wie möchtest du angesprochen werden?', options: ['männlich', 'weiblich', 'divers', 'keine Angabe'], type: 'select' },
+    { id: 'gender', question: 'Dein Geschlecht?', options: ['männlich', 'weiblich', 'divers', 'keine Angabe'], type: 'select' },
     { id: 'goal', question: 'Was treibt dich an? Was möchtest du mit deinem Gehirn erreichen? 💪', placeholder: 'z.B. Gedächtnis verbessern, fokussierter werden...', type: 'text' },
     { id: 'dailyExercises', question: 'Wie viel Zeit hast du pro Tag für dein Brain-Workout?', options: ['1', '3', '5', '10'], type: 'select' },
   ],
