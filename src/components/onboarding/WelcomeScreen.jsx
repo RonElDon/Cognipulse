@@ -59,10 +59,10 @@ export default function WelcomeScreen({ onStart }) {
       if (focusLevel < 2) setFocusLevel(prev => prev + 1);
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      if (focusLevel === 0) setLang('de');
+      if (focusLevel === 0 && lang !== 'de') setLang('de');
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      if (focusLevel === 0) setLang('en');
+      if (focusLevel === 0 && lang !== 'en') setLang('en');
     } else if (e.key === 'Enter' && focusLevel === 2) {
       e.preventDefault();
       onStart(lang);
