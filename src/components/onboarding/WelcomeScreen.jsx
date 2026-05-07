@@ -67,7 +67,7 @@ export default function WelcomeScreen({ onStart }) {
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setFocusLevel(prev => (prev - 1 + 3) % 3);
+      if (focusLevel > 0) setFocusLevel(prev => prev - 1);
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (focusLevel < 2) setFocusLevel(prev => prev + 1);
