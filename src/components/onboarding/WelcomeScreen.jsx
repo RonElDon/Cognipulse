@@ -39,6 +39,12 @@ export default function WelcomeScreen({ onStart }) {
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       setFocusIdx(prev => (prev < 2 ? prev + 1 : 0));
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (focusIdx === 1) setFocusIdx(0);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      if (focusIdx === 0) setFocusIdx(1);
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (focusIdx === 0) setLang('de');
