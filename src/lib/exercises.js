@@ -194,7 +194,7 @@ export const BADGES = [
   { id: 'xp_100', name: 'Brain Spark', nameDE: 'Hirnfunke', icon: '⚡', description: 'Earn 100 XP', condition: (stats) => stats.totalXP >= 100 },
   { id: 'xp_500', name: 'Brain Power', nameDE: 'Hirnkraft', icon: '🧠', description: 'Earn 500 XP', condition: (stats) => stats.totalXP >= 500 },
   { id: 'all_domains', name: 'Renaissance Mind', nameDE: 'Renaissance-Geist', icon: '🎭', description: 'Try all 6 domains', condition: (stats) => stats.domainsPlayed >= 6 },
-  { id: 'perfect_score', name: 'Perfect!', nameDE: 'Perfekt!', icon: '💯', description: 'Score 100% on any exercise', condition: (stats) => stats.hasPerfect },
+  { id: 'perfect_score', name: 'Domain-Meister', nameDE: 'Domain-Meister', icon: '💯', description: 'Alle Übungen eines Bereichs mindestens 1x gespielt', condition: (stats) => stats.hasCompletedAllInDomain },
   { id: 'speed_demon', name: 'Speed Demon', nameDE: 'Geschwindigkeits-Dämon', icon: '🏎️', description: 'React in under 300ms', condition: (stats) => stats.bestReaction <= 300 },
   { id: 'explorer', name: 'Explorer', nameDE: 'Entdecker', icon: '🗺️', description: '20 exercises done', condition: (stats) => stats.totalGames >= 20 },
   { id: 'centurion', name: 'Centurion', nameDE: 'Zenturio', icon: '💯', description: '100 exercises done', condition: (stats) => stats.totalGames >= 100 },

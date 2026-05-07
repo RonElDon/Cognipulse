@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useProfile } from '@/lib/useProfile';
-import { BADGES, DOMAINS, getLevel } from '@/lib/exercises';
+import { BADGES, DOMAINS, EXERCISES, getLevel } from '@/lib/exercises';
 import XPBar from '@/components/ui/XPBar';
 import { User, Settings, Globe, Target, LogOut, Check, Edit2, Palette } from 'lucide-react';
 import AppearanceSettings from '@/components/profile/AppearanceSettings';
@@ -26,12 +26,17 @@ export default function Profile() {
   // Compute badge unlocks
   const totalGames = results.length;
   const streak = profile?.current_streak || 0;
-  const hasPerfect = results.some(r => r.score === 100);
   const domainsPlayed = new Set(results.map(r => r.domain)).size;
+  // Check if user has played ALL exercises in at least one domain
+  const playedExerciseIds = new Set(results.map(r => r.exercise_id));
+  const hasCompletedAllInDomain = Object.keys(DOMAINS).some(domainId => {
+    const domainExercises = EXERCISES.filter(e => e.domain === domainId);
+    return domainExercises.length > 0 && domainExercises.every(e => playedExerciseIds.has(e.id));
+  });
   const bestReaction = results.reduce((min, r) => r.reaction_time_ms ? Math.min(min, r.reaction_time_ms) : min, Infinity);
   const userBadgeIds = profile?.badges || [];
 
-  const badgeStats = { totalGames, streak, totalXP: xp, hasPerfect, domainsPlayed, bestReaction };
+  const badgeStats = { totalGames, streak, totalXP: xp, domainsPlayed, bestReaction, hasCompletedAllInDomain };
   const earnedBadges = BADGES.filter(b => b.condition(badgeStats));
 
   const handleSaveName = async () => {
