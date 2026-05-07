@@ -126,7 +126,11 @@ export default function OnboardingFlow({ onComplete }) {
           if (isBaselinePrompt(last.content)) {
             setPhase('baseline_prompt');
           }
-          checkOnboardingComplete();
+          // Check completion async without blocking loading state
+          setTimeout(() => checkOnboardingComplete(), 0);
+        } else if (last?.role === 'user') {
+          // Ensure loading is shown when user sends a message
+          setLoading(true);
         }
       });
 
@@ -148,20 +152,26 @@ export default function OnboardingFlow({ onComplete }) {
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       const profile = profiles[0];
 
-      // Check if baseline was just completed while waiting
-      if (phase === 'baseline_waiting' && profile?.baseline_assessment_completed) {
-        setPhase('baseline_done');
-        clearInterval(pollRef.current);
-        if (conversation) {
-          setLoading(true);
-          setEmotion('thinking');
-          await base44.agents.addMessage(conversation, {
-            role: 'user',
-            content: 'Ich habe den Einschätzungstest abgeschlossen.',
+      // Use functional state update to read current phase without stale closure
+      setPhase(currentPhase => {
+        if (currentPhase === 'baseline_waiting' && profile?.baseline_assessment_completed) {
+          clearInterval(pollRef.current);
+          // Notify Neuro async
+          setConversation(conv => {
+            if (conv) {
+              setLoading(true);
+              setEmotion('thinking');
+              base44.agents.addMessage(conv, {
+                role: 'user',
+                content: 'Ich habe den Einschätzungstest abgeschlossen.',
+              });
+            }
+            return conv;
           });
+          return 'baseline_done';
         }
-        return;
-      }
+        return currentPhase;
+      });
 
       // Only finalize onboarding when BOTH onboarding AND baseline are complete
       if (profile?.onboarding_completed && profile?.baseline_assessment_completed) {
