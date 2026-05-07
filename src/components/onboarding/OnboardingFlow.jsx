@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Send, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import WelcomeScreen from './WelcomeScreen';
 
 // Emotion config for the animated brain globe
 const GLOBE_EMOTIONS = {
@@ -80,7 +81,7 @@ export default function OnboardingFlow({ onComplete }) {
   const [loading, setLoading] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [emotion, setEmotion] = useState('happy');
-  const [phase, setPhase] = useState('chat'); // 'chat' | 'baseline_prompt' | 'baseline_waiting' | 'baseline_done'
+  const [phase, setPhase] = useState('welcome'); // 'welcome' | 'chat' | 'baseline_prompt' | 'baseline_waiting' | 'baseline_done'
   const chatEndRef = useRef(null);
   const unsubRef = useRef(null);
   const pollRef = useRef(null);
@@ -90,12 +91,16 @@ export default function OnboardingFlow({ onComplete }) {
   }, [messages, loading]);
 
   useEffect(() => {
-    initConversation();
     return () => {
       unsubRef.current?.();
       clearInterval(pollRef.current);
     };
   }, []);
+
+  const handleWelcomeDone = () => {
+    setPhase('chat');
+    initConversation();
+  };
 
   const initConversation = async () => {
     try {
@@ -184,6 +189,8 @@ export default function OnboardingFlow({ onComplete }) {
   };
 
   const visibleMessages = messages.filter(m => m.content && m.content !== '__onboarding_start__');
+
+  if (phase === 'welcome') return <WelcomeScreen onStart={handleWelcomeDone} />;
 
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex items-center justify-center p-4">
