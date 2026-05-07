@@ -27,9 +27,9 @@ export default function Train() {
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       {/* Header */}
-      <div className="bg-white border-b border-slate-100 px-4 pt-6 pb-4 sticky top-0 md:top-0 z-10">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-4 pt-6 pb-4 sticky top-0 md:top-0 z-10">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-2xl font-black text-slate-900 mb-4">🧠 Trainingsbibliothek</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 mb-4">🧠 Trainingsbibliothek</h1>
           {/* Search */}
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -38,7 +38,7 @@ export default function Train() {
               placeholder="Übungen suchen..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
             />
           </div>
           {/* Domain filter */}

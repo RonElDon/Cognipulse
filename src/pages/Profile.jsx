@@ -101,23 +101,23 @@ export default function Profile() {
       <div className="max-w-lg mx-auto px-4 -mt-8 space-y-4">
         {/* XP */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+          className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
         >
           <XPBar xp={xp} />
         </motion.div>
 
         {/* Badges */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+          className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
         >
-          <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">🏅 Abzeichen ({earnedBadges.length}/{BADGES.length})</h2>
+          <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">🏅 Abzeichen ({earnedBadges.length}/{BADGES.length})</h2>
           <div className="grid grid-cols-4 gap-3">
             {BADGES.map(badge => {
               const earned = badge.condition(badgeStats);
               return (
-                <div key={badge.id} className={`flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${earned ? 'bg-amber-50' : 'bg-slate-50 opacity-40'}`}>
+                <div key={badge.id} className={`flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${earned ? 'bg-amber-50 dark:bg-amber-900/30' : 'bg-slate-50 dark:bg-slate-700/50 opacity-40'}`}>
                   <div className={`text-3xl ${!earned && 'grayscale'}`}>{badge.icon}</div>
-                  <div className="text-xs font-bold text-slate-700 text-center leading-tight">{badge.name}</div>
+                  <div className="text-xs font-bold text-slate-700 dark:text-slate-300 text-center leading-tight">{badge.name}</div>
                 </div>
               );
             })}
@@ -126,9 +126,9 @@ export default function Profile() {
 
         {/* Language */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+          className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
         >
-          <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">
+          <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Globe className="w-5 h-5 text-blue-600" /> Sprache
           </h2>
           <div className="grid grid-cols-2 gap-3">
@@ -139,7 +139,7 @@ export default function Profile() {
                 className={`py-3 rounded-2xl font-bold text-sm transition-all ${
                   profile?.preferred_language === l.code
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                 }`}
               >
                 {l.label}
@@ -150,12 +150,12 @@ export default function Profile() {
 
         {/* Daily Goal */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+          className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
         >
-          <h2 className="font-black text-slate-800 mb-4 flex items-center gap-2">
+          <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Target className="w-5 h-5 text-emerald-600" /> Tagesziel
           </h2>
-          <p className="text-sm text-slate-500 mb-3">Wie viele Übungen pro Tag?</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">Wie viele Übungen pro Tag?</p>
           <div className="grid grid-cols-4 gap-2">
             {[1, 3, 5, 10].map(n => (
               <button
@@ -164,7 +164,7 @@ export default function Profile() {
                 className={`py-3 rounded-2xl font-black text-lg transition-all ${
                   (profile?.goals?.daily_exercises || 3) === n
                     ? 'bg-emerald-500 text-white shadow-md'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                 }`}
               >
                 {n}
@@ -175,9 +175,9 @@ export default function Profile() {
 
         {/* Stats */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-          className="bg-white rounded-3xl shadow-xl p-5 border border-slate-100"
+          className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
         >
-          <h2 className="font-black text-slate-800 mb-4">📊 Meine Statistiken</h2>
+          <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4">📊 Meine Statistiken</h2>
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Übungen gesamt', value: totalGames, icon: '🎯' },
@@ -185,10 +185,10 @@ export default function Profile() {
               { label: 'Beste Serie', value: `${profile?.longest_streak || 0} Tage`, icon: '🔥' },
               { label: 'Bereiche versucht', value: `${domainsPlayed}/6`, icon: '🧠' },
             ].map(s => (
-              <div key={s.label} className="bg-slate-50 rounded-2xl p-3">
+              <div key={s.label} className="bg-slate-50 dark:bg-slate-700/60 rounded-2xl p-3">
                 <div className="text-2xl">{s.icon}</div>
-                <div className="font-black text-slate-800 text-lg mt-1">{s.value}</div>
-                <div className="text-xs text-slate-500">{s.label}</div>
+                <div className="font-black text-slate-800 dark:text-slate-100 text-lg mt-1">{s.value}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">{s.label}</div>
               </div>
             ))}
           </div>
@@ -198,7 +198,7 @@ export default function Profile() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
           <button
             onClick={handleLogout}
-            className="w-full py-3 rounded-2xl border-2 border-red-100 text-red-500 font-bold flex items-center justify-center gap-2 hover:bg-red-50 transition-colors"
+            className="w-full py-3 rounded-2xl border-2 border-red-100 dark:border-red-900/40 text-red-500 font-bold flex items-center justify-center gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
           >
             <LogOut className="w-4 h-4" /> Abmelden
           </button>
