@@ -102,6 +102,7 @@ export default function OnboardingFlow({ onComplete }) {
   const [emotion, setEmotion] = useState('happy');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [selectedOptionIdx, setSelectedOptionIdx] = useState(0);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -131,8 +132,9 @@ export default function OnboardingFlow({ onComplete }) {
     setAnswers(prev => ({ ...prev, [currentQuestion.id]: value }));
     setInput('');
     
-    // Add user message
-    setMessages(prev => [...prev, { role: 'user', content: String(value) }]);
+    // Add user message with emoji
+    const displayValue = currentQuestion.type === 'select' ? `${getEmojiForAnswer(value)} ${value}` : String(value);
+    setMessages(prev => [...prev, { role: 'user', content: displayValue }]);
     setEmotion('thinking');
 
     // Move to next question or finish
@@ -180,9 +182,30 @@ export default function OnboardingFlow({ onComplete }) {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (currentQuestion.type === 'select') {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedOptionIdx(Math.max(0, selectedOptionIdx - 1));
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedOptionIdx(Math.min(currentQuestion.options.length - 1, selectedOptionIdx + 1));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAnswer(currentQuestion.options[selectedOptionIdx]);
+      }
+    } else if (e.key === 'Enter') {
       handleSendMessage();
     }
+  };
+
+  const getEmojiForAnswer = (value) => {
+    if (!value) return '🧠';
+    const lower = String(value).toLowerCase();
+    if (lower.includes('männlich') || lower.includes('male')) return '👨';
+    if (lower.includes('weiblich') || lower.includes('female')) return '👩';
+    if (lower.includes('divers') || lower.includes('diverse')) return '🌈';
+    if (lower.includes('angabe') || lower.includes('not')) return '🤐';
+    return '🧠';
   };
 
   if (phase === 'welcome') {
@@ -278,14 +301,21 @@ export default function OnboardingFlow({ onComplete }) {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            {currentQuestion.options.map(opt => (
+            {currentQuestion.options.map((opt, idx) => (
               <button
                 key={opt}
                 onClick={() => handleAnswer(opt)}
+                onFocus={() => setSelectedOptionIdx(idx)}
+                onKeyDown={handleKeyDown}
+                autoFocus={idx === 0}
                 disabled={saving}
-                className="py-3 px-4 rounded-2xl font-bold text-sm text-white bg-white/10 hover:bg-white/20 border border-white/15 transition-all disabled:opacity-50"
+                className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 ${
+                  selectedOptionIdx === idx
+                    ? 'text-white bg-gradient-to-r from-purple-600 to-indigo-600 border border-purple-400 shadow-lg'
+                    : 'text-white bg-white/10 hover:bg-white/20 border border-white/15'
+                }`}
               >
-                {opt}
+                {getEmojiForAnswer(opt)} {opt}
               </button>
             ))}
           </div>
