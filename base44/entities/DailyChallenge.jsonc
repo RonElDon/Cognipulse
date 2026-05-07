@@ -1,0 +1,62 @@
+{
+  "name": "DailyChallenge",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The date this challenge is for (YYYY-MM-DD)"
+    },
+    "goals": {
+      "type": "array",
+      "description": "List of daily goal tasks",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "target": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "exercises_count",
+              "domain_exercises",
+              "min_score",
+              "streak"
+            ]
+          },
+          "domain": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "all_completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "bonus_multiplier": {
+      "type": "number",
+      "default": 1.5,
+      "description": "XP multiplier earned for next day"
+    },
+    "bonus_claimed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the bonus for completing yesterday's challenge was already applied"
+    }
+  },
+  "required": [
+    "date"
+  ]
+}

@@ -9,6 +9,7 @@ import XPBar from '@/components/ui/XPBar';
 import { Brain, Flame, Trophy, Zap, ChevronRight, Star, TrendingUp, Target } from 'lucide-react';
 import DailyPlanCard from '@/components/training/DailyPlanCard';
 import ProgressWidget from '@/components/training/ProgressWidget';
+import DailyChallengeCard from '@/components/training/DailyChallengeCard';
 import { useTheme } from '@/lib/ThemeContext';
 
 const MOTIVATIONAL = [
@@ -103,6 +104,9 @@ export default function Home() {
 
         {/* Daily Training Plan by Neuro — primary focus */}
         <DailyPlanCard />
+
+        {/* Daily Challenge */}
+        <DailyChallengeCard />
 
         {/* Performance over time */}
         <ProgressWidget />

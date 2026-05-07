@@ -70,7 +70,6 @@ export default function Exercise() {
   const GameComponent = GAME_MAP[id];
 
   const handleTrialComplete = () => {
-    // After trial: go back to ready screen
     setPhase('ready');
   };
 
@@ -82,6 +81,17 @@ export default function Exercise() {
     setSaving(true);
     try {
       const user = await base44.auth.me();
+      const today = new Date().toISOString().split('T')[0];
+
+      // Check for active bonus multiplier (yesterday's challenge completed, not yet claimed)
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      const [yc] = await base44.entities.DailyChallenge.filter({ created_by: user.email, date: yesterdayStr });
+      const multiplier = (yc?.all_completed && !yc?.bonus_claimed) ? (yc.bonus_multiplier || 1.5) : 1;
+
+      const baseXP = Math.round(exercise.xpReward * (gameResult.score / 100));
+      const earnedXP = Math.round(baseXP * multiplier);
+
       await base44.entities.ExerciseResult.create({
         exercise_id: exercise.id,
         exercise_name: exercise.name,
@@ -90,18 +100,22 @@ export default function Exercise() {
         accuracy: gameResult.accuracy,
         reaction_time_ms: gameResult.reaction_time_ms,
         level,
-        xp_earned: Math.round(exercise.xpReward * (gameResult.score / 100)),
+        xp_earned: earnedXP,
         duration_seconds: 30,
         completed: true,
       });
-      // Update profile XP
+
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       if (profiles.length > 0) {
         const p = profiles[0];
         await base44.entities.UserProfile.update(p.id, {
-          total_xp: (p.total_xp || 0) + Math.round(exercise.xpReward * (gameResult.score / 100)),
+          total_xp: (p.total_xp || 0) + earnedXP,
         });
       }
+
+      // Store multiplier on result for display
+      gameResult._multiplier = multiplier;
+      gameResult._earnedXP = earnedXP;
     } catch (e) { console.error(e); }
     setSaving(false);
   };
@@ -250,11 +264,19 @@ export default function Exercise() {
                     {result.score >= 80 ? 'Ausgezeichnet!' : result.score >= 60 ? 'Gute Arbeit!' : result.score >= 40 ? 'Weiter so!' : 'Übung macht den Meister!'}
                   </div>
                 </div>
+                {result._multiplier > 1 && (
+                  <div className="flex items-center justify-center gap-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl p-2.5">
+                    <span className="text-lg">🎉</span>
+                    <span className="text-sm font-black text-yellow-700 dark:text-yellow-400">
+                      ×{result._multiplier} Bonus aktiv — {result._earnedXP} XP erhalten!
+                    </span>
+                  </div>
+                )}
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { label: 'Ergebnis', value: `${result.score}%`, icon: '🎯' },
                     { label: 'Genauigkeit', value: `${result.accuracy}%`, icon: '✅' },
-                    { label: 'XP erhalten', value: `+${Math.round(exercise.xpReward * result.score / 100)}`, icon: '⚡' },
+                    { label: 'XP erhalten', value: `+${result._earnedXP || Math.round(exercise.xpReward * result.score / 100)}`, icon: '⚡' },
                   ].map(s => (
                     <div key={s.label} className="bg-slate-50 rounded-2xl p-3">
                       <div className="text-lg">{s.icon}</div>
