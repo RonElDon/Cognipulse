@@ -118,8 +118,8 @@ export default function OnboardingFlow({ onComplete }) {
     setPhase('chat');
     // Start with welcome message and first question
     const welcome = lang === 'de'
-      ? 'Willkommen! Ich bin Neuro, dein persönlicher Trainingsbegleiter. 🎉 Lass mich dich gleich ein bisschen besser kennenlernen, dann passe ich alles perfekt auf dich an!'
-      : 'Welcome! I\'m Neuro, your personal training coach. 🎉 Let me get to know you better so I can customize everything perfectly for you!';
+      ? 'Hey, willkommen bei mir! 🎉 Ich bin Neuro, dein persönlicher Trainingsbegleiter, und ich freue mich riesig, dich kennenzulernen! Lass mich einfach ein paar schnelle Fragen stellen, dann personalisiere ich dein gesamtes Training speziell für dich. Los geht\'s!'
+      : 'Hey there, welcome! 🎉 I\'m Neuro, your personal training coach, and I\'m excited to get to know you! Let me ask you a few quick questions so I can personalize your entire training just for you. Let\'s go!';
     setMessages([
       { role: 'assistant', content: welcome },
       { role: 'assistant', content: QUESTIONS[lang][0].question }
