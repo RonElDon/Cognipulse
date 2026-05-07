@@ -54,13 +54,12 @@ export default function WelcomeScreen({ onStart }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex items-center justify-center p-6" onKeyDown={handleKeyDown}>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-sm flex flex-col items-center text-center gap-5"
-        onKeyDown={handleKeyDown}
       >
         {/* Language picker */}
         <motion.div
@@ -74,8 +73,9 @@ export default function WelcomeScreen({ onStart }) {
           {[{ code: 'de', label: '🇩🇪 Deutsch' }, { code: 'en', label: '🇬🇧 English' }].map((l, idx) => (
             <button
               key={l.code}
-              onClick={() => setLang(l.code)}
+              onClick={() => { setLang(l.code); setFocusIdx(idx); }}
               onFocus={() => setFocusIdx(idx)}
+              onKeyDown={handleKeyDown}
               tabIndex={focusIdx === idx ? 0 : -1}
               autoFocus={idx === 0}
               className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
@@ -127,21 +127,22 @@ export default function WelcomeScreen({ onStart }) {
         </motion.div>
 
         {/* CTA */}
-        <motion.button
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6 }}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => onStart(lang)}
-          onFocus={() => setFocusIdx(2)}
-          tabIndex={focusIdx === 2 ? 0 : -1}
-          className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
-            focusIdx === 2 ? 'ring-2 ring-white' : ''
-          }`}
-        >
-          {t.cta}
-        </motion.button>
+         <motion.button
+           initial={{ opacity: 0, scale: 0.9 }}
+           animate={{ opacity: 1, scale: 1 }}
+           transition={{ delay: 0.6 }}
+           whileHover={{ scale: 1.03 }}
+           whileTap={{ scale: 0.97 }}
+           onClick={() => onStart(lang)}
+           onFocus={() => setFocusIdx(2)}
+           onKeyDown={handleKeyDown}
+           tabIndex={focusIdx === 2 ? 0 : -1}
+           className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
+             focusIdx === 2 ? 'ring-2 ring-white' : ''
+           }`}
+         >
+           {t.cta}
+         </motion.button>
 
         <p className="text-white/30 text-xs">{t.hint}</p>
       </motion.div>
