@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
-  const [focusLevel, setFocusLevel] = useState(0); // 0 = Sprachen-Ebene, 1 = Button-Ebene
+  const [focusLevel, setFocusLevel] = useState(0); // 0 = Brain-Icon, 1 = Sprachen-Ebene, 2 = Button-Ebene
 
   const text = {
     de: {
@@ -35,19 +35,19 @@ export default function WelcomeScreen({ onStart }) {
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setFocusLevel(0);
+      setFocusLevel(prev => (prev > 0 ? prev - 1 : 0));
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setFocusLevel(1);
+      setFocusLevel(prev => (prev < 2 ? prev + 1 : 2));
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      if (focusLevel === 0) setLang('de');
+      if (focusLevel === 1) setLang('de');
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      if (focusLevel === 0) setLang('en');
+      if (focusLevel === 1) setLang('en');
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (focusLevel === 1) onStart(lang);
+      if (focusLevel === 2) onStart(lang);
     }
   };
 
@@ -65,9 +65,9 @@ export default function WelcomeScreen({ onStart }) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
           onKeyDown={handleKeyDown}
-          tabIndex={focusLevel === 0 ? 0 : -1}
+          tabIndex={focusLevel === 1 ? 0 : -1}
           className={`flex gap-2 bg-white/5 border rounded-xl p-1 transition-all ${
-            focusLevel === 0 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
+            focusLevel === 1 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
           }`}
         >
           {[{ code: 'de', label: '🇩🇪 Deutsch' }, { code: 'en', label: '🇬🇧 English' }].map((l) => (
@@ -87,15 +87,20 @@ export default function WelcomeScreen({ onStart }) {
         </motion.div>
 
         {/* Brain logo */}
-        <motion.div
+        <motion.button
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.15, duration: 0.5, type: 'spring' }}
-          className="w-24 h-24 rounded-3xl flex items-center justify-center text-5xl shadow-2xl"
-          style={{ background: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)', boxShadow: '0 0 60px rgba(139,92,246,0.5)' }}
+          onClick={() => setFocusLevel(0)}
+          onKeyDown={handleKeyDown}
+          tabIndex={focusLevel === 0 ? 0 : -1}
+          className={`w-24 h-24 rounded-3xl flex items-center justify-center text-5xl shadow-2xl transition-all ${
+            focusLevel === 0 ? 'ring-2 ring-white' : ''
+          }`}
+          style={{ background: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)', boxShadow: focusLevel === 0 ? '0 0 60px rgba(139,92,246,0.8), 0 0 0 2px white' : '0 0 60px rgba(139,92,246,0.5)' }}
         >
           🧠
-        </motion.div>
+        </motion.button>
 
         {/* Title */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
@@ -133,9 +138,9 @@ export default function WelcomeScreen({ onStart }) {
            onClick={() => onStart(lang)}
            onContextMenu={(e) => { e.preventDefault(); onStart(lang); }}
            onKeyDown={handleKeyDown}
-           tabIndex={focusLevel === 1 ? 0 : -1}
+           tabIndex={focusLevel === 2 ? 0 : -1}
            className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
-             focusLevel === 1 ? 'ring-2 ring-white' : ''
+             focusLevel === 2 ? 'ring-2 ring-white' : ''
            }`}
          >
            {t.cta}
