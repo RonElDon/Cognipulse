@@ -203,14 +203,17 @@ export default function OnboardingFlow({ onComplete }) {
       setSelectedOptionIdx(0);
       setInput('');
       setDateInput({ day: '', month: '', year: '' });
-      const answerKey = questions[prevStep].id;
+      const answerKey = questions[currentStep].id;
       setAnswers(prev => {
         const newAnswers = { ...prev };
         delete newAnswers[answerKey];
         return newAnswers;
       });
-      // Remove last 2 messages (user answer + next question)
-      setMessages(prev => prev.slice(0, -2));
+      // Remove last 2 messages (user answer + next question), show previous question again
+      setMessages(prev => {
+        const newMsgs = prev.slice(0, -2);
+        return [...newMsgs, { role: 'assistant', content: QUESTIONS[language][prevStep].question }];
+      });
       setEmotion('happy');
     }
   };
