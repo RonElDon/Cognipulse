@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import History from './pages/History';
 import NeuroDemo from './pages/NeuroDemo';
 import Duel from './pages/Duel';
+import BaselineAssessment from './pages/BaselineAssessment';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
         <Route path="/history" element={<History />} />
         <Route path="/neuro-demo" element={<NeuroDemo />} />
         <Route path="/duel" element={<Duel />} />
+        <Route path="/baseline" element={<BaselineAssessment />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

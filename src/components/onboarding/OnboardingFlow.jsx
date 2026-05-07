@@ -190,7 +190,7 @@ export default function OnboardingFlow({ onComplete }) {
     setPhase('baseline_waiting');
     setEmotion('waiting');
     startBaselinePolling();
-    navigate('/train');
+    navigate('/baseline');
   };
 
   const sendMessage = async (text) => {
