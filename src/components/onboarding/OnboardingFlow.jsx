@@ -220,7 +220,7 @@ export default function OnboardingFlow({ onComplete }) {
 
   const visibleMessages = messages.filter(m => {
     if (!m.content?.trim()) return false; // hide empty messages
-    if (m.role === 'user' && (m.content.startsWith('Starte das Onboarding') || m.content.startsWith('The user has chosen'))) return false;
+    if (m.role === 'user' && (m.content.startsWith('Starte das Onboarding') || m.content.startsWith('The user has chosen') || m.content.includes('Wie heißt du') || m.content.includes('What is your name'))) return false;
     return true;
   });
 
