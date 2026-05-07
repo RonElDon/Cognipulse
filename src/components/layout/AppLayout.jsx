@@ -19,6 +19,20 @@ export default function AppLayout({ lang = 'de' }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
+
+  const handleDebugReset = async () => {
+    try {
+      const user = await base44.auth.me();
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      if (profiles.length > 0) {
+        await base44.entities.UserProfile.update(profiles[0].id, { onboarding_completed: false });
+        window.location.reload();
+      }
+    } catch (e) {
+      console.error('Reset failed:', e);
+    }
+  };
+
   const DarkToggle = () => (
     <div className="flex items-center gap-1 bg-slate-800 dark:bg-slate-700 rounded-xl p-1">
       <button
@@ -162,6 +176,15 @@ export default function AppLayout({ lang = 'de' }) {
           );
         })}
       </div>
+
+      {/* Debug Reset Button */}
+      <button
+        onClick={handleDebugReset}
+        className="fixed top-2 left-2 z-50 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-lg transition-colors"
+        title="Debug: Onboarding neu starten"
+      >
+        🔄 RESET
+      </button>
 
       {/* Neuro Mascot — global */}
       <NeuroMascot popupsEnabled={true} />
