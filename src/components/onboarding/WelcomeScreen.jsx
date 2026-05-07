@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, useAnimationControls } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
@@ -8,7 +8,6 @@ export default function WelcomeScreen({ onStart }) {
   const brainRef = useRef(null);
   const languageContainerRef = useRef(null);
   const ctaRef = useRef(null);
-  const brainControls = useAnimationControls();
 
   // Automatisch Fokus auf das aktuelle focusLevel Element setzen
   useEffect(() => {
@@ -51,7 +50,7 @@ export default function WelcomeScreen({ onStart }) {
 
   const t = text[lang];
 
-  const handleKeyDown = async (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (focusLevel > 0) setFocusLevel(prev => prev - 1);
@@ -64,9 +63,6 @@ export default function WelcomeScreen({ onStart }) {
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
       if (focusLevel === 0 && lang !== 'en') setLang('en');
-    } else if (e.key === 'Enter' && focusLevel === 1) {
-      e.preventDefault();
-      await brainControls.start({ scale: [1, 0.85, 1], transition: { duration: 0.3, ease: 'easeInOut' } });
     } else if (e.key === 'Enter' && focusLevel === 2) {
       e.preventDefault();
       onStart(lang);
@@ -113,17 +109,12 @@ export default function WelcomeScreen({ onStart }) {
           ref={brainRef}
           tabIndex={focusLevel === 1 ? 0 : -1}
           initial={{ scale: 0.7, opacity: 0 }}
-          animate={brainControls}
+          animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.15, duration: 0.5, type: 'spring' }}
           className={`w-24 h-24 rounded-3xl flex items-center justify-center text-5xl shadow-2xl transition-all cursor-default ${
             focusLevel === 1 ? 'ring-2 ring-white' : ''
           }`}
           style={{ background: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)', boxShadow: focusLevel === 1 ? '0 0 60px rgba(139,92,246,0.8), 0 0 0 2px white' : '0 0 60px rgba(139,92,246,0.5)' }}
-          onAnimationStart={() => {
-            if (focusLevel === 1) {
-              brainControls.set({ scale: 1, opacity: 1 });
-            }
-          }}
         >
           🧠
         </motion.div>
