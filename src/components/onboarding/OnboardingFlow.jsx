@@ -306,8 +306,18 @@ export default function OnboardingFlow({ onComplete }) {
               <button
                 key={opt}
                 onClick={() => handleAnswer(opt)}
-                onFocus={() => setSelectedOptionIdx(idx)}
-                onKeyDown={handleKeyDown}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    setSelectedOptionIdx((prev) => (prev - 1 + currentQuestion.options.length) % currentQuestion.options.length);
+                  } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    setSelectedOptionIdx((prev) => (prev + 1) % currentQuestion.options.length);
+                  } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAnswer(opt);
+                  }
+                }}
                 tabIndex={selectedOptionIdx === idx ? 0 : -1}
                 autoFocus={idx === 0}
                 disabled={saving}
