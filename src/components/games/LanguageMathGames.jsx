@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useKeyboard } from '@/lib/useKeyboard';
 
 // ─── LANGUAGE GAMES ───────────────────────────────────────────────────────────
 
@@ -52,6 +53,7 @@ export function SynonymFind({ onComplete, level }) {
   const shuffled = useRef([...pairs].sort(()=>Math.random()-0.5));
 
   const handle=(i)=>{ const p=shuffled.current[idx]; const correct=i===p.correct; if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:500}),200);}else setIdx(ni); };
+  useKeyboard({ '1':()=>handle(0), '2':()=>handle(1), '3':()=>handle(2), '4':()=>handle(3) }, [idx, score]);
   const p=shuffled.current[idx];
 
   return (
@@ -106,6 +108,7 @@ export function WordChain({ onComplete, level }) {
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
 
+  useKeyboard({ '1':()=>handle(chain.connections[idx][0]), '2':()=>handle(chain.connections[idx][1]), '3':()=>handle(chain.connections[idx][2]), '4':()=>handle(chain.connections[idx][3]) }, [idx, score]);
   const handle=(word)=>{
     setScore(s=>s+1);
     const ni=idx+1;
@@ -135,6 +138,7 @@ export function OddWordOut({ onComplete, level }) {
   const shuffled = useRef([...groups].sort(()=>Math.random()-0.5));
 
   const handle=(i)=>{ const g=shuffled.current[idx]; const correct=i===g.odd; if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:400}),200);}else setIdx(ni); };
+  useKeyboard({ '1':()=>handle(0), '2':()=>handle(1), '3':()=>handle(2), '4':()=>handle(3) }, [idx, score]);
   const g=shuffled.current[idx];
 
   return (
@@ -158,6 +162,7 @@ export function DefinitionMatch({ onComplete, level }) {
   const shuffled = useRef([...defs].sort(()=>Math.random()-0.5));
 
   const handle=(i)=>{ const d=shuffled.current[idx]; const correct=i===d.correct; if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:500}),200);}else setIdx(ni); };
+  useKeyboard({ '1':()=>handle(0), '2':()=>handle(1), '3':()=>handle(2), '4':()=>handle(3) }, [idx, score]);
   const d=shuffled.current[idx];
 
   return (
@@ -189,6 +194,7 @@ export function VerbalMemory({ onComplete, level }) {
     return()=>clearInterval(ti);
   },[phase]);
 
+  useKeyboard({ 'j':()=>handle(true), 'y':()=>handle(true), 'n':()=>handle(false), '1':()=>handle(true), '2':()=>handle(false) }, [idx, score, errors, phase]);
   const handle=(ans)=>{
     const word=tested[idx]; const isShown=shown.includes(word);
     if(ans===isShown) setScore(s=>s+1); else setErrors(e=>e+1);
@@ -234,6 +240,7 @@ export function MentalMath({ onComplete, level }) {
 
   useEffect(()=>{const ti=setInterval(()=>setTimeLeft(t=>{if(t<=1){clearInterval(ti);const acc=total.current>0?Math.round(score/total.current*100):0;setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:400}),300);return 0;}return t-1;}),1000);return()=>clearInterval(ti);},[score]);
 
+  useKeyboard({ '1':()=>handle(problem.opts[0]), '2':()=>handle(problem.opts[1]), '3':()=>handle(problem.opts[2]), '4':()=>handle(problem.opts[3]) }, [problem, score]);
   const handle=(ans)=>{ total.current++; if(ans===problem.answer) setScore(s=>s+1); else setErrors(e=>e+1); setProblem(genProblem(level)); };
 
   return (
@@ -320,6 +327,7 @@ export function MissingNumber({ onComplete, level }) {
   const [eq, setEq] = useState(()=>genEq(level));
   const total = 4+level;
 
+  useKeyboard({ '1':()=>handle(eq.opts[0]), '2':()=>handle(eq.opts[1]), '3':()=>handle(eq.opts[2]), '4':()=>handle(eq.opts[3]) }, [eq, idx, score]);
   const handle=(ans)=>{ const correct=ans===eq.answer; if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:400}),200);}else{setIdx(ni);setEq(genEq(level));} };
 
   return (
@@ -343,6 +351,7 @@ export function FractionFight({ onComplete, level }) {
   const shuffled = useRef([...fractions].sort(()=>Math.random()-0.5));
 
   const handle=(bigger)=>{ const f=shuffled.current[idx]; const correct=bigger?(f.aVal>f.bVal):(f.bVal>f.aVal); if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:500}),200);}else setIdx(ni); };
+  useKeyboard({ '1':()=>handle(true), 'a':()=>handle(true), '2':()=>handle(false), 'b':()=>handle(false) }, [idx, score]);
   const f=shuffled.current[idx];
 
   return (
@@ -369,6 +378,7 @@ export function MathPatterns({ onComplete, level }) {
 
   const handle=(ans)=>{ const p=shuffled.current[idx]; const correct=ans===p.answer; if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:400}),200);}else setIdx(ni); };
   const p=shuffled.current[idx];
+  useKeyboard({ '1':()=>handle(p.opts[0]), '2':()=>handle(p.opts[1]), '3':()=>handle(p.opts[2]), '4':()=>handle(p.opts[3]) }, [idx, score]);
 
   return (
     <div className="space-y-4">

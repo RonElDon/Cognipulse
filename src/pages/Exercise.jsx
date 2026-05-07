@@ -6,6 +6,7 @@ import { EXERCISES, DOMAINS } from '@/lib/exercises';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
 import NeuroMascot from '@/components/mascot/NeuroMascot';
 import GAME_MAP from '@/components/games/GameMap';
+import { useKeyboard } from '@/lib/useKeyboard';
 
 
 
@@ -18,6 +19,8 @@ export default function Exercise() {
   const [lastNeuroResult, setLastNeuroResult] = useState(null);
   const [saving, setSaving] = useState(false);
   const [level, setLevel] = useState(exercise?.difficulty || 1);
+
+  useKeyboard({ 'Enter': () => { if (phase === 'intro') setPhase('playing'); else if (phase === 'result') { setPhase('intro'); setResult(null); } }, '1': () => phase === 'intro' && setLevel(1), '2': () => phase === 'intro' && setLevel(2), '3': () => phase === 'intro' && setLevel(3) }, [phase]);
 
   if (!exercise) return <div className="p-8 text-center text-slate-500">Übung nicht gefunden</div>;
 
@@ -109,6 +112,7 @@ export default function Exercise() {
                 >
                   Übung starten! 🚀
                 </button>
+                <p className="text-xs text-slate-400 text-center">⌨️ Tasten: 1/2/3 = Schwierigkeitsgrad · Enter = Starten · In Spielen: Ziffern & J/N</p>
               </motion.div>
             )}
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useKeyboard } from '@/lib/useKeyboard';
 
 // ─── MEMORY GAMES ─────────────────────────────────────────────────────────────
 
@@ -54,6 +55,7 @@ export function SequenceRecall({ onComplete, level }) {
   const [round, setRound] = useState(1);
   const maxRound = 4 + level;
   const colors = [{ bg:'bg-red-400', label:'🔴' },{ bg:'bg-blue-400', label:'🔵' },{ bg:'bg-green-400', label:'🟢' },{ bg:'bg-yellow-400', label:'🟡' }];
+  useKeyboard({ '1':()=>phase==='input'&&handleInput(0), '2':()=>phase==='input'&&handleInput(1), '3':()=>phase==='input'&&handleInput(2), '4':()=>phase==='input'&&handleInput(3) }, [phase, userSeq, sequence, round]);
 
   const startRound = useCallback((seq) => {
     const newSeq = [...seq, Math.floor(Math.random()*4)];
@@ -138,6 +140,7 @@ export function NBackChallenge({ onComplete, level }) {
   const totalRounds = 15;
   const responded = useRef(false);
   const histRef = useRef([]);
+  useKeyboard({ ' ': () => handleMatch(), 'Enter': () => handleMatch() }, [score, errors, round]);
 
   useEffect(() => {
     const iv = setInterval(() => {
@@ -220,6 +223,7 @@ export function ColorSequenceSimon({ onComplete, level }) {
     {id:2,bg:'bg-green-500',active:'bg-green-300',label:'🟢'},
     {id:3,bg:'bg-yellow-400',active:'bg-yellow-200',label:'🟡'},
   ];
+  useKeyboard({ '1':()=>handleInput(0), '2':()=>handleInput(1), '3':()=>handleInput(2), '4':()=>handleInput(3) }, [phase, userInput, seq, round]);
   const [seq, setSeq] = useState([]);
   const [userInput, setUserInput] = useState([]);
   const [phase, setPhase] = useState('show');
@@ -270,6 +274,7 @@ export function StoryRecall({ onComplete, level }) {
   const [timeLeft, setTimeLeft] = useState(8+level*2);
   const [qIdx, setQIdx] = useState(0);
   const [correct, setCorrect] = useState(0);
+  useKeyboard({ '1':()=>phase==='quiz'&&handleAnswer(0), '2':()=>phase==='quiz'&&handleAnswer(1), '3':()=>phase==='quiz'&&handleAnswer(2) }, [phase, qIdx, correct]);
 
   useEffect(()=>{
     if(phase!=='read') return;
@@ -332,6 +337,7 @@ export function TaskSwitch({ onComplete, level }) {
   const [errors, setErrors] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
   const total = useRef(0);
+  // keyboard added after options is computed below
 
   const nextItem = () => {
     setRule(rules[Math.floor(Math.random()*2)]);
@@ -351,6 +357,7 @@ export function TaskSwitch({ onComplete, level }) {
   };
 
   const options=rule==='Farbe'?colorNames.map(c=>({label:c,value:c})):shapes.slice(0,4).map(s=>({label:s,value:s}));
+  useKeyboard({ '1':()=>handleAnswer(options[0]?.value), '2':()=>handleAnswer(options[1]?.value), '3':()=>handleAnswer(options[2]?.value), '4':()=>handleAnswer(options[3]?.value) }, [rule, item, score]);
   return (
     <div className="space-y-4">
       <div className="flex justify-between text-sm font-bold text-slate-600"><span>⏱ {timeLeft}s</span><span className="text-emerald-600">Regel: {rule}</span><span className="text-green-600">✓ {score}</span></div>
@@ -372,6 +379,7 @@ export function StopSignal({ onComplete, level }) {
   const isStop = useRef(false);
   const responded = useRef(false);
   const roundRef = useRef(0);
+  useKeyboard({ ' ': () => handleTap(), 'Enter': () => handleTap() }, [score, errors, round]);
 
   const nextRound = useCallback(() => {
     if (roundRef.current >= total) return;
@@ -411,6 +419,7 @@ export function StroopChallenge({ onComplete, level }) {
   const [errors, setErrors] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
   const total = useRef(0);
+  useKeyboard({ '1':()=>handleAnswer(colorNames[0]), '2':()=>handleAnswer(colorNames[1]), '3':()=>handleAnswer(colorNames[2]), '4':()=>handleAnswer(colorNames[3]) }, [item, score]);
 
   const nextItem = () => setItem({ word:colorNames[Math.floor(Math.random()*4)], inkColor:colorNames[Math.floor(Math.random()*4)] });
   useEffect(()=>{
@@ -438,6 +447,7 @@ export function RuleShift({ onComplete, level }) {
   const [timeLeft, setTimeLeft] = useState(30);
   const [item, setItem] = useState({size:'groß',color:'rot',shape:'Kreis'});
   const total = useRef(0); const counter = useRef(0);
+  useKeyboard({ '1':()=>handleAnswer(getOptions()[0]?.val), '2':()=>handleAnswer(getOptions()[1]?.val) }, [ruleIdx, item, score]);
 
   const nextItem=()=>{ counter.current++; if(counter.current%4===0) setRuleIdx(r=>(r+1)%rules.length); setItem({size:['groß','klein'][Math.floor(Math.random()*2)],color:['rot','blau'][Math.floor(Math.random()*2)],shape:['Kreis','Quadrat'][Math.floor(Math.random()*2)]}); };
 

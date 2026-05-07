@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useKeyboard } from '@/lib/useKeyboard';
 
 // ─── VISUOMOTOR GAMES ─────────────────────────────────────────────────────────
 
@@ -100,6 +101,7 @@ export function GridNavigator({ onComplete, level }) {
   const [moves, setMoves] = useState(0);
   const [done, setDone] = useState(false);
   const optimal = (size-1)*2;
+  useKeyboard({ 'ArrowUp':()=>move(0,-1), 'ArrowDown':()=>move(0,1), 'ArrowLeft':()=>move(-1,0), 'ArrowRight':()=>move(1,0), 'w':()=>move(0,-1), 's':()=>move(0,1), 'a':()=>move(-1,0), 'd':()=>move(1,0) }, [pos, done, moves]);
 
   const move=(dx,dy)=>{
     if(done) return;
@@ -143,6 +145,7 @@ export function SymbolMatch({ onComplete, level }) {
   const [errors, setErrors] = useState(0);
   const [current, setCurrent] = useState(()=>symbols[Math.floor(Math.random()*symbols.length)]);
   const total = useRef(0);
+  useKeyboard({ '1':()=>handle('1'), '2':()=>handle('2'), '3':()=>handle('3'), '4':()=>handle('4'), '5':()=>handle('5'), '6':()=>handle('6') }, [current, score]);
 
   useEffect(()=>{
     const ti=setInterval(()=>setTimeLeft(t=>{if(t<=1){clearInterval(ti);const acc=total.current>0?Math.round(score/total.current*100):0;setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:300}),300);return 0;}return t-1;}),1000);
@@ -200,6 +203,7 @@ export function ReactionTimer({ onComplete, level }) {
   const totalRounds = 5+level;
   const startRef = useRef(null);
   const timerRef = useRef(null);
+  useKeyboard({ ' ': () => handleTap(), 'Enter': () => handleTap() }, [phase, reactions, round]);
 
   const startRound = useCallback(()=>{
     setPhase('waiting');
@@ -237,6 +241,7 @@ export function DecisionDash({ onComplete, level }) {
   const [current, setCurrent] = useState(()=>Math.floor(Math.random()*20)+1);
   const [rule] = useState(()=>['gerade','ungerade','> 10','< 10'][Math.floor(Math.random()*4)]);
   const total = useRef(0);
+  useKeyboard({ 'j':()=>handle(true), 'y':()=>handle(true), 'n':()=>handle(false), '1':()=>handle(true), '2':()=>handle(false) }, [current, score]);
 
   const isCorrect=(n)=>{if(rule==='gerade')return n%2===0;if(rule==='ungerade')return n%2!==0;if(rule==='> 10')return n>10;return n<10;};
   useEffect(()=>{const ti=setInterval(()=>setTimeLeft(t=>{if(t<=1){clearInterval(ti);const acc=total.current>0?Math.round(score/total.current*100):0;setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:300}),300);return 0;}return t-1;}),1000);return()=>clearInterval(ti);},[score]);
@@ -264,6 +269,7 @@ export function NumberCompare({ onComplete, level }) {
   const total = useRef(0);
   const max = Math.pow(10, level+1);
   const next=()=>{setA(Math.floor(Math.random()*max));setB(Math.floor(Math.random()*max));};
+  useKeyboard({ '1':()=>handle(true), 'a':()=>handle(true), '2':()=>handle(false), 'b':()=>handle(false) }, [a, b, score]);
 
   useEffect(()=>{const ti=setInterval(()=>setTimeLeft(t=>{if(t<=1){clearInterval(ti);const acc=total.current>0?Math.round(score/total.current*100):0;setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:300}),300);return 0;}return t-1;}),1000);return()=>clearInterval(ti);},[score]);
 
@@ -300,6 +306,7 @@ export function TrueFalseBlitz({ onComplete, level }) {
   useEffect(()=>{const ti=setInterval(()=>setTimeLeft(t=>{if(t<=1){clearInterval(ti);const total=score+errors;const acc=total>0?Math.round(score/total*100):0;setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:400}),300);return 0;}return t-1;}),1000);return()=>clearInterval(ti);},[score,errors]);
 
   const handle=(ans)=>{ const s=shuffled.current[idx%shuffled.current.length]; if(ans===s.a) setScore(sc=>sc+1); else setErrors(e=>e+1); setIdx(i=>i+1); };
+  useKeyboard({ 'j':()=>handle(true), 'y':()=>handle(true), 'n':()=>handle(false), '1':()=>handle(true), '2':()=>handle(false) }, [idx, score, errors]);
   const s=shuffled.current[idx%shuffled.current.length];
 
   return (
@@ -340,6 +347,7 @@ export function PatternMaster({ onComplete, level }) {
   };
 
   const p=shuffled.current[idx];
+  useKeyboard({ '1':()=>handle(p.opts[0]), '2':()=>handle(p.opts[1]), '3':()=>handle(p.opts[2]), '4':()=>handle(p.opts[3]) }, [idx, score, feedback]);
   return (
     <div className="space-y-4">
       <div className="text-sm font-bold text-slate-600 text-center">{idx+1}/{total} • Was kommt als nächstes?</div>
@@ -370,6 +378,7 @@ export function NumberSequences({ onComplete, level }) {
   const s=shuffled.current[idx];
   const diff=s.next-s.seq[s.seq.length-1];
   const opts=[s.next,s.next+Math.abs(diff),s.next-Math.abs(diff),s.next*2].filter((v,i,a)=>a.indexOf(v)===i&&v>0).sort(()=>Math.random()-0.5).slice(0,4);
+  useKeyboard({ '1':()=>handle(String(opts[0])), '2':()=>handle(String(opts[1])), '3':()=>handle(String(opts[2])), '4':()=>handle(String(opts[3])) }, [idx, score]);
 
   return (
     <div className="space-y-4">
@@ -395,6 +404,7 @@ export function LogicPuzzles({ onComplete, level }) {
 
   const handle=(i)=>{ const p=shuffled.current[idx]; const correct=i===p.correct; if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:600}),200);}else setIdx(ni); };
   const p=shuffled.current[idx];
+  useKeyboard({ '1':()=>handle(0), '2':()=>handle(1), '3':()=>handle(2), '4':()=>handle(3) }, [idx, score]);
 
   return (
     <div className="space-y-4">
@@ -418,6 +428,7 @@ export function MatrixReasoning({ onComplete, level }) {
 
   const handle=(opt)=>{ const m=shuffled.current[idx]; const correct=opt===m.answer; if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:500}),200);}else setIdx(ni); };
   const m=shuffled.current[idx];
+  useKeyboard({ '1':()=>handle(m.opts[0]), '2':()=>handle(m.opts[1]), '3':()=>handle(m.opts[2]), '4':()=>handle(m.opts[3]) }, [idx, score]);
 
   return (
     <div className="space-y-4">
@@ -444,6 +455,7 @@ export function AnalogyTrain({ onComplete, level }) {
 
   const handle=(i)=>{ const a=shuffled.current[idx]; const correct=i===a.correct; if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:500}),200);}else setIdx(ni); };
   const a=shuffled.current[idx];
+  useKeyboard({ '1':()=>handle(0), '2':()=>handle(1), '3':()=>handle(2), '4':()=>handle(3) }, [idx, score]);
 
   return (
     <div className="space-y-4">
@@ -467,6 +479,7 @@ export function CategorySort({ onComplete, level }) {
 
   const getCategory=(word)=>categories.findIndex(c=>c.words.includes(word));
   const handle=(catIdx)=>{ const word=allWords.current[wordIdx%total]; if(catIdx===getCategory(word)) setScore(s=>s+1); else setErrors(e=>e+1); const ni=wordIdx+1; if(ni>=total){const acc=Math.round((score+(catIdx===getCategory(word)?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:400}),300);}else setWordIdx(ni); };
+  useKeyboard({ '1':()=>handle(0), '2':()=>handle(1), '3':()=>handle(2) }, [wordIdx, score, errors]);
 
   return (
     <div className="space-y-4">
@@ -493,6 +506,7 @@ export function SyllogismSprint({ onComplete, level }) {
   const shuffled = useRef([...syllogisms].sort(()=>Math.random()-0.5));
 
   const handle=(ans)=>{ const s=shuffled.current[idx]; const correct=ans===s.correct; if(correct) setScore(sc=>sc+1); else setErrors(e=>e+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:400}),200);}else setIdx(ni); };
+  useKeyboard({ 'j':()=>handle(true), 'y':()=>handle(true), 'n':()=>handle(false), '1':()=>handle(true), '2':()=>handle(false) }, [idx, score, errors]);
   const s=shuffled.current[idx];
 
   return (
@@ -518,6 +532,7 @@ export function DeductionGame({ onComplete, level }) {
   const total = Math.min(2+level, puzzles.length);
 
   const handle=(i)=>{ const p=puzzles[idx]; const correct=i===p.correct; if(correct) setScore(s=>s+1); const ni=idx+1; if(ni>=total){const acc=Math.round((score+(correct?1:0))/total*100);setTimeout(()=>onComplete({score:acc,accuracy:acc,reaction_time_ms:600}),200);}else setIdx(ni); };
+  useKeyboard({ '1':()=>handle(0), '2':()=>handle(1), '3':()=>handle(2), '4':()=>handle(3) }, [idx, score]);
   const p=puzzles[idx];
 
   return (

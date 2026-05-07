@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useKeyboard } from '@/lib/useKeyboard';
 
 // att_1: Spotlight Focus
 export function SpotlightFocus({ onComplete, level }) {
@@ -116,6 +117,7 @@ export function ColorSwitch({ onComplete, level }) {
   const [errors, setErrors] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
   const total = useRef(0);
+  useKeyboard({ 'j': () => handleYes(), 'y': () => handleYes(), 'n': () => handleNo(), ' ': () => handleYes() }, [score, errors]);
 
   useEffect(() => {
     const ti = setInterval(() => setTimeLeft(t => {
@@ -151,6 +153,7 @@ export function SustainedWatch({ onComplete, level }) {
   const [timeLeft, setTimeLeft] = useState(40);
   const targetRef = useRef(false);
   const total = useRef(0);
+  useKeyboard({ ' ': () => handleTap() }, [hits, misses]);
 
   useEffect(() => {
     const showNext = () => {
@@ -270,6 +273,7 @@ export function FlashDetect({ onComplete, level }) {
   const total = 6;
   const startRef = useRef(null);
   const timerRef = useRef(null);
+  useKeyboard({ ' ': () => handleTap(), 'Enter': () => handleTap() }, [phase, results, round]);
 
   const nextRound = useCallback(() => {
     setPhase('waiting');
@@ -316,6 +320,7 @@ export function FocusMarathon({ onComplete, level }) {
   const [errors, setErrors] = useState(0);
   const [timeLeft, setTimeLeft] = useState(45);
   const [current, setCurrent] = useState({ shape: '🔵', isTarget: true });
+  useKeyboard({ 'j': () => handleYes(), 'y': () => handleYes(), 'n': () => handleNo(), ' ': () => handleYes() }, [streak, errors, current]);
 
   const generate = () => {
     const shapes = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠'];
