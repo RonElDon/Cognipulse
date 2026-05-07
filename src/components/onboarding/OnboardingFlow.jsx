@@ -328,10 +328,10 @@ export default function OnboardingFlow({ onComplete }) {
                 tabIndex={selectedOptionIdx === idx ? 0 : -1}
                 autoFocus={idx === 0}
                 disabled={saving}
-                className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 ${
+                className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 text-white border ${
                   selectedOptionIdx === idx
-                    ? 'text-white bg-gradient-to-r from-purple-600 to-indigo-600 border border-purple-400 shadow-lg'
-                    : 'text-white bg-white/10 hover:bg-white/20 border border-white/15'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400 shadow-lg'
+                    : 'bg-white/10 hover:bg-white/20 border-white/15'
                 }`}
               >
                 {getEmojiForAnswer(opt)} {opt}
