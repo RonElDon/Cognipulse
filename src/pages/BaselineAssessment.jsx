@@ -5,6 +5,7 @@ import { ArrowLeft, CheckCircle2, ChevronRight } from 'lucide-react';
 import GAME_MAP from '@/components/games/GameMap';
 import { DOMAINS } from '@/lib/exercises';
 import { base44 } from '@/api/base44Client';
+import PostAssessmentNeuro from '@/components/onboarding/PostAssessmentNeutro';
 
 const BASELINE_POOL = {
   attention:  [
@@ -166,43 +167,9 @@ export default function BaselineAssessment() {
     );
   }
 
-  // DONE
+  // DONE — show Neuro post-assessment screen
   if (currentIdx === 6) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex items-center justify-center p-6">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-sm text-center space-y-6"
-        >
-          <div className="text-6xl">🎉</div>
-          <div>
-            <h1 className="text-2xl font-black text-white mb-2">Test abgeschlossen!</h1>
-            <p className="text-white/60 text-sm">Neuro analysiert jetzt deine Ergebnisse und stellt dein Training zusammen.</p>
-          </div>
-          <div className="space-y-2">
-            {results.map((r, i) => {
-              const domain = DOMAINS[r.domain];
-              const domainMeta = BASELINE_EXERCISES.find(ex => ex.domain === r.domain);
-              return (
-                <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
-                  <span className="text-xl">{domainMeta?.icon || '🧠'}</span>
-                  <div className="flex-1 text-left">
-                    <div className="text-white/80 text-xs font-semibold">{domainMeta?.name || r.domain}</div>
-                  </div>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span className="font-black text-sm" style={{ color: domain?.color || '#fff' }}>{r.score}%</span>
-                </div>
-              );
-            })}
-          </div>
-          <button
-            onClick={() => navigate('/')}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-black text-base shadow-xl hover:from-emerald-500 hover:to-cyan-500 transition-all"
-          >
-            Zur App →
-          </button>
-        </motion.div>
-      </div>
-    );
+    return <PostAssessmentNeuro results={results} />;
   }
 
   // EXERCISE
