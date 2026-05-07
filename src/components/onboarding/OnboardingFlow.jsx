@@ -441,7 +441,7 @@ export default function OnboardingFlow({ onComplete }) {
                 type="text"
                 inputMode="numeric"
                 placeholder="TT"
-                value={padInput(dateInput.day, 2)}
+                value={dateFocus === 'day' ? dateInput.day : padInput(dateInput.day, 2)}
                 onChange={e => {
                   let val = e.target.value.replace(/\D/g, '').slice(-2);
                   setDateInput(p => ({ ...p, day: val }));
@@ -463,7 +463,7 @@ export default function OnboardingFlow({ onComplete }) {
                 type="text"
                 inputMode="numeric"
                 placeholder="MM"
-                value={padInput(dateInput.month, 2)}
+                value={dateFocus === 'month' ? dateInput.month : padInput(dateInput.month, 2)}
                 onChange={e => {
                   let val = e.target.value.replace(/\D/g, '').slice(-2);
                   setDateInput(p => ({ ...p, month: val }));
@@ -485,7 +485,7 @@ export default function OnboardingFlow({ onComplete }) {
                 type="text"
                 inputMode="numeric"
                 placeholder="YYYY"
-                value={dateInput.year}
+                value={dateFocus === 'year' ? dateInput.year : padInput(dateInput.year, 4)}
                 onChange={e => {
                   let val = e.target.value.replace(/\D/g, '').slice(-4);
                   setDateInput(p => ({ ...p, year: val }));
