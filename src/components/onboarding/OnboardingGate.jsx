@@ -13,7 +13,20 @@ export default function OnboardingGate({ children }) {
     try {
       const user = await base44.auth.me();
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-      if (!profiles.length || !profiles[0]?.onboarding_completed) {
+      if (!profiles.length) {
+        // Create empty profile first so Neuro can update it
+        await base44.entities.UserProfile.create({
+          display_name: user.full_name || '',
+          preferred_language: 'de',
+          total_xp: 0,
+          current_streak: 0,
+          longest_streak: 0,
+          badges: [],
+          goals: { daily_exercises: 3, focus_domains: [] },
+          onboarding_completed: false,
+        });
+        setStatus('onboarding');
+      } else if (!profiles[0]?.onboarding_completed) {
         setStatus('onboarding');
       } else {
         setStatus('done');
