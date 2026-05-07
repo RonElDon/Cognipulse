@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { DOMAINS, getLevel } from '@/lib/exercises';
-import { Trophy, Medal, Zap } from 'lucide-react';
+import { Trophy, Medal, Zap, Share2, Swords } from 'lucide-react';
+import { ShareAchievementModal } from '@/components/social/SocialShareWidget';
 
 export default function Leaderboard() {
   const [allProfiles, setAllProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
   const [filterDomain, setFilterDomain] = useState('overall');
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -88,18 +90,23 @@ export default function Leaderboard() {
           </motion.div>
         )}
 
-        {/* My rank highlight */}
-        {myRank && myRank.rank > 3 && (
+        {/* My rank highlight + share */}
+        {myRank && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
             className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-4 text-white shadow-lg"
           >
             <div className="flex items-center gap-3">
               <div className="text-2xl font-black">#{myRank.rank}</div>
               <div className="flex-1">
-                <div className="font-black">Du</div>
+                <div className="font-black">Du · {myRank.display_name || 'Champion'}</div>
                 <div className="text-white/80 text-sm">{myRank.total_xp || 0} XP</div>
               </div>
-              <Zap className="w-6 h-6 text-yellow-300" />
+              <button
+                onClick={() => setShowShareModal(true)}
+                className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all"
+              >
+                <Share2 className="w-3.5 h-3.5" /> Teilen
+              </button>
             </div>
           </motion.div>
         )}
@@ -158,6 +165,16 @@ export default function Leaderboard() {
           )}
         </motion.div>
       </div>
+
+      <AnimatePresence>
+        {showShareModal && (
+          <ShareAchievementModal
+            profile={myRank}
+            rank={myRank?.rank}
+            onClose={() => setShowShareModal(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
