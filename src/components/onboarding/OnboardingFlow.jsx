@@ -138,15 +138,12 @@ export default function OnboardingFlow({ onComplete }) {
     try {
       const user = await base44.auth.me();
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-      if (profiles[0]?.onboarding_completed) {
-        clearInterval(pollRef.current);
-        setTimeout(() => onComplete?.(), 1500);
-      }
+      const profile = profiles[0];
+
       // Check if baseline was just completed while waiting
-      if (phase === 'baseline_waiting' && profiles[0]?.baseline_assessment_completed) {
+      if (phase === 'baseline_waiting' && profile?.baseline_assessment_completed) {
         setPhase('baseline_done');
         clearInterval(pollRef.current);
-        // Tell Neuro the baseline is done so it can continue
         if (conversation) {
           setLoading(true);
           setEmotion('thinking');
@@ -155,6 +152,13 @@ export default function OnboardingFlow({ onComplete }) {
             content: 'Ich habe den Einschätzungstest abgeschlossen.',
           });
         }
+        return;
+      }
+
+      // Only finalize onboarding when BOTH onboarding AND baseline are complete
+      if (profile?.onboarding_completed && profile?.baseline_assessment_completed) {
+        clearInterval(pollRef.current);
+        setTimeout(() => onComplete?.(), 1500);
       }
     } catch (_) {}
   };
@@ -256,6 +260,12 @@ export default function OnboardingFlow({ onComplete }) {
               >
                 <ExternalLink className="w-4 h-4" />
                 Zum Einschätzungstest
+              </button>
+              <button
+                onClick={() => onComplete?.()}
+                className="w-full py-2 text-white/40 text-xs hover:text-white/60 transition-colors"
+              >
+                Jetzt überspringen
               </button>
             </motion.div>
           )}
