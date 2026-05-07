@@ -114,6 +114,7 @@ export default function OnboardingFlow({ onComplete }) {
   const [initialized, setInitialized] = useState(false);
   const [emotion, setEmotion] = useState('happy');
   const [phase, setPhase] = useState('welcome');
+  const [language, setLanguage] = useState('de');
   const chatEndRef = useRef(null);
   const unsubRef = useRef(null);
   const pollRef = useRef(null);
@@ -128,12 +129,13 @@ export default function OnboardingFlow({ onComplete }) {
     return () => { unsubRef.current?.(); clearInterval(pollRef.current); clearTimeout(loadingTimeoutRef.current); };
   }, []);
 
-  const handleWelcomeDone = () => {
+  const handleWelcomeDone = (lang = 'de') => {
+    setLanguage(lang);
     setPhase('chat');
-    initConversation();
+    initConversation(lang);
   };
 
-  const initConversation = async () => {
+  const initConversation = async (lang = 'de') => {
     try {
       const conv = await base44.agents.createConversation({ agent_name: 'neuro', metadata: { name: 'Onboarding' } });
       setConversation(conv);
@@ -165,10 +167,21 @@ export default function OnboardingFlow({ onComplete }) {
 
       setLoading(true);
       setEmotion('thinking');
+      const langInstruction = lang === 'en'
+        ? 'The user has chosen English. Respond ONLY in English for the entire conversation. Start onboarding: greet briefly (1 sentence) and immediately ask for their name.'
+        : 'Starte das Onboarding. Begrüße mich kurz (1 Satz) und frage sofort nach meinem Namen.';
       await base44.agents.addMessage(conv, {
         role: 'user',
-        content: 'Starte das Onboarding. Begrüße mich kurz (1 Satz) und frage sofort nach meinem Namen.',
+        content: langInstruction,
       });
+      // Also save preferred language to profile immediately
+      try {
+        const user = await base44.auth.me();
+        const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+        if (profiles.length > 0) {
+          await base44.entities.UserProfile.update(profiles[0].id, { preferred_language: lang });
+        }
+      } catch (_) {}
       setInitialized(true);
     } catch (e) { console.error(e); }
   };
@@ -221,7 +234,11 @@ export default function OnboardingFlow({ onComplete }) {
     await base44.agents.addMessage(conversation, { role: 'user', content: text });
   };
 
-  const visibleMessages = messages.filter(m => m.role !== 'user' || !m.content.startsWith('Starte das Onboarding'));
+  const visibleMessages = messages.filter(m => {
+    if (!m.content?.trim()) return false; // hide empty messages
+    if (m.role === 'user' && (m.content.startsWith('Starte das Onboarding') || m.content.startsWith('The user has chosen'))) return false;
+    return true;
+  });
 
   if (phase === 'welcome') return <WelcomeScreen onStart={handleWelcomeDone} />;
 
