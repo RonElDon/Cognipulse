@@ -117,6 +117,12 @@ export default function OnboardingFlow({ onComplete }) {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  useEffect(() => {
+    if (inputRef.current && currentQuestion.type === 'date') {
+      inputRef.current.focus();
+    }
+  }, [dateFocus, currentQuestion.type]);
+
   const handleWelcomeDone = (lang) => {
     setLanguage(lang);
     setPhase('chat');
