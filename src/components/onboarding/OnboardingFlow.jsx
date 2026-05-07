@@ -168,8 +168,8 @@ export default function OnboardingFlow({ onComplete }) {
       setLoading(true);
       setEmotion('thinking');
       const langInstruction = lang === 'en'
-        ? 'The user has chosen English. Respond ONLY in English for the entire conversation. Start onboarding: greet briefly (1 sentence) and immediately ask for their name.'
-        : 'Starte das Onboarding. Begrüße mich kurz (1 Satz) und frage sofort nach meinem Namen.';
+        ? 'Hi! (1 sentence greeting) What is your name?'
+        : 'Hallo! (1 Satz Begrüßung) Wie heißt du?';
       await base44.agents.addMessage(conv, {
         role: 'user',
         content: langInstruction,
