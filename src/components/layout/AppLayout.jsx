@@ -171,7 +171,7 @@ export default function AppLayout({ lang = 'de' }) {
       {/* Debug Back Button */}
       <button
         onClick={handleDebugBack}
-        className="fixed top-2 left-2 z-50 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-lg transition-colors"
+        className="fixed bottom-6 right-96 z-40 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-lg transition-colors"
         title="Debug: Ein Schritt zurück"
       >
         ← BACK
