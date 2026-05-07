@@ -176,6 +176,24 @@ export default function OnboardingFlow({ onComplete }) {
     }, 600);
   };
 
+  const handleBack = () => {
+    if (currentStep > 0) {
+      const prevStep = currentStep - 1;
+      setCurrentStep(prevStep);
+      setSelectedOptionIdx(0);
+      setInput('');
+      const answerKey = questions[prevStep].id;
+      setAnswers(prev => {
+        const newAnswers = { ...prev };
+        delete newAnswers[answerKey];
+        return newAnswers;
+      });
+      // Remove last 2 messages (user answer + next question)
+      setMessages(prev => prev.slice(0, -2));
+      setEmotion('happy');
+    }
+  };
+
   const handleSendMessage = () => {
     if (!input.trim()) return;
     handleAnswer(input);
@@ -277,6 +295,19 @@ export default function OnboardingFlow({ onComplete }) {
         </AnimatePresence>
         <div ref={chatEndRef} />
       </div>
+
+      {/* Back Button */}
+      {currentStep > 0 && (
+        <div className="relative z-10 flex-shrink-0 px-4 pt-2">
+          <button
+            onClick={handleBack}
+            disabled={saving}
+            className="text-white/60 hover:text-white text-xs font-semibold transition-colors disabled:opacity-30"
+          >
+            ← {language === 'de' ? 'Zurück' : 'Back'}
+          </button>
+        </div>
+      )}
 
       {/* Input */}
       <div className="relative z-10 flex-shrink-0 px-4 pb-6 pt-2">
