@@ -113,10 +113,14 @@ export default function WelcomeScreen({ onStart }) {
         <motion.div
           ref={brainRef}
           tabIndex={focusLevel === 1 ? 0 : -1}
+          onClick={() => {
+            setIsPressingBrain(true);
+            setTimeout(() => setIsPressingBrain(false), 300);
+          }}
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: isPressingBrain ? 0.85 : 1, opacity: 1 }}
           transition={{ duration: 0.25 }}
-          className={`w-24 h-24 rounded-3xl flex items-center justify-center text-5xl shadow-2xl transition-all cursor-default ${
+          className={`w-24 h-24 rounded-3xl flex items-center justify-center text-5xl shadow-2xl transition-all cursor-pointer ${
             focusLevel === 1 ? 'ring-2 ring-white' : ''
           }`}
           style={{ background: `radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)`, boxShadow: focusLevel === 1 ? `0 0 60px rgba(139,92,246,${isPressingBrain ? 0.3 : 0.8}), 0 0 0 2px white` : '0 0 60px rgba(139,92,246,0.5)' }}
@@ -159,7 +163,6 @@ export default function WelcomeScreen({ onStart }) {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => onStart(lang)}
-          onContextMenu={(e) => { e.preventDefault(); onStart(lang); }}
           tabIndex={focusLevel === 2 ? 0 : -1}
           className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
             focusLevel === 2 ? 'ring-2 ring-white' : ''
