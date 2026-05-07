@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
-  const [focusLevel, setFocusLevel] = useState(1); // 0 = Sprachen, 1 = Brain-Icon, 2 = Button-Ebene
+  const [focusLevel, setFocusLevel] = useState(0); // 0 = Sprachen, 1 = Brain-Icon, 2 = Button-Ebene
 
   const brainRef = useRef(null);
   const languageContainerRef = useRef(null);
@@ -26,7 +26,13 @@ export default function WelcomeScreen({ onStart }) {
   // Initial focus on load
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (brainRef.current) brainRef.current.focus();
+      if (focusLevel === 0 && languageContainerRef.current) {
+        languageContainerRef.current.focus();
+      } else if (focusLevel === 1 && brainRef.current) {
+        brainRef.current.focus();
+      } else if (focusLevel === 2 && ctaRef.current) {
+        ctaRef.current.focus();
+      }
     }, 100);
     return () => clearTimeout(timer);
   }, [focusLevel]);
