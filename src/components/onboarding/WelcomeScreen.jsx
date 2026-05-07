@@ -19,20 +19,6 @@ export default function WelcomeScreen({ onStart }) {
       } else if (focusLevel === 2 && ctaRef.current) {
         ctaRef.current.focus();
       }
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [focusLevel]);
-
-  // Initial focus on load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (focusLevel === 0 && languageContainerRef.current) {
-        languageContainerRef.current.focus();
-      } else if (focusLevel === 1 && brainRef.current) {
-        brainRef.current.focus();
-      } else if (focusLevel === 2 && ctaRef.current) {
-        ctaRef.current.focus();
-      }
     }, 100);
     return () => clearTimeout(timer);
   }, [focusLevel]);
