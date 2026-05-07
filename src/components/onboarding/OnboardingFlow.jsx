@@ -142,7 +142,6 @@ export default function OnboardingFlow({ onComplete }) {
     setAnswers(prev => ({ ...prev, [currentQuestion.id]: String(value) }));
     setInput('');
     setDateInput({ day: '', month: '', year: '' });
-    setSelectedOptionIdx(0);
     
     // Add user message with emoji
     let displayValue = String(value);
