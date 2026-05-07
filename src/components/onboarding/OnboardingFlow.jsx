@@ -429,18 +429,19 @@ export default function OnboardingFlow({ onComplete }) {
               <input
                 key="day-input"
                 autoFocus
-                type="number"
+                type="text"
                 inputMode="numeric"
                 placeholder="TT"
                 value={padInput(dateInput.day, 2)}
                 onChange={e => {
-                  const val = validateDay(e.target.value.slice(0, 2));
-                  setDateInput(p => ({ ...p, day: val }));
-                  if (val.length === 2 && parseInt(val) > 0) setDateFocus('month');
+                  let val = e.target.value.replace(/\D/g, '');
+                  val = val.slice(-2);
+                  const validated = validateDay(val);
+                  setDateInput(p => ({ ...p, day: validated }));
+                  if (validated.length === 2 && parseInt(validated) > 0) setDateFocus('month');
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('day')}
-                maxLength="2"
                 className={`py-3 px-3 rounded-2xl text-center font-bold text-white text-lg transition-all border outline-none focus:outline-none ${
                   dateFocus === 'day'
                     ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400'
@@ -449,18 +450,19 @@ export default function OnboardingFlow({ onComplete }) {
               />
               <input
                 key="month-input"
-                type="number"
+                type="text"
                 inputMode="numeric"
                 placeholder="MM"
                 value={padInput(dateInput.month, 2)}
                 onChange={e => {
-                  const val = validateMonth(e.target.value.slice(0, 2));
-                  setDateInput(p => ({ ...p, month: val }));
-                  if (val.length === 2 && parseInt(val) > 0) setDateFocus('year');
+                  let val = e.target.value.replace(/\D/g, '');
+                  val = val.slice(-2);
+                  const validated = validateMonth(val);
+                  setDateInput(p => ({ ...p, month: validated }));
+                  if (validated.length === 2 && parseInt(validated) > 0) setDateFocus('year');
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('month')}
-                maxLength="2"
                 className={`py-3 px-3 rounded-2xl text-center font-bold text-white text-lg transition-all border outline-none focus:outline-none ${
                   dateFocus === 'month'
                     ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400'
@@ -469,17 +471,18 @@ export default function OnboardingFlow({ onComplete }) {
               />
               <input
                 key="year-input"
-                type="number"
+                type="text"
                 inputMode="numeric"
                 placeholder="YYYY"
                 value={dateInput.year}
                 onChange={e => {
-                  const val = validateYear(e.target.value.slice(0, 4));
-                  setDateInput(p => ({ ...p, year: val }));
+                  let val = e.target.value.replace(/\D/g, '');
+                  val = val.slice(-4);
+                  const validated = validateYear(val);
+                  setDateInput(p => ({ ...p, year: validated }));
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('year')}
-                maxLength="4"
                 className={`py-3 px-3 rounded-2xl text-center font-bold text-white text-lg transition-all border outline-none focus:outline-none ${
                   dateFocus === 'year'
                     ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400'
