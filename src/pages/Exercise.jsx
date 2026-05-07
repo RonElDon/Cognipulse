@@ -14,6 +14,11 @@ export default function Exercise() {
   const { id } = useParams();
   const navigate = useNavigate();
   const exercise = EXERCISES.find(e => e.id === id);
+
+  // Duel params
+  const urlParams = new URLSearchParams(window.location.search);
+  const duelId = urlParams.get('duel');
+  const duelRole = urlParams.get('role'); // 'challenger' | 'opponent'
   const [phase, setPhase] = useState('intro'); // intro, ready, countdown, playing, trial, result
   const [countdown, setCountdown] = useState(3);
   const [isTrial, setIsTrial] = useState(false);
@@ -116,6 +121,40 @@ export default function Exercise() {
       // Store multiplier on result for display
       gameResult._multiplier = multiplier;
       gameResult._earnedXP = earnedXP;
+
+      // Duel: save score
+      if (duelId) {
+        const duel = await base44.entities.Duel.filter({ id: duelId }).then(r => r[0]).catch(() => null);
+        if (duel) {
+          const scoreField = duelRole === 'challenger' ? 'challenger_score' : 'opponent_score';
+          const opponentField = duelRole === 'challenger' ? 'opponent_score' : 'challenger_score';
+          const opponentScore = duel[opponentField];
+          const myFinalScore = gameResult.score;
+
+          const updateData = { [scoreField]: myFinalScore };
+
+          // Check if duel is now complete
+          if (opponentScore != null) {
+            updateData.status = 'completed';
+            const challScore = duelRole === 'challenger' ? myFinalScore : opponentScore;
+            const oppScore = duelRole === 'opponent' ? myFinalScore : opponentScore;
+            if (challScore > oppScore) updateData.winner_email = duel.challenger_email;
+            else if (oppScore > challScore) updateData.winner_email = duel.opponent_email || user.email;
+            // equal → no winner_email (draw)
+          } else if (duelRole === 'opponent') {
+            updateData.status = 'accepted';
+            updateData.opponent_email = user.email;
+            const profiles2 = await base44.entities.UserProfile.filter({ created_by: user.email });
+            updateData.opponent_name = profiles2[0]?.display_name || user.full_name;
+          }
+
+          await base44.entities.Duel.update(duel.id, updateData);
+          gameResult._duelResult = opponentScore != null
+            ? (myFinalScore > opponentScore ? 'win' : myFinalScore < opponentScore ? 'loss' : 'draw')
+            : 'waiting';
+          gameResult._opponentScore = opponentScore;
+        }
+      }
     } catch (e) { console.error(e); }
     setSaving(false);
   };
@@ -272,6 +311,29 @@ export default function Exercise() {
                     </span>
                   </div>
                 )}
+                {result._duelResult && (
+                  <div className={`flex items-center justify-center gap-2 rounded-2xl p-2.5 ${
+                    result._duelResult === 'win' ? 'bg-green-50 dark:bg-green-900/20' :
+                    result._duelResult === 'loss' ? 'bg-red-50 dark:bg-red-900/20' :
+                    result._duelResult === 'draw' ? 'bg-slate-50 dark:bg-slate-800' :
+                    'bg-blue-50 dark:bg-blue-900/20'
+                  }`}>
+                    <span className="text-lg">
+                      {result._duelResult === 'win' ? '🏆' : result._duelResult === 'loss' ? '😤' : result._duelResult === 'draw' ? '🤝' : '⏳'}
+                    </span>
+                    <span className={`text-sm font-black ${
+                      result._duelResult === 'win' ? 'text-green-700 dark:text-green-400' :
+                      result._duelResult === 'loss' ? 'text-red-700 dark:text-red-400' :
+                      result._duelResult === 'draw' ? 'text-slate-600 dark:text-slate-300' :
+                      'text-blue-700 dark:text-blue-400'
+                    }`}>
+                      {result._duelResult === 'win' ? `Duell gewonnen! (Gegner: ${result._opponentScore}%)` :
+                       result._duelResult === 'loss' ? `Duell verloren (Gegner: ${result._opponentScore}%)` :
+                       result._duelResult === 'draw' ? 'Unentschieden!' :
+                       'Score gespeichert — warte auf Gegner!'}
+                    </span>
+                  </div>
+                )}
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { label: 'Ergebnis', value: `${result.score}%`, icon: '🎯' },
@@ -293,12 +355,21 @@ export default function Exercise() {
                   >
                     <RefreshCw className="w-4 h-4" /> Nochmal
                   </button>
-                  <button
-                    onClick={() => { exitFullscreen(); navigate('/train'); }}
-                    className={`flex-1 py-3 rounded-2xl text-white font-bold ${domain.gradient} shadow-md`}
-                  >
-                    Nächste Übung →
-                  </button>
+                  {duelId ? (
+                    <button
+                      onClick={() => { exitFullscreen(); navigate('/duel'); }}
+                      className={`flex-1 py-3 rounded-2xl text-white font-bold bg-gradient-to-r from-rose-500 to-pink-600 shadow-md`}
+                    >
+                      Zum Duell ⚔️
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => { exitFullscreen(); navigate('/train'); }}
+                      className={`flex-1 py-3 rounded-2xl text-white font-bold ${domain.gradient} shadow-md`}
+                    >
+                      Nächste Übung →
+                    </button>
+                  )}
                 </div>
               </motion.div>
             )}

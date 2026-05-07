@@ -1,0 +1,66 @@
+{
+  "name": "Duel",
+  "type": "object",
+  "properties": {
+    "challenger_email": {
+      "type": "string",
+      "description": "Email of the user who created the duel"
+    },
+    "challenger_name": {
+      "type": "string"
+    },
+    "opponent_email": {
+      "type": "string",
+      "description": "Email of the invited opponent (optional, open duel if empty)"
+    },
+    "exercise_id": {
+      "type": "string"
+    },
+    "exercise_name": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "attention",
+        "memory",
+        "executive",
+        "visuomotor",
+        "processing",
+        "reasoning"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "accepted",
+        "completed",
+        "expired"
+      ],
+      "default": "open"
+    },
+    "challenger_score": {
+      "type": "number"
+    },
+    "opponent_score": {
+      "type": "number"
+    },
+    "opponent_name": {
+      "type": "string"
+    },
+    "winner_email": {
+      "type": "string"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this duel challenge expires"
+    }
+  },
+  "required": [
+    "exercise_id",
+    "domain",
+    "status"
+  ]
+}

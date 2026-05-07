@@ -1,6 +1,6 @@
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useState } from 'react';
-import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight, Swords } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
 import { base44 } from '@/api/base44Client';
 import NeuroMascot from '@/components/mascot/NeuroMascot';
@@ -8,6 +8,7 @@ import NeuroMascot from '@/components/mascot/NeuroMascot';
 const NAV_ITEMS = [
   { path: '/', icon: Home, label: 'Home', labelDE: 'Startseite' },
   { path: '/train', icon: Brain, label: 'Train', labelDE: 'Trainieren' },
+  { path: '/duel', icon: Swords, label: 'Duel', labelDE: 'Duell' },
   { path: '/progress', icon: BarChart2, label: 'Progress', labelDE: 'Fortschritt' },
   { path: '/leaderboard', icon: Trophy, label: 'Leaderboard', labelDE: 'Rangliste' },
   { path: '/profile', icon: User, label: 'Profile', labelDE: 'Profil' },
