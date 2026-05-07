@@ -97,8 +97,7 @@ export default function WelcomeScreen({ onStart }) {
             <button
               key={l.code}
               onClick={() => setLang(l.code)}
-              onContextMenu={(e) => { e.preventDefault(); setLang(l.code); }}
-              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all cursor-pointer ${
                 lang === l.code
                   ? 'bg-purple-600 text-white shadow'
                   : 'text-white/50 hover:text-white/80'
