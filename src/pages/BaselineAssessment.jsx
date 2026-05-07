@@ -180,16 +180,16 @@ export default function BaselineAssessment() {
           </div>
           <div className="space-y-2">
             {results.map((r, i) => {
-              const ex = BASELINE_EXERCISES[i];
-              const domain = DOMAINS[ex.domain];
+              const domain = DOMAINS[r.domain];
+              const domainMeta = BASELINE_EXERCISES.find(ex => ex.domain === r.domain);
               return (
                 <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
-                  <span className="text-xl">{ex.icon}</span>
+                  <span className="text-xl">{domainMeta?.icon || '🧠'}</span>
                   <div className="flex-1 text-left">
-                    <div className="text-white/80 text-xs font-semibold">{ex.name}</div>
+                    <div className="text-white/80 text-xs font-semibold">{domainMeta?.name || r.domain}</div>
                   </div>
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span className="font-black text-sm" style={{ color: domain.color }}>{r.score}%</span>
+                  <span className="font-black text-sm" style={{ color: domain?.color || '#fff' }}>{r.score}%</span>
                 </div>
               );
             })}
