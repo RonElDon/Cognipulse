@@ -244,6 +244,17 @@ export default function OnboardingFlow({ onComplete }) {
       handleBack();
       return;
     }
+    if (e.key === 'Backspace') {
+      // Wenn das Feld leer ist, zurück zum vorherigen Feld
+      if (dateFocus === 'month' && !dateInput.month) {
+        e.preventDefault();
+        setDateFocus('day');
+      } else if (dateFocus === 'year' && !dateInput.year) {
+        e.preventDefault();
+        setDateFocus('month');
+      }
+      return;
+    }
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
       if (dateFocus === 'month') setDateFocus('day');
@@ -252,28 +263,6 @@ export default function OnboardingFlow({ onComplete }) {
       e.preventDefault();
       if (dateFocus === 'day') setDateFocus('month');
       else if (dateFocus === 'month') setDateFocus('year');
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (dateFocus === 'day') {
-        const newDay = (parseInt(dateInput.day) || 0) + 1;
-        setDateInput(p => ({ ...p, day: validateDay(String(newDay), p.month, p.year) }));
-      } else if (dateFocus === 'month') {
-        const newMonth = (parseInt(dateInput.month) || 0) + 1;
-        setDateInput(p => ({ ...p, month: validateMonth(String(newMonth)) }));
-      } else if (dateFocus === 'year') {
-        setDateInput(p => ({ ...p, year: String(parseInt(p.year) + 1) }));
-      }
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (dateFocus === 'day') {
-        const newDay = (parseInt(dateInput.day) || 1) - 1;
-        setDateInput(p => ({ ...p, day: newDay < 1 ? '' : String(newDay).padStart(2, '0') }));
-      } else if (dateFocus === 'month') {
-        const newMonth = (parseInt(dateInput.month) || 1) - 1;
-        setDateInput(p => ({ ...p, month: newMonth < 1 ? '' : String(newMonth).padStart(2, '0') }));
-      } else if (dateFocus === 'year') {
-        setDateInput(p => ({ ...p, year: String(Math.max(1900, parseInt(p.year) - 1)) }));
-      }
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (dateInput.day && dateInput.month && dateInput.year) {
@@ -429,6 +418,7 @@ export default function OnboardingFlow({ onComplete }) {
               <input
                 key="day-input"
                 autoFocus
+                ref={dateFocus === 'day' ? inputRef : null}
                 type="text"
                 inputMode="numeric"
                 placeholder="TT"
@@ -438,6 +428,9 @@ export default function OnboardingFlow({ onComplete }) {
                   val = val.slice(-2);
                   const validated = validateDay(val);
                   setDateInput(p => ({ ...p, day: validated }));
+                  if (validated.length === 2 && parseInt(validated) > 0) {
+                    setDateFocus('month');
+                  }
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('day')}
@@ -449,6 +442,7 @@ export default function OnboardingFlow({ onComplete }) {
               />
               <input
                 key="month-input"
+                ref={dateFocus === 'month' ? inputRef : null}
                 type="text"
                 inputMode="numeric"
                 placeholder="MM"
@@ -458,6 +452,9 @@ export default function OnboardingFlow({ onComplete }) {
                   val = val.slice(-2);
                   const validated = validateMonth(val);
                   setDateInput(p => ({ ...p, month: validated }));
+                  if (validated.length === 2 && parseInt(validated) > 0) {
+                    setDateFocus('year');
+                  }
                 }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('month')}
@@ -469,6 +466,7 @@ export default function OnboardingFlow({ onComplete }) {
               />
               <input
                 key="year-input"
+                ref={dateFocus === 'year' ? inputRef : null}
                 type="text"
                 inputMode="numeric"
                 placeholder="YYYY"
