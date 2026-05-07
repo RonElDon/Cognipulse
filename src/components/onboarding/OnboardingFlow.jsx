@@ -179,7 +179,6 @@ export default function OnboardingFlow({ onComplete }) {
                 daily_exercises: parseInt(answers.dailyExercises, 10) || 3,
                 focus_domains: []
               },
-              onboarding_completed: true,
             });
           }
         } catch (e) {

@@ -106,6 +106,7 @@ export default function BaselineAssessment() {
           const overallAccuracy = Math.round(newResults.reduce((s, r) => s + r.score, 0) / newResults.length);
           const avgReaction = Math.round(newResults.filter(r => r.reaction_time_ms).reduce((s, r, _, a) => s + r.reaction_time_ms / a.length, 0));
           await base44.entities.UserProfile.update(profiles[0].id, {
+            onboarding_completed: true,
             baseline_assessment_completed: true,
             baseline_results: {
               domain_scores: domainScores,
