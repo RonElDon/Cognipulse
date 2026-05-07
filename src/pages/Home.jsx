@@ -8,6 +8,7 @@ import { DOMAINS, getLevel } from '@/lib/exercises';
 import XPBar from '@/components/ui/XPBar';
 import { Brain, Flame, Trophy, Zap, ChevronRight, Star, TrendingUp, Target } from 'lucide-react';
 import DailyPlanCard from '@/components/training/DailyPlanCard';
+import ProgressWidget from '@/components/training/ProgressWidget';
 import { useTheme } from '@/lib/ThemeContext';
 
 const MOTIVATIONAL = [
@@ -102,6 +103,9 @@ export default function Home() {
 
         {/* Daily Training Plan by Neuro — primary focus */}
         <DailyPlanCard />
+
+        {/* Performance over time */}
+        <ProgressWidget />
 
         {/* Cognitive Focus Areas — sorted by weakest first */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
