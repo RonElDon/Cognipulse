@@ -70,7 +70,7 @@ export default function WelcomeScreen({ onStart }) {
       setFocusLevel(prev => (prev - 1 + 3) % 3);
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setFocusLevel(prev => (prev + 1) % 3);
+      if (focusLevel < 2) setFocusLevel(prev => prev + 1);
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
       if (focusLevel === 0) setLang('de');
