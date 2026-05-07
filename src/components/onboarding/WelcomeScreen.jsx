@@ -1,9 +1,27 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
   const [focusLevel, setFocusLevel] = useState(0); // 0 = Brain-Icon, 1 = Sprachen-Ebene, 2 = Button-Ebene
+
+  const brainRef = useRef(null);
+  const languageContainerRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  // Automatisch Fokus auf das aktuelle focusLevel Element setzen
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (focusLevel === 0 && brainRef.current) {
+        brainRef.current.focus();
+      } else if (focusLevel === 1 && languageContainerRef.current) {
+        languageContainerRef.current.focus();
+      } else if (focusLevel === 2 && ctaRef.current) {
+        ctaRef.current.focus();
+      }
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [focusLevel]);
 
   const text = {
     de: {
@@ -61,10 +79,10 @@ export default function WelcomeScreen({ onStart }) {
       >
         {/* Language picker */}
         <motion.div
+          ref={languageContainerRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
-          onKeyDown={handleKeyDown}
           tabIndex={focusLevel === 1 ? 0 : -1}
           className={`flex gap-2 bg-white/5 border rounded-xl p-1 transition-all ${
             focusLevel === 1 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
@@ -88,11 +106,11 @@ export default function WelcomeScreen({ onStart }) {
 
         {/* Brain logo */}
         <motion.button
+          ref={brainRef}
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.15, duration: 0.5, type: 'spring' }}
           onClick={() => setFocusLevel(0)}
-          onKeyDown={handleKeyDown}
           tabIndex={focusLevel === 0 ? 0 : -1}
           className={`w-24 h-24 rounded-3xl flex items-center justify-center text-5xl shadow-2xl transition-all ${
             focusLevel === 0 ? 'ring-2 ring-white' : ''
@@ -129,22 +147,22 @@ export default function WelcomeScreen({ onStart }) {
         </motion.div>
 
         {/* CTA */}
-         <motion.button
-           initial={{ opacity: 0, scale: 0.9 }}
-           animate={{ opacity: 1, scale: 1 }}
-           transition={{ delay: 0.6 }}
-           whileHover={{ scale: 1.03 }}
-           whileTap={{ scale: 0.97 }}
-           onClick={() => onStart(lang)}
-           onContextMenu={(e) => { e.preventDefault(); onStart(lang); }}
-           onKeyDown={handleKeyDown}
-           tabIndex={focusLevel === 2 ? 0 : -1}
-           className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
-             focusLevel === 2 ? 'ring-2 ring-white' : ''
-           }`}
-         >
-           {t.cta}
-         </motion.button>
+        <motion.button
+          ref={ctaRef}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.6 }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => onStart(lang)}
+          onContextMenu={(e) => { e.preventDefault(); onStart(lang); }}
+          tabIndex={focusLevel === 2 ? 0 : -1}
+          className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
+            focusLevel === 2 ? 'ring-2 ring-white' : ''
+          }`}
+        >
+          {t.cta}
+        </motion.button>
 
         <p className="text-white/30 text-xs">{t.hint}</p>
       </motion.div>
