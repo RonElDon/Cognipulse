@@ -1,6 +1,6 @@
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useState } from 'react';
-import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight, Palette } from 'lucide-react';
+import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
 import { base44 } from '@/api/base44Client';
 import NeuroMascot from '@/components/mascot/NeuroMascot';
@@ -17,78 +17,30 @@ export default function AppLayout({ lang = 'de' }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor, applyExternalTheme } = useTheme();
-  const [paletteOpen, setPaletteOpen] = useState(false);
-  const [tempColor, setTempColor] = useState(accentColor);
-
-  const ACCENT_COLORS = [
-    { name: 'Purple', value: '#8b5cf6' },
-    { name: 'Rose', value: '#ec4899' },
-    { name: 'Cyan', value: '#06b6d4' },
-    { name: 'Emerald', value: '#10b981' },
-    { name: 'Orange', value: '#f97316' },
-  ];
-
-  const handleColorChange = async (color) => {
-    if (accentColor === color) return;
-    try {
-      applyExternalTheme({ accentColor: color });
-      const user = await base44.auth.me();
-      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-      if (profiles.length > 0) {
-        await base44.entities.UserProfile.update(profiles[0].id, { theme_accent_color: color });
-      }
-    } catch (e) {
-      console.error('Farb-Update fehlgeschlagen:', e);
-    }
-  };
-
+  const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
   const DarkToggle = () => (
-    <div className="space-y-2">
-      <div className="flex items-center gap-1 bg-slate-800 dark:bg-slate-700 rounded-xl p-1">
-        <button
-          onClick={enableAutoDark}
-          title="Automatisch"
-          className={`p-1.5 rounded-lg transition-all ${autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-        >
-          <Monitor className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={() => { if (darkMode) toggleDark(); }}
-          title="Hell"
-          className={`p-1.5 rounded-lg transition-all ${!darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-        >
-          <Sun className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={() => { if (!darkMode) toggleDark(); }}
-          title="Dunkel"
-          className={`p-1.5 rounded-lg transition-all ${darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-        >
-          <Moon className="w-3.5 h-3.5" />
-        </button>
-      </div>
-      <div className="space-y-2">
-        <div className="flex gap-2">
-          {ACCENT_COLORS.map(c => (
-            <button
-              key={c.value}
-              onClick={() => handleColorChange(c.value)}
-              title={c.name}
-              className={`w-6 h-6 rounded-lg transition-all hover:scale-110 ${accentColor === c.value ? 'ring-2 ring-white' : 'border border-white/30'}`}
-              style={{ backgroundColor: c.value }}
-            />
-          ))}
-        </div>
-        <input
-          type="color"
-          value={accentColor}
-          onChange={(e) => handleColorChange(e.target.value)}
-          onMouseDown={(e) => e.stopPropagation()}
-          title="Farbe mit Maus auswählen"
-          className="w-6 h-6 rounded-lg cursor-pointer border border-white/30"
-        />
-      </div>
+    <div className="flex items-center gap-1 bg-slate-800 dark:bg-slate-700 rounded-xl p-1">
+      <button
+        onClick={enableAutoDark}
+        title="Automatisch"
+        className={`p-1.5 rounded-lg transition-all ${autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+      >
+        <Monitor className="w-3.5 h-3.5" />
+      </button>
+      <button
+        onClick={() => { if (darkMode) toggleDark(); }}
+        title="Hell"
+        className={`p-1.5 rounded-lg transition-all ${!darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+      >
+        <Sun className="w-3.5 h-3.5" />
+      </button>
+      <button
+        onClick={() => { if (!darkMode) toggleDark(); }}
+        title="Dunkel"
+        className={`p-1.5 rounded-lg transition-all ${darkMode && !autoDark ? 'bg-slate-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+      >
+        <Moon className="w-3.5 h-3.5" />
+      </button>
     </div>
   );
 
