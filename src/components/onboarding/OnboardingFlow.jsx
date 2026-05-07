@@ -183,10 +183,10 @@ export default function OnboardingFlow({ onComplete }) {
 
   const handleKeyDown = (e) => {
     if (currentQuestion.type === 'select') {
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      if (e.key === 'ArrowLeft') {
         e.preventDefault();
         setSelectedOptionIdx(Math.max(0, selectedOptionIdx - 1));
-      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         setSelectedOptionIdx(Math.min(currentQuestion.options.length - 1, selectedOptionIdx + 1));
       } else if (e.key === 'Enter') {
@@ -194,6 +194,7 @@ export default function OnboardingFlow({ onComplete }) {
         handleAnswer(currentQuestion.options[selectedOptionIdx]);
       }
     } else if (e.key === 'Enter') {
+      e.preventDefault();
       handleSendMessage();
     }
   };
