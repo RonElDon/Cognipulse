@@ -118,13 +118,14 @@ export default function OnboardingFlow({ onComplete }) {
   const unsubRef = useRef(null);
   const pollRef = useRef(null);
   const inputRef = useRef(null);
+  const loadingTimeoutRef = useRef(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
   useEffect(() => {
-    return () => { unsubRef.current?.(); clearInterval(pollRef.current); };
+    return () => { unsubRef.current?.(); clearInterval(pollRef.current); clearTimeout(loadingTimeoutRef.current); };
   }, []);
 
   const handleWelcomeDone = () => {
@@ -142,16 +143,23 @@ export default function OnboardingFlow({ onComplete }) {
         const msgs = data.messages || [];
         setMessages([...msgs]);
         const last = msgs[msgs.length - 1];
-        if (last?.role === 'assistant' && last?.content) {
-          setLoading(false);
-          const c = last.content.toLowerCase();
-          if (c.includes('fantastisch') || c.includes('perfekt') || c.includes('toll')) setEmotion('proud');
-          else if (c.includes('herausforderung') || c.includes('starten') || c.includes('super')) setEmotion('excited');
-          else setEmotion('happy');
-          if (isBaselinePrompt(last.content)) setPhase('baseline_prompt');
-          setTimeout(() => checkOnboardingComplete(), 0);
+        if (last?.role === 'assistant') {
+          if (last?.content) {
+            clearTimeout(loadingTimeoutRef.current);
+            setLoading(false);
+            const c = last.content.toLowerCase();
+            if (c.includes('fantastisch') || c.includes('perfekt') || c.includes('toll')) setEmotion('proud');
+            else if (c.includes('herausforderung') || c.includes('starten') || c.includes('super')) setEmotion('excited');
+            else setEmotion('happy');
+            if (isBaselinePrompt(last.content)) setPhase('baseline_prompt');
+            setTimeout(() => checkOnboardingComplete(), 0);
+          }
+          // assistant message exists but content still streaming — keep loading
         } else if (last?.role === 'user') {
           setLoading(true);
+          // Safety: if no assistant reply comes within 30s, reset loading
+          clearTimeout(loadingTimeoutRef.current);
+          loadingTimeoutRef.current = setTimeout(() => setLoading(false), 30000);
         }
       });
 
@@ -208,6 +216,8 @@ export default function OnboardingFlow({ onComplete }) {
     setInput('');
     setLoading(true);
     setEmotion('thinking');
+    clearTimeout(loadingTimeoutRef.current);
+    loadingTimeoutRef.current = setTimeout(() => setLoading(false), 30000);
     await base44.agents.addMessage(conversation, { role: 'user', content: text });
   };
 
