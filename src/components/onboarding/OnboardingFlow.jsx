@@ -200,6 +200,11 @@ export default function OnboardingFlow({ onComplete }) {
   };
 
   const handleKeyDown = (e) => {
+    if (e.key === 'Delete') {
+      e.preventDefault();
+      handleBack();
+      return;
+    }
     if (currentQuestion.type === 'select') {
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
