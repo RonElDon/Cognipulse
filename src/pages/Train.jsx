@@ -47,8 +47,8 @@ export default function Train() {
               onClick={() => setSelectedDomain('all')}
               className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-bold transition-all ${
                 selectedDomain === 'all'
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-sm'
+                  : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
               }`}
             >
               Alle
@@ -60,7 +60,7 @@ export default function Train() {
                 className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold transition-all ${
                   selectedDomain === d.id
                     ? 'text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                 }`}
                 style={selectedDomain === d.id ? { backgroundColor: d.color } : {}}
               >
@@ -124,7 +124,7 @@ export default function Train() {
                 >
                   <Link
                     to={`/exercise/${ex.id}`}
-                    className="flex items-center gap-4 bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
+                    className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
                   >
                     <div className={`w-14 h-14 rounded-2xl ${domain.gradient} flex items-center justify-center text-2xl shadow-md flex-shrink-0`}>
                       {ex.icon}
@@ -132,8 +132,8 @@ export default function Train() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <div className="font-black text-slate-800">{ex.name}</div>
-                          <div className="text-xs text-slate-500 mt-0.5">{ex.description}</div>
+                          <div className="font-black text-slate-800 dark:text-slate-100">{ex.name}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{ex.description}</div>
                         </div>
                         <div className="flex-shrink-0 text-right">
                           <div className="text-sm font-black" style={{ color: domain.color }}>+{ex.xpReward} XP</div>
