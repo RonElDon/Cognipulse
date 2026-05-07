@@ -15,6 +15,20 @@ const GRADIENT_PRESETS = [
 export { GRADIENT_PRESETS };
 
 export function ThemeProvider({ children }) {
+  // Apply saved font on mount
+  useEffect(() => {
+    const savedFont = localStorage.getItem('app_font');
+    const fontMap = {
+      nunito: 'Nunito, sans-serif',
+      inter: 'Inter, sans-serif',
+      poppins: 'Poppins, sans-serif',
+      lexend: 'Lexend, sans-serif',
+    };
+    if (savedFont && fontMap[savedFont]) {
+      document.body.style.fontFamily = fontMap[savedFont];
+    }
+  }, []);
+
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('dark_mode');
     if (saved !== null) return saved === 'true';

@@ -4,7 +4,8 @@ import { base44 } from '@/api/base44Client';
 import { useProfile } from '@/lib/useProfile';
 import { BADGES, DOMAINS, getLevel } from '@/lib/exercises';
 import XPBar from '@/components/ui/XPBar';
-import { User, Settings, Globe, Target, LogOut, Check, Edit2 } from 'lucide-react';
+import { User, Settings, Globe, Target, LogOut, Check, Edit2, Palette } from 'lucide-react';
+import AppearanceSettings from '@/components/profile/AppearanceSettings';
 import { toast } from 'sonner';
 
 export default function Profile() {
@@ -192,6 +193,16 @@ export default function Profile() {
               </div>
             ))}
           </div>
+        </motion.div>
+
+        {/* Appearance */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+          className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
+        >
+          <h2 className="font-black text-slate-800 dark:text-slate-100 mb-5 flex items-center gap-2">
+            <Palette className="w-5 h-5 text-purple-500" /> Erscheinungsbild
+          </h2>
+          <AppearanceSettings />
         </motion.div>
 
         {/* Logout */}
