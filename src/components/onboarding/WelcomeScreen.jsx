@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
+  const [focusIdx, setFocusIdx] = useState(null); // null = lang buttons, 0-1 = lang select, 2 = CTA button
 
   const text = {
     de: {
@@ -31,6 +32,25 @@ export default function WelcomeScreen({ onStart }) {
 
   const t = text[lang];
 
+  const handleKeyDown = (e) => {
+    if (focusIdx === null) {
+      // At language selector
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusIdx(2); // Jump to CTA button
+      }
+    } else if (focusIdx === 2) {
+      // At CTA button
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusIdx(0); // Go back to languages
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        onStart(lang);
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex items-center justify-center p-6">
       <motion.div
@@ -38,18 +58,23 @@ export default function WelcomeScreen({ onStart }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-sm flex flex-col items-center text-center gap-5"
+        onKeyDown={handleKeyDown}
       >
         {/* Language picker */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="flex gap-2 bg-white/5 border border-white/10 rounded-xl p-1"
+          className={`flex gap-2 bg-white/5 border rounded-xl p-1 transition-all ${
+            focusIdx === 0 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
+          }`}
         >
-          {[{ code: 'de', label: '🇩🇪 Deutsch' }, { code: 'en', label: '🇬🇧 English' }].map(l => (
+          {[{ code: 'de', label: '🇩🇪 Deutsch' }, { code: 'en', label: '🇬🇧 English' }].map((l, idx) => (
             <button
               key={l.code}
               onClick={() => setLang(l.code)}
+              onFocus={() => setFocusIdx(0)}
+              autoFocus={idx === 0}
               className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
                 lang === l.code
                   ? 'bg-purple-600 text-white shadow'
@@ -106,7 +131,10 @@ export default function WelcomeScreen({ onStart }) {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => onStart(lang)}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all"
+          onFocus={() => setFocusIdx(2)}
+          className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
+            focusIdx === 2 ? 'ring-2 ring-white' : ''
+          }`}
         >
           {t.cta}
         </motion.button>
