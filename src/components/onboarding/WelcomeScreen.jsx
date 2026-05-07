@@ -24,31 +24,18 @@ export default function WelcomeScreen({ onStart }) {
   }, [focusLevel]);
 
   const text = {
-    de: {
-      title: 'Willkommen bei',
-      subtitle: 'Dein persönliches kognitives Trainingsprogramm — angepasst auf dich.',
-      features: [
-        { icon: '🎯', title: 'Personalisiertes Training', desc: 'Übungen die zu deinen Stärken und Zielen passen' },
-        { icon: '🤖', title: 'Neuro — dein KI-Begleiter', desc: 'Analysiert deinen Fortschritt und passt das Training an' },
-        { icon: '📈', title: 'Messbarer Fortschritt', desc: 'Verfolge deine kognitive Entwicklung täglich' },
-      ],
-      cta: "Los geht's! 🚀",
-      hint: 'Neuro stellt dir ein paar kurze Fragen zum Einstieg',
-    },
-    en: {
-      title: 'Welcome to',
-      subtitle: 'Your personal cognitive training program — tailored just for you.',
-      features: [
-        { icon: '🎯', title: 'Personalized Training', desc: 'Exercises matched to your strengths and goals' },
-        { icon: '🤖', title: 'Neuro — your AI coach', desc: 'Analyzes your progress and adapts your training' },
-        { icon: '📈', title: 'Measurable Progress', desc: 'Track your cognitive development every day' },
-      ],
-      cta: "Let's go! 🚀",
-      hint: 'Neuro will ask you a few quick questions to get started',
-    },
+    title: 'Willkommen bei',
+    subtitle: 'Dein persönliches kognitives Trainingsprogramm — angepasst auf dich.',
+    features: [
+      { icon: '🎯', title: 'Personalisiertes Training', desc: 'Übungen die zu deinen Stärken und Zielen passen' },
+      { icon: '🤖', title: 'Neuro — dein KI-Begleiter', desc: 'Analysiert deinen Fortschritt und passt das Training an' },
+      { icon: '📈', title: 'Messbarer Fortschritt', desc: 'Verfolge deine kognitive Entwicklung täglich' },
+    ],
+    cta: "Los geht's! 🚀",
+    hint: 'Neuro stellt dir ein paar kurze Fragen zum Einstieg',
   };
 
-  const t = text[lang];
+  const t = text;
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowUp') {
