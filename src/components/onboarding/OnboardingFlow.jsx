@@ -390,11 +390,17 @@ export default function OnboardingFlow({ onComplete }) {
             <div className="text-white/50 text-xs font-semibold mb-2">Geburtsdatum (TT/MM/YYYY)</div>
             <div className="grid grid-cols-3 gap-2">
               <input
+                key="day-input"
                 autoFocus
-                type="text"
-                placeholder="Tag"
+                type="number"
+                inputMode="numeric"
+                placeholder="TT"
                 value={dateInput.day}
-                onChange={e => setDateInput(p => ({ ...p, day: e.target.value.slice(0, 2) }))}
+                onChange={e => {
+                  const val = e.target.value.slice(0, 2);
+                  setDateInput(p => ({ ...p, day: val }));
+                  if (val.length === 2) setDateFocus('month');
+                }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('day')}
                 maxLength="2"
@@ -405,10 +411,16 @@ export default function OnboardingFlow({ onComplete }) {
                 }`}
               />
               <input
-                type="text"
-                placeholder="Monat"
+                key="month-input"
+                type="number"
+                inputMode="numeric"
+                placeholder="MM"
                 value={dateInput.month}
-                onChange={e => setDateInput(p => ({ ...p, month: e.target.value.slice(0, 2) }))}
+                onChange={e => {
+                  const val = e.target.value.slice(0, 2);
+                  setDateInput(p => ({ ...p, month: val }));
+                  if (val.length === 2) setDateFocus('year');
+                }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('month')}
                 maxLength="2"
@@ -419,10 +431,15 @@ export default function OnboardingFlow({ onComplete }) {
                 }`}
               />
               <input
-                type="text"
-                placeholder="Jahr"
+                key="year-input"
+                type="number"
+                inputMode="numeric"
+                placeholder="YYYY"
                 value={dateInput.year}
-                onChange={e => setDateInput(p => ({ ...p, year: e.target.value.slice(0, 4) }))}
+                onChange={e => {
+                  const val = e.target.value.slice(0, 4);
+                  setDateInput(p => ({ ...p, year: val }));
+                }}
                 onKeyDown={handleDateKeyDown}
                 onFocus={() => setDateFocus('year')}
                 maxLength="4"
