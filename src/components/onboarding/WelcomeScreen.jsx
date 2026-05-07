@@ -12,10 +12,10 @@ export default function WelcomeScreen({ onStart }) {
   // Automatisch Fokus auf das aktuelle focusLevel Element setzen
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (focusLevel === 0 && brainRef.current) {
-        brainRef.current.focus();
-      } else if (focusLevel === 1 && languageContainerRef.current) {
+      if (focusLevel === 0 && languageContainerRef.current) {
         languageContainerRef.current.focus();
+      } else if (focusLevel === 1 && brainRef.current) {
+        brainRef.current.focus();
       } else if (focusLevel === 2 && ctaRef.current) {
         ctaRef.current.focus();
       }
