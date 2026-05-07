@@ -115,7 +115,7 @@ export default function WelcomeScreen({ onStart }) {
           tabIndex={focusLevel === 1 ? 0 : -1}
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: isPressingBrain ? 0.85 : 1, opacity: 1 }}
-          transition={{ delay: 0.15, duration: isPressingBrain ? 0.1 : 0.5, type: 'spring' }}
+          transition={{ duration: 0.25 }}
           className={`w-24 h-24 rounded-3xl flex items-center justify-center text-5xl shadow-2xl transition-all cursor-default ${
             focusLevel === 1 ? 'ring-2 ring-white' : ''
           }`}
