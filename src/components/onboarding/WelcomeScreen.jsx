@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
-  const [focusLevel, setFocusLevel] = useState(0); // 0 = Brain-Icon, 1 = Sprachen-Ebene, 2 = Button-Ebene
+  const [focusLevel, setFocusLevel] = useState(1); // 0 = Sprachen, 1 = Brain-Icon, 2 = Button-Ebene
 
   const brainRef = useRef(null);
   const languageContainerRef = useRef(null);
@@ -29,7 +29,7 @@ export default function WelcomeScreen({ onStart }) {
       if (brainRef.current) brainRef.current.focus();
     }, 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, [focusLevel]);
 
   const text = {
     de: {
@@ -67,10 +67,10 @@ export default function WelcomeScreen({ onStart }) {
       setFocusLevel(prev => (prev < 2 ? prev + 1 : 2));
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      if (focusLevel === 1) setLang('de');
+      if (focusLevel === 0) setLang('de');
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      if (focusLevel === 1) setLang('en');
+      if (focusLevel === 0) setLang('en');
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (focusLevel === 2) onStart(lang);
@@ -91,9 +91,9 @@ export default function WelcomeScreen({ onStart }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
-          tabIndex={focusLevel === 1 ? 0 : -1}
+          tabIndex={focusLevel === 0 ? 0 : -1}
           className={`flex gap-2 bg-white/5 border rounded-xl p-1 transition-all ${
-            focusLevel === 1 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
+            focusLevel === 0 ? 'border-white/80 ring-2 ring-white' : 'border-white/10'
           }`}
         >
           {[{ code: 'de', label: '🇩🇪 Deutsch' }, { code: 'en', label: '🇬🇧 English' }].map((l) => (
@@ -118,12 +118,12 @@ export default function WelcomeScreen({ onStart }) {
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.15, duration: 0.5, type: 'spring' }}
-          onClick={() => setFocusLevel(0)}
-          tabIndex={focusLevel === 0 ? 0 : -1}
+          onClick={() => setFocusLevel(1)}
+          tabIndex={focusLevel === 1 ? 0 : -1}
           className={`w-24 h-24 rounded-3xl flex items-center justify-center text-5xl shadow-2xl transition-all ${
-            focusLevel === 0 ? 'ring-2 ring-white' : ''
+            focusLevel === 1 ? 'ring-2 ring-white' : ''
           }`}
-          style={{ background: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)', boxShadow: focusLevel === 0 ? '0 0 60px rgba(139,92,246,0.8), 0 0 0 2px white' : '0 0 60px rgba(139,92,246,0.5)' }}
+          style={{ background: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)', boxShadow: focusLevel === 1 ? '0 0 60px rgba(139,92,246,0.8), 0 0 0 2px white' : '0 0 60px rgba(139,92,246,0.5)' }}
         >
           🧠
         </motion.button>
