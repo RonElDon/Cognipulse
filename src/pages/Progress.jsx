@@ -136,16 +136,27 @@ export default function Progress() {
             <Calendar className="w-5 h-5 text-emerald-600" />
             <h2 className="font-black text-slate-800 dark:text-slate-100">Diese Woche</h2>
           </div>
-          <div className="flex items-end justify-between gap-1 h-24">
-            {last7Days.map((d, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <div
-                  className="w-full rounded-t-lg transition-all duration-500 bg-gradient-to-t from-indigo-500 to-purple-400"
-                  style={{ height: `${Math.max(d.exercises * 20, d.exercises > 0 ? 8 : 2)}px`, opacity: d.exercises > 0 ? 1 : 0.2 }}
-                />
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{d.day}</span>
-              </div>
-            ))}
+          <div className="flex items-end justify-between gap-1 h-28">
+            {(() => {
+              const maxEx = Math.max(...last7Days.map(d => d.exercises), 1);
+              return last7Days.map((d, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                  <span className="text-xs font-bold text-slate-400" style={{ minHeight: 16 }}>
+                    {d.exercises > 0 ? d.exercises : ''}
+                  </span>
+                  <div className="w-full flex-1 flex items-end">
+                    <motion.div
+                      className="w-full rounded-t-lg bg-gradient-to-t from-indigo-500 to-purple-400"
+                      style={{ opacity: d.exercises > 0 ? 1 : 0.15 }}
+                      initial={{ height: 0 }}
+                      animate={{ height: d.exercises > 0 ? `${Math.round((d.exercises / maxEx) * 72)}px` : '4px' }}
+                      transition={{ duration: 0.5, delay: i * 0.05 }}
+                    />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{d.day}</span>
+                </div>
+              ));
+            })()}
           </div>
         </motion.div>
 
@@ -157,29 +168,43 @@ export default function Progress() {
             <Award className="w-5 h-5 text-amber-500" />
             <h2 className="font-black text-slate-800 dark:text-slate-100">Bereichs-Leistung</h2>
           </div>
-          <div className="space-y-3">
-            {domainStats.map(d => (
-              <div key={d.id} className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-xl ${d.gradient} flex items-center justify-center text-lg flex-shrink-0`}>
-                  {d.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{d.name}</span>
-                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{d.count} Spiele</span>
+          <div className="space-y-4">
+            {domainStats.map(d => {
+              const clampedScore = Math.min(d.avgScore ?? 0, 100);
+              const mastery = d.count === 0 ? null : d.count >= 50 ? 'Experte' : d.count >= 20 ? 'Fortgeschritten' : d.count >= 5 ? 'Lernend' : 'Einsteiger';
+              return (
+                <div key={d.id} className="flex items-center gap-3">
+                  <div className={`w-9 h-9 rounded-xl ${d.gradient} flex items-center justify-center text-lg flex-shrink-0`}>
+                    {d.icon}
                   </div>
-                  <div className="bg-slate-100 dark:bg-slate-700 rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full transition-all duration-700"
-                      style={{ width: `${d.avgScore || 0}%`, backgroundColor: d.color }}
-                    />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate">{d.nameDE || d.name}</span>
+                        {mastery && (
+                          <span className="text-xs font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 flex-shrink-0">
+                            {mastery}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs font-bold text-slate-400 flex-shrink-0 ml-2">{d.count}×</span>
+                    </div>
+                    <div className="bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden">
+                      <motion.div
+                        className="h-2.5 rounded-full"
+                        style={{ backgroundColor: d.color }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${clampedScore}%` }}
+                        transition={{ duration: 0.7 }}
+                      />
+                    </div>
                   </div>
+                  <span className="text-sm font-black w-10 text-right flex-shrink-0" style={{ color: d.avgScore !== null ? d.color : '#94a3b8' }}>
+                    {d.avgScore !== null ? `${Math.min(d.avgScore, 100)}%` : '—'}
+                  </span>
                 </div>
-                <span className="text-sm font-black w-10 text-right" style={{ color: d.color }}>
-                  {d.avgScore !== null ? `${d.avgScore}%` : '—'}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
 
