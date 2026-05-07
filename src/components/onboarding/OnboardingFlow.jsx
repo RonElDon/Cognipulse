@@ -126,7 +126,11 @@ export default function OnboardingFlow({ onComplete }) {
   }, [messages, loading]);
 
   useEffect(() => {
-    return () => { unsubRef.current?.(); clearInterval(pollRef.current); clearTimeout(loadingTimeoutRef.current); };
+    return () => {
+      if (unsubRef.current) unsubRef.current();
+      if (pollRef.current) clearInterval(pollRef.current);
+      if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
+    };
   }, []);
 
   const handleWelcomeDone = (lang = 'de') => {
@@ -159,9 +163,12 @@ export default function OnboardingFlow({ onComplete }) {
           // assistant message exists but content still streaming — keep loading
         } else if (last?.role === 'user') {
           setLoading(true);
-          // Safety: if no assistant reply comes within 30s, reset loading
+          // Safety fallback only: if no assistant reply comes within 60s, reset loading
           clearTimeout(loadingTimeoutRef.current);
-          loadingTimeoutRef.current = setTimeout(() => setLoading(false), 30000);
+          loadingTimeoutRef.current = setTimeout(() => {
+            setLoading(false);
+            setEmotion('happy');
+          }, 60000);
         }
       });
 
@@ -170,18 +177,21 @@ export default function OnboardingFlow({ onComplete }) {
       const langInstruction = lang === 'en'
         ? 'Hi! (1 sentence greeting) What is your name?'
         : 'Hallo! (1 Satz Begrüßung) Wie heißt du?';
-      await base44.agents.addMessage(conv, {
-        role: 'user',
-        content: langInstruction,
-      });
-      // Also save preferred language to profile immediately
       try {
+        await base44.agents.addMessage(conv, {
+          role: 'user',
+          content: langInstruction,
+        });
+        // Save preferred language immediately
         const user = await base44.auth.me();
         const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
         if (profiles.length > 0) {
           await base44.entities.UserProfile.update(profiles[0].id, { preferred_language: lang });
         }
-      } catch (_) {}
+      } catch (err) {
+        console.error('Onboarding init error:', err);
+        setLoading(false);
+      }
       setInitialized(true);
     } catch (e) { console.error(e); }
   };
