@@ -104,7 +104,7 @@ export default function OnboardingFlow({ onComplete }) {
   const [emotion, setEmotion] = useState('happy');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [selectedOptionIdx, setSelectedOptionIdx] = useState(0);
+  const [selectedOptionIdx, setSelectedOptionIdx] = useState(null);
   const [dateInput, setDateInput] = useState({ day: '', month: '', year: '' });
   const [dateFocus, setDateFocus] = useState('day');
   const chatEndRef = useRef(null);
@@ -142,7 +142,7 @@ export default function OnboardingFlow({ onComplete }) {
     setAnswers(prev => ({ ...prev, [currentQuestion.id]: String(value) }));
     setInput('');
     setDateInput({ day: '', month: '', year: '' });
-    setSelectedOptionIdx(0);
+    setSelectedOptionIdx(null);
     
     // Add user message with emoji
     let displayValue = String(value);
@@ -199,7 +199,7 @@ export default function OnboardingFlow({ onComplete }) {
     if (currentStep > 0) {
       const prevStep = currentStep - 1;
       setCurrentStep(prevStep);
-      setSelectedOptionIdx(0);
+      setSelectedOptionIdx(null);
       setInput('');
       setDateInput({ day: '', month: '', year: '' });
       const answerKey = questions[currentStep].id;
@@ -289,15 +289,17 @@ export default function OnboardingFlow({ onComplete }) {
     if (currentQuestion.type === 'select') {
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        setSelectedOptionIdx(Math.max(0, selectedOptionIdx - 1));
+        setSelectedOptionIdx(prev => Math.max(0, (prev ?? 0) - 1));
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
-        setSelectedOptionIdx(Math.min(currentQuestion.options.length - 1, selectedOptionIdx + 1));
+        setSelectedOptionIdx(prev => Math.min(currentQuestion.options.length - 1, (prev ?? 0) + 1));
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        const opt = currentQuestion.options[selectedOptionIdx];
-        const value = opt.value || opt;
-        handleAnswer(value);
+        if (selectedOptionIdx !== null) {
+          const opt = currentQuestion.options[selectedOptionIdx];
+          const value = opt.value || opt;
+          handleAnswer(value);
+        }
       }
     } else if (e.key === 'Enter') {
       e.preventDefault();
@@ -540,7 +542,7 @@ export default function OnboardingFlow({ onComplete }) {
                    autoFocus={currentQuestion.type === 'select' && idx === 0}
                    disabled={saving}
                    className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 text-white border outline-none focus:outline-none cursor-pointer ${
-                     selectedOptionIdx === idx
+                     selectedOptionIdx === idx && selectedOptionIdx !== null
                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400 shadow-lg'
                        : 'bg-white/10 hover:bg-white/20 border-white/15'
                    }`}
