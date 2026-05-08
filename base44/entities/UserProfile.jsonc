@@ -90,7 +90,7 @@
     },
     "baseline_results": {
       "type": "object",
-      "description": "Ergebnisse des initialen Leistungstests: Genauigkeit, Reaktionszeit, Fehlertypen, Domainwerte",
+      "description": "Ergebnisse des initialen Leistungstests",
       "properties": {
         "overall_accuracy": {
           "type": "number"
@@ -136,6 +136,88 @@
     "health_notes": {
       "type": "string",
       "description": "Optionale klinische Notizen / Diagnose (nur f\u00fcr Therapeuten-Kontext)"
+    },
+    "subscription_plan": {
+      "type": "string",
+      "enum": [
+        "lite",
+        "regular",
+        "pro"
+      ],
+      "default": "lite",
+      "description": "Aktueller Abonnement-Plan des Nutzers"
+    },
+    "current_coins": {
+      "type": "number",
+      "default": 0,
+      "description": "Ingame-W\u00e4hrung (Coins) des Nutzers"
+    },
+    "coins_ads_watched_today": {
+      "type": "number",
+      "default": 0,
+      "description": "Anzahl der heute geschauten Reward-Ads (Reset t\u00e4glich)"
+    },
+    "coins_ads_last_reset": {
+      "type": "string",
+      "format": "date",
+      "description": "Datum des letzten t\u00e4glichen Ad-Resets"
+    },
+    "ad_free_expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt bis wann der Nutzer werbefrei spielt (null = keine aktive Buchung)"
+    },
+    "active_boosters": {
+      "type": "array",
+      "default": [],
+      "description": "Liste der aktiven Booster des Nutzers",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "xp_2x",
+              "score_10pct",
+              "coin_50pct",
+              "continue_shield"
+            ],
+            "description": "Art des Boosters"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "single_game",
+              "timed"
+            ],
+            "description": "Gilt f\u00fcr ein Spiel oder zeitlich begrenzt"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Ablaufzeit (nur bei timed)"
+          },
+          "uses_remaining": {
+            "type": "number",
+            "description": "Verbleibende Nutzungen (nur bei single_game)"
+          }
+        }
+      }
+    },
+    "all_games_unlocked_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt bis wann alle Spiele f\u00fcr den Nutzer freigeschaltet sind"
+    },
+    "extra_lives": {
+      "type": "number",
+      "default": 0,
+      "description": "Anzahl der extra Leben / Versuche des Nutzers"
+    },
+    "unlimited_lives_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt bis wann der Nutzer unbegrenzte Leben hat"
     }
   },
   "required": []
