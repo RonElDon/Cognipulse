@@ -512,43 +512,67 @@ export default function OnboardingFlow({ onComplete }) {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2">
+          <div
+            className="grid grid-cols-2 gap-2"
+            tabIndex={0}
+            autoFocus
+            onKeyDown={(e) => {
+              const cols = 2;
+              const len = currentQuestion.options.length;
+              if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                setSelectedOptionIdx(prev => {
+                  const cur = prev ?? 0;
+                  return cur % cols === 0 ? cur : cur - 1;
+                });
+              } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                setSelectedOptionIdx(prev => {
+                  const cur = prev ?? 0;
+                  return cur % cols === 1 || cur === len - 1 ? cur : cur + 1;
+                });
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setSelectedOptionIdx(prev => {
+                  const cur = prev ?? 0;
+                  return cur >= cols ? cur - cols : cur;
+                });
+              } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setSelectedOptionIdx(prev => {
+                  const cur = prev ?? 0;
+                  return cur + cols < len ? cur + cols : cur;
+                });
+              } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedOptionIdx !== null) {
+                  const opt = currentQuestion.options[selectedOptionIdx];
+                  handleAnswer(opt.value || opt);
+                }
+              } else if (e.key === 'Delete') {
+                e.preventDefault();
+                handleBack();
+              }
+            }}
+            style={{ outline: 'none' }}
+          >
             {currentQuestion.options.map((opt, idx) => {
               const value = opt.value || opt;
               const label = opt.label || opt;
               return (
                 <button
-                   key={value}
-                   onClick={() => handleAnswer(value)}
-                   onKeyDown={(e) => {
-                     const cols = 2;
-                     if (e.key === 'ArrowLeft') {
-                       e.preventDefault();
-                       setSelectedOptionIdx((prev) => prev % cols === 0 ? prev : prev - 1);
-                     } else if (e.key === 'ArrowRight') {
-                       e.preventDefault();
-                       setSelectedOptionIdx((prev) => prev % cols === 1 || prev === currentQuestion.options.length - 1 ? prev : prev + 1);
-                     } else if (e.key === 'ArrowUp') {
-                       e.preventDefault();
-                       setSelectedOptionIdx((prev) => prev >= cols ? prev - cols : prev);
-                     } else if (e.key === 'ArrowDown') {
-                       e.preventDefault();
-                       setSelectedOptionIdx((prev) => prev + cols < currentQuestion.options.length ? prev + cols : prev);
-                     } else if (e.key === 'Enter') {
-                       e.preventDefault();
-                       handleAnswer(value);
-                     }
-                   }}
-                   autoFocus={currentQuestion.type === 'select' && idx === 0}
-                   disabled={saving}
-                   className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 text-white border outline-none focus:outline-none cursor-pointer ${
-                     selectedOptionIdx === idx && selectedOptionIdx !== null
-                       ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400 shadow-lg'
-                       : 'bg-white/10 hover:bg-white/20 border-white/15'
-                   }`}
-                 >
-                   {getEmojiForAnswer(label)} {label}
-                 </button>
+                  key={value}
+                  onClick={() => handleAnswer(value)}
+                  disabled={saving}
+                  tabIndex={-1}
+                  className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 text-white border outline-none focus:outline-none cursor-pointer ${
+                    selectedOptionIdx === idx
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400 shadow-lg'
+                      : 'bg-white/10 hover:bg-white/20 border-white/15'
+                  }`}
+                >
+                  {getEmojiForAnswer(label)} {label}
+                </button>
               );
             })}
           </div>
