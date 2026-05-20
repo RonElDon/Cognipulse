@@ -40,12 +40,22 @@ export default function OnboardingGate({ children }) {
 
   useEffect(() => {
     if (status === 'baseline') {
-      navigate('/baseline');
+      // Only navigate to /baseline if not already there
+      if (window.location.pathname !== '/baseline') {
+        navigate('/baseline');
+      }
       setStatus('done');
     }
   }, [status]);
 
-  if (status === 'loading') return null;
+  if (status === 'loading') return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="text-white font-black text-lg">BrainBoost</div>
+      </div>
+    </div>
+  );
 
   if (status === 'onboarding') {
     return <OnboardingFlow onComplete={() => setStatus('baseline')} />;
