@@ -105,6 +105,7 @@ export default function BaselineAssessment() {
     } catch (e) { console.error(e); }
     setSaving(false);
 
+    completedRef.current = false;
     if (currentIdx + 1 >= BASELINE_EXERCISES.length) {
       // All done — save baseline results to profile
       try {
@@ -129,7 +130,6 @@ export default function BaselineAssessment() {
       } catch (e) { console.error(e); }
       setCurrentIdx(6);
     } else {
-      completedRef.current = false;
       setCurrentIdx(currentIdx + 1);
     }
   };
@@ -145,7 +145,7 @@ export default function BaselineAssessment() {
           <div>
             <h1 className="text-2xl font-black text-white mb-2">Einschätzungstest</h1>
             <p className="text-white/60 text-sm leading-relaxed">
-              6 kurze Übungen aus verschiedenen Bereichen — je max. 90 Sekunden. Kein Richtig oder Falsch, ich möchte nur verstehen wo du gerade stehst.
+              6 kurze Übungen aus verschiedenen Bereichen — je etwa 30 Sekunden. Kein Richtig oder Falsch, ich möchte nur verstehen wo du gerade stehst.
             </p>
           </div>
           <div className="space-y-2">
@@ -188,8 +188,11 @@ export default function BaselineAssessment() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex flex-col items-center justify-center p-4">
+      {/* Countdown Timer Bar */}
+      <BaselineTimer exerciseIdx={currentIdx} onTimeout={handleTimeout} />
+
       {/* Progress */}
-      <div className="w-full max-w-lg mb-2">
+      <div className="w-full max-w-lg mb-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-white/50 text-xs font-semibold">Übung {currentIdx + 1} von {BASELINE_EXERCISES.length}</span>
           <span className="text-white/50 text-xs">{ex.name}</span>
@@ -203,9 +206,6 @@ export default function BaselineAssessment() {
           />
         </div>
       </div>
-
-      {/* Per-exercise timer */}
-      <BaselineTimer exerciseIdx={currentIdx} onTimeout={handleTimeout} />
 
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6 border border-slate-100">
         <AnimatePresence mode="wait">
