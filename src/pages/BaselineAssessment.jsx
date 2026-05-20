@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import GAME_MAP from '@/components/games/GameMap';
@@ -66,6 +66,15 @@ export default function BaselineAssessment() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [results, setResults] = useState([]);
   const completedRef = useRef(false);
+
+  // Enter to start test from intro
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'Enter' && phase === 'intro') setPhase('exercise');
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [phase]);
 
   const handleComplete = async (gameResult) => {
     if (completedRef.current) return;

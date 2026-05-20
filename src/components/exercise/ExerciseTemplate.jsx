@@ -49,10 +49,14 @@ export default function ExerciseTemplate({
     return () => clearTimeout(timerRef.current);
   }, [phase, countdownIdx]);
 
-  // ── ESC to exit ───────────────────────────────────────────
+  // ── Keyboard shortcuts ────────────────────────────────────
   useEffect(() => {
     const handler = (e) => {
       if (e.key === 'Escape' && (phase === 'playing' || phase === 'countdown')) {
+        handleExit();
+      } else if (e.key === 'Enter' && phase === 'idle') {
+        handleStart();
+      } else if (e.key === 'Enter' && phase === 'done') {
         handleExit();
       }
     };
