@@ -150,7 +150,7 @@ export default function OnboardingFlow({ onComplete }) {
     }
   }, [currentStep, currentQuestion.type]);
 
-  // Global keydown for age slider and select
+  // Global keydown — single source of truth for keyboard navigation
   useEffect(() => {
     const handler = (e) => {
       if (currentQuestion.type === 'age') {
@@ -165,24 +165,46 @@ export default function OnboardingFlow({ onComplete }) {
           handleAnswer(String(ageSlider));
         }
       } else if (currentQuestion.type === 'select') {
-        if (e.key === 'Enter') {
+        const opts = currentQuestion.options;
+        const len = opts.length;
+        // Use 1 column for 5 options (dailyExercises), 2 columns otherwise
+        const cols = len >= 5 ? 1 : 2;
+
+        if (e.key === 'ArrowLeft') {
           e.preventDefault();
-          // If nothing selected yet, select first option
+          setSelectedOptionIdx(prev => {
+            const cur = prev ?? 0;
+            return cur % cols === 0 ? cur : cur - 1;
+          });
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          setSelectedOptionIdx(prev => {
+            const cur = prev ?? 0;
+            return (cur % cols === cols - 1 || cur === len - 1) ? cur : cur + 1;
+          });
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setSelectedOptionIdx(prev => {
+            const cur = prev ?? 1;
+            return cur >= cols ? cur - cols : cur;
+          });
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setSelectedOptionIdx(prev => {
+            const cur = prev ?? -1;
+            return cur + cols < len ? cur + cols : cur;
+          });
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
           const idx = selectedOptionIdx ?? 0;
-          const opt = currentQuestion.options[idx];
+          const opt = opts[idx];
           if (opt) handleAnswer(opt.value || opt);
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-          e.preventDefault();
-          setSelectedOptionIdx(prev => Math.max(0, (prev ?? 0) - 1));
-        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-          e.preventDefault();
-          setSelectedOptionIdx(prev => Math.min(currentQuestion.options.length - 1, (prev ?? 0) + 1));
         }
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [currentQuestion.type, ageSlider, selectedOptionIdx, currentQuestion.options]);
+  }, [currentQuestion.type, currentQuestion.options, ageSlider, selectedOptionIdx]);
 
   const handleWelcomeDone = (lang) => {
     setLanguage(lang);
@@ -360,27 +382,7 @@ export default function OnboardingFlow({ onComplete }) {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Delete') {
-      e.preventDefault();
-      handleBack();
-      return;
-    }
-    if (currentQuestion.type === 'select') {
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        setSelectedOptionIdx(prev => Math.max(0, (prev ?? 0) - 1));
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        setSelectedOptionIdx(prev => Math.min(currentQuestion.options.length - 1, (prev ?? 0) + 1));
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (selectedOptionIdx !== null) {
-          const opt = currentQuestion.options[selectedOptionIdx];
-          const value = opt.value || opt;
-          handleAnswer(value);
-        }
-      }
-    } else if (e.key === 'Enter') {
+    if (e.key === 'Enter') {
       e.preventDefault();
       handleSendMessage();
     }
@@ -631,41 +633,8 @@ export default function OnboardingFlow({ onComplete }) {
         ) : (
           <div
             ref={selectContainerRef}
-            className="grid grid-cols-2 gap-2"
+            className={`grid gap-2 ${currentQuestion.options.length >= 5 ? 'grid-cols-1' : 'grid-cols-2'}`}
             tabIndex={0}
-            onKeyDown={(e) => {
-              const cols = 2;
-              const len = currentQuestion.options.length;
-              if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                setSelectedOptionIdx(prev => {
-                  const cur = prev ?? 0;
-                  return cur % cols === 0 ? cur : cur - 1;
-                });
-              } else if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                setSelectedOptionIdx(prev => {
-                  const cur = prev ?? 0;
-                  return cur % cols === cols - 1 || cur === len - 1 ? cur : cur + 1;
-                });
-              } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                setSelectedOptionIdx(prev => {
-                  const cur = prev ?? 0;
-                  return cur >= cols ? cur - cols : cur;
-                });
-              } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                setSelectedOptionIdx(prev => {
-                  const cur = prev ?? 0;
-                  return cur + cols < len ? cur + cols : cur;
-                });
-              } else if (e.key === 'Enter' && selectedOptionIdx !== null) {
-                e.preventDefault();
-                const opt = currentQuestion.options[selectedOptionIdx];
-                handleAnswer(opt.value || opt);
-              }
-            }}
             style={{ outline: 'none' }}
           >
             {currentQuestion.options.map((opt, idx) => {
