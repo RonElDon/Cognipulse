@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, ChevronRight } from 'lucide-react';
@@ -6,6 +6,7 @@ import GAME_MAP from '@/components/games/GameMap';
 import { DOMAINS } from '@/lib/exercises';
 import { base44 } from '@/api/base44Client';
 import PostAssessmentNeuro from '@/components/onboarding/PostAssessmentNeutro';
+import BaselineTimer from '@/components/baseline/BaselineTimer';
 
 const BASELINE_POOL = {
   attention:  [
@@ -66,6 +67,7 @@ export default function BaselineAssessment() {
   const [currentIdx, setCurrentIdx] = useState(-1); // -1 = intro, 0-5 = exercises, 6 = done
   const [results, setResults] = useState([]);
   const [saving, setSaving] = useState(false);
+  const completedRef = useRef(false);
 
   const currentExercise = currentIdx >= 0 && currentIdx < BASELINE_EXERCISES.length
     ? BASELINE_EXERCISES[currentIdx]
@@ -73,7 +75,14 @@ export default function BaselineAssessment() {
 
   const GameComponent = currentExercise ? GAME_MAP[currentExercise.id] : null;
 
+  const handleTimeout = () => {
+    if (completedRef.current) return;
+    handleComplete({ score: 30, accuracy: 30, reaction_time_ms: null });
+  };
+
   const handleComplete = async (gameResult) => {
+    if (completedRef.current) return;
+    completedRef.current = true;
     const ex = BASELINE_EXERCISES[currentIdx];
     const newResults = [...results, { ...gameResult, exercise_id: ex.id, domain: ex.domain, exercise_name: ex.nameExercise }];
     setResults(newResults);
@@ -120,6 +129,7 @@ export default function BaselineAssessment() {
       } catch (e) { console.error(e); }
       setCurrentIdx(6);
     } else {
+      completedRef.current = false;
       setCurrentIdx(currentIdx + 1);
     }
   };
@@ -135,7 +145,7 @@ export default function BaselineAssessment() {
           <div>
             <h1 className="text-2xl font-black text-white mb-2">Einschätzungstest</h1>
             <p className="text-white/60 text-sm leading-relaxed">
-              6 kurze Übungen aus verschiedenen Bereichen — je etwa 30 Sekunden. Kein Richtig oder Falsch, ich möchte nur verstehen wo du gerade stehst.
+              6 kurze Übungen aus verschiedenen Bereichen — je max. 90 Sekunden. Kein Richtig oder Falsch, ich möchte nur verstehen wo du gerade stehst.
             </p>
           </div>
           <div className="space-y-2">
@@ -179,7 +189,7 @@ export default function BaselineAssessment() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex flex-col items-center justify-center p-4">
       {/* Progress */}
-      <div className="w-full max-w-lg mb-4">
+      <div className="w-full max-w-lg mb-2">
         <div className="flex items-center justify-between mb-2">
           <span className="text-white/50 text-xs font-semibold">Übung {currentIdx + 1} von {BASELINE_EXERCISES.length}</span>
           <span className="text-white/50 text-xs">{ex.name}</span>
@@ -193,6 +203,9 @@ export default function BaselineAssessment() {
           />
         </div>
       </div>
+
+      {/* Per-exercise timer */}
+      <BaselineTimer exerciseIdx={currentIdx} onTimeout={handleTimeout} />
 
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6 border border-slate-100">
         <AnimatePresence mode="wait">
