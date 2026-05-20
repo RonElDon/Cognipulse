@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import OnboardingFlow from './OnboardingFlow';
 
 export default function OnboardingGate({ children }) {
-  const [status, setStatus] = useState('loading'); // loading | onboarding | done
+  const navigate = useNavigate();
+  const [status, setStatus] = useState('loading'); // loading | onboarding | baseline | done
 
   useEffect(() => {
     checkStatus();
@@ -28,6 +30,9 @@ export default function OnboardingGate({ children }) {
         setStatus('onboarding');
       } else if (!profiles[0]?.onboarding_completed) {
         setStatus('onboarding');
+      } else if (!profiles[0]?.baseline_assessment_completed) {
+        // Onboarding done but baseline not yet completed — go straight to baseline
+        setStatus('baseline');
       } else {
         setStatus('done');
       }
@@ -36,10 +41,17 @@ export default function OnboardingGate({ children }) {
     }
   };
 
+  useEffect(() => {
+    if (status === 'baseline') {
+      navigate('/baseline');
+      setStatus('done');
+    }
+  }, [status]);
+
   if (status === 'loading') return null;
 
   if (status === 'onboarding') {
-    return <OnboardingFlow onComplete={() => checkStatus()} />;
+    return <OnboardingFlow onComplete={() => setStatus('done')} />;
   }
 
   return children;
