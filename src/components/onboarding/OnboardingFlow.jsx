@@ -82,7 +82,7 @@ const QUESTIONS = {
   de: [
     { id: 'name', question: 'Lass mich dich kennenlernen — wie heißt du? 😊', placeholder: 'Dein Name...', type: 'text' },
     { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'age' },
-    { id: 'gender', question: 'Was ist dein Geschlecht? ⚧️', options: [{ label: 'Männlich', value: 'männlich' }, { label: 'Weiblich', value: 'weiblich' }, { label: 'Divers', value: 'divers' }, { label: 'Keine Angabe', value: 'keine Angabe' }], type: 'select' },
+    { id: 'gender', question: 'Was ist dein Geschlecht? ⚧️', options: [{ label: 'Männlich', value: 'männlich' }, { label: 'Weiblich', value: 'weiblich' }, { label: 'Divers', value: 'divers' }, { label: 'Keine Angabe', value: 'keine Angabe' }], type: 'select', defaultIdx: 0 },
     { id: 'goal', question: 'Was treibt dich an? Was möchtest du mit deinem Gehirn erreichen? 🎯', placeholder: 'z.B. Gedächtnis verbessern, fokussierter werden...', type: 'text' },
     { id: 'dailyExercises', question: 'Wie viel Zeit hast du pro Tag für dein Brain-Workout? ⏱️', options: [
       { label: 'Starter (5 Min.)', value: '3' },
@@ -179,20 +179,20 @@ export default function OnboardingFlow({ onComplete }) {
         } else if (e.key === 'ArrowRight') {
           e.preventDefault();
           setSelectedOptionIdx(prev => {
-            const cur = prev ?? 0;
-            return (cur % cols === cols - 1 || cur === len - 1) ? cur : cur + 1;
+            if (prev === null) return 0;
+            return (prev % cols === cols - 1 || prev === len - 1) ? prev : prev + 1;
           });
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
           setSelectedOptionIdx(prev => {
-            const cur = prev ?? 1;
+            const cur = prev ?? cols;
             return cur >= cols ? cur - cols : cur;
           });
         } else if (e.key === 'ArrowDown') {
           e.preventDefault();
           setSelectedOptionIdx(prev => {
-            const cur = prev ?? -1;
-            return cur + cols < len ? cur + cols : cur;
+            if (prev === null) return 0;
+            return prev + cols < len ? prev + cols : prev;
           });
         } else if (e.key === 'Enter') {
           e.preventDefault();
