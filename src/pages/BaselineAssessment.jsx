@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import GAME_MAP from '@/components/games/GameMap';
-import { DOMAINS } from '@/lib/exercises';
 import { base44 } from '@/api/base44Client';
 import PostAssessmentNeuro from '@/components/onboarding/PostAssessmentNeutro';
 import ExerciseTemplate from '@/components/exercise/ExerciseTemplate';
@@ -24,7 +23,6 @@ const BASELINE_POOL = {
     { id: 'exe_1', nameExercise: 'Aufgabenwechsel',    desc: 'Wechsle schnell zwischen zwei verschiedenen Regeln.' },
     { id: 'exe_2', nameExercise: 'Stoppsignal',        desc: 'Stoppe deine Reaktion wenn ein Signal erscheint.' },
     { id: 'exe_4', nameExercise: 'Stroop-Herausforderung', desc: 'Nenne die Farbe, ignoriere das geschriebene Wort.' },
-    { id: 'exe_8', nameExercise: 'Hemmungs-Rennen',    desc: 'Unterdrücke impulsive Reaktionen unter Zeitdruck.' },
   ],
   visuomotor: [
     { id: 'vis_3', nameExercise: 'Ziel antippen',      desc: 'Tippe präzise auf erscheinende Ziele.' },
@@ -44,18 +42,19 @@ const BASELINE_POOL = {
 };
 
 const DOMAIN_META = {
-  attention:  { name: 'Aufmerksamkeit',          icon: '🎯', color: '#f59e0b' },
-  memory:     { name: 'Gedächtnis',               icon: '🧠', color: '#6366f1' },
-  executive:  { name: 'Exekutive Funktionen',     icon: '⚙️', color: '#10b981' },
-  visuomotor: { name: 'Visuomotorik',             icon: '👁️', color: '#f97316' },
-  processing: { name: 'Verarbeitungsgeschw.',     icon: '⚡', color: '#06b6d4' },
-  reasoning:  { name: 'Logik & Schlussfolgerung', icon: '🔮', color: '#f43f5e' },
+  attention:  { name: 'Aufmerksamkeit',      icon: '🎯', color: '#f59e0b' },
+  memory:     { name: 'Gedächtnis',           icon: '🧠', color: '#6366f1' },
+  executive:  { name: 'Exekutive Funktion',   icon: '⚙️', color: '#10b981' },
+  visuomotor: { name: 'Visuomotorik',         icon: '👁️', color: '#f97316' },
+  processing: { name: 'Verarbeitung',         icon: '⚡', color: '#06b6d4' },
+  reasoning:  { name: 'Logik',                icon: '🔮', color: '#f43f5e' },
 };
 
 function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+// Pick one random exercise per domain (6 total)
 const BASELINE_EXERCISES = Object.entries(BASELINE_POOL).map(([domain, pool]) => {
   const picked = pickRandom(pool);
   return { ...picked, domain, ...DOMAIN_META[domain] };
@@ -63,16 +62,22 @@ const BASELINE_EXERCISES = Object.entries(BASELINE_POOL).map(([domain, pool]) =>
 
 export default function BaselineAssessment() {
   const navigate = useNavigate();
-  // -1 = intro, 0..N-1 = exercises list, N = done
-  const [phase, setPhase] = useState('intro'); // intro | list | done
+  const [phase, setPhase] = useState('intro'); // intro | exercise | done
+  const [currentIdx, setCurrentIdx] = useState(0);
   const [results, setResults] = useState([]);
   const completedRef = useRef(false);
 
-  const handleComplete = async (gameResult, exIdx) => {
+  const handleComplete = async (gameResult) => {
     if (completedRef.current) return;
     completedRef.current = true;
-    const ex = BASELINE_EXERCISES[exIdx];
-    const newResults = [...results, { ...gameResult, exercise_id: ex.id, domain: ex.domain, exercise_name: ex.nameExercise }];
+
+    const ex = BASELINE_EXERCISES[currentIdx];
+    const newResults = [...results, {
+      ...gameResult,
+      exercise_id: ex.id,
+      domain: ex.domain,
+      exercise_name: ex.nameExercise,
+    }];
     setResults(newResults);
 
     try {
@@ -92,9 +97,9 @@ export default function BaselineAssessment() {
 
     completedRef.current = false;
 
-    // Check if all exercises done
-    const allDone = newResults.length >= BASELINE_EXERCISES.length;
-    if (allDone) {
+    const nextIdx = currentIdx + 1;
+    if (nextIdx >= BASELINE_EXERCISES.length) {
+      // Save baseline to profile
       try {
         const user = await base44.auth.me();
         const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
@@ -116,6 +121,8 @@ export default function BaselineAssessment() {
         }
       } catch (e) { console.error(e); }
       setPhase('done');
+    } else {
+      setCurrentIdx(nextIdx);
     }
   };
 
@@ -130,7 +137,7 @@ export default function BaselineAssessment() {
           <div>
             <h1 className="text-2xl font-black text-white mb-2">Einschätzungstest</h1>
             <p className="text-white/60 text-sm leading-relaxed">
-              6 kurze Übungen aus verschiedenen Bereichen. Kein Richtig oder Falsch — ich möchte nur verstehen, wo du gerade stehst.
+              {BASELINE_EXERCISES.length} kurze Übungen aus verschiedenen Bereichen — je etwa 30–60 Sekunden. Kein Richtig oder Falsch, ich möchte nur verstehen, wo du gerade stehst.
             </p>
           </div>
           <div className="space-y-2">
@@ -146,7 +153,7 @@ export default function BaselineAssessment() {
             ))}
           </div>
           <button
-            onClick={() => setPhase('list')}
+            onClick={() => setPhase('exercise')}
             className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all"
           >
             Test starten 🚀
@@ -164,87 +171,54 @@ export default function BaselineAssessment() {
     return <PostAssessmentNeuro results={results} />;
   }
 
-  // ── EXERCISE LIST ──────────────────────────────────────────
-  const completedIds = results.map(r => r.exercise_id);
+  // ── SEQUENTIAL EXERCISE ────────────────────────────────────
+  const ex = BASELINE_EXERCISES[currentIdx];
+  const GameComponent = GAME_MAP[ex.id];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 px-4 py-8">
-      <div className="w-full max-w-sm mx-auto space-y-4">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="text-white font-black text-xl">Einschätzungstest</div>
-          <div className="text-white/40 text-xs mt-1">
-            {completedIds.length} / {BASELINE_EXERCISES.length} abgeschlossen
-          </div>
-          {/* Progress bar */}
-          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mt-3">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-500"
-              animate={{ width: `${(completedIds.length / BASELINE_EXERCISES.length) * 100}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex flex-col items-center justify-center p-4">
+      {/* Progress */}
+      <div className="w-full max-w-lg mb-4 flex-shrink-0">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-white/50 text-xs font-semibold">
+            {currentIdx + 1} / {BASELINE_EXERCISES.length}
+          </span>
+          <span className="text-white/50 text-xs">{ex.name}</span>
         </div>
-
-        {/* Exercise cards */}
-        <AnimatePresence>
-          {BASELINE_EXERCISES.map((ex, idx) => {
-            const isDone = completedIds.includes(ex.id);
-            const GameComponent = GAME_MAP[ex.id];
-
-            return (
-              <motion.div
-                key={ex.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.06 }}
-              >
-                {isDone ? (
-                  // Completed card
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-3 opacity-60">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                      style={{ background: `${ex.color}33` }}>
-                      {ex.icon}
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-white/70 font-bold text-sm">{ex.nameExercise}</div>
-                      <div className="text-white/30 text-xs">{ex.name}</div>
-                    </div>
-                    <div className="text-green-400 text-lg">✓</div>
-                  </div>
-                ) : (
-                  // Active card via ExerciseTemplate
-                  <ExerciseTemplate
-                    title={ex.nameExercise}
-                    description={ex.desc}
-                    icon={ex.icon}
-                    accentColor={ex.color}
-                    onComplete={(result) => handleComplete(result, idx)}
-                    onExit={() => {}}
-                  >
-                    {({ onComplete }) =>
-                      GameComponent
-                        ? <GameComponent onComplete={onComplete} level={2} />
-                        : <div className="text-center py-8 text-slate-400">Übung nicht verfügbar</div>
-                    }
-                  </ExerciseTemplate>
-                )}
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-
-        {completedIds.length === BASELINE_EXERCISES.length && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            onClick={() => setPhase('done')}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-black text-base shadow-xl transition-all hover:opacity-90"
-          >
-            Auswertung ansehen 🎉
-          </motion.button>
-        )}
+        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-500"
+            animate={{ width: `${((currentIdx) / BASELINE_EXERCISES.length) * 100}%` }}
+            transition={{ duration: 0.4 }}
+          />
+        </div>
       </div>
+
+      {/* ExerciseTemplate — one at a time */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentIdx}
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          className="w-full max-w-lg"
+        >
+          <ExerciseTemplate
+            title={ex.nameExercise}
+            description={ex.desc}
+            icon={ex.icon}
+            accentColor={ex.color}
+            onComplete={handleComplete}
+            onExit={() => {}}
+          >
+            {({ onComplete }) =>
+              GameComponent
+                ? <GameComponent onComplete={onComplete} level={2} />
+                : <div className="text-center py-8 text-slate-400">Übung nicht verfügbar</div>
+            }
+          </ExerciseTemplate>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
