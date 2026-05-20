@@ -43,7 +43,7 @@ export function SpotlightFocus({ onComplete, level }) {
         <span>⏱ {timeLeft}s</span><span className="text-green-600">✓ {score}</span><span className="text-red-400">✗ {missed}</span>
       </div>
       <div className="relative bg-slate-100 rounded-2xl overflow-hidden" style={{ height: 340 }}>
-        <p className="absolute inset-0 flex items-center justify-center text-slate-300 text-sm font-semibold">Tippe alle 🎯!</p>
+        <p className="absolute inset-0 flex items-center justify-center text-slate-400 text-base font-black">Tippe alle 🎯!</p>
         {targets.map(t => (
           <button key={t.id} onClick={() => { reactions.current.push(Date.now() - t.spawnTime); setScore(s => s + 1); setTargets(tt => tt.filter(x => x.id !== t.id)); }}
             className="absolute w-14 h-14 rounded-full bg-amber-400 border-4 border-amber-500 shadow-lg pop-in flex items-center justify-center text-xl hover:scale-110 transition-transform"
@@ -175,7 +175,7 @@ export function SustainedWatch({ onComplete, level }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between text-sm font-bold text-slate-600"><span>⏱ {timeLeft}s</span><span className="text-green-600">Treffer: {hits}</span><span className="text-red-400">Fehler: {misses}</span></div>
-      <p className="text-center text-sm font-bold text-slate-500">Tippe NUR bei 🟥!</p>
+      <p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">Tippe NUR bei 🟥!</p>
       <button onClick={handleTap} className="w-full h-56 rounded-3xl flex items-center justify-center text-9xl bg-slate-100 hover:bg-slate-200 active:scale-95 transition-all">{current}</button>
     </div>
   );
@@ -342,7 +342,7 @@ export function FocusMarathon({ onComplete, level }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between text-sm font-bold text-slate-600"><span>⏱ {timeLeft}s</span><span className="text-green-600">Serie: {streak}</span><span className="text-red-400">Fehler: {errors}</span></div>
-      <p className="text-center text-sm text-slate-500 font-bold">Ist es 🔵?</p>
+      <p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">Ist es 🔵?</p>
       <div className="bg-slate-50 rounded-2xl p-10 text-center text-9xl">{current.shape}</div>
       <div className="grid grid-cols-2 gap-3">
         <button onClick={handleYes} className="py-4 rounded-2xl bg-green-500 text-white font-black text-lg active:scale-95">✅ JA</button>

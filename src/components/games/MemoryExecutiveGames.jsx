@@ -121,9 +121,9 @@ export function WordList({ onComplete, level }) {
   return (
     <div className="space-y-4">
       {phase==='study'?(
-        <><p className="text-center text-sm font-bold text-slate-500">Einprägen: {timeLeft}s übrig</p><div className="bg-slate-50 rounded-2xl p-5 grid grid-cols-2 gap-3">{words.map((w,i)=><div key={i} className="bg-white rounded-xl p-3 text-center font-bold text-slate-700 border border-slate-200 shadow-sm">{w}</div>)}</div></>
+        <><p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">⏳ Einprägen: {timeLeft}s übrig</p><div className="bg-slate-50 rounded-2xl p-5 grid grid-cols-2 gap-3">{words.map((w,i)=><div key={i} className="bg-white rounded-xl p-3 text-center font-bold text-slate-700 border border-slate-200 shadow-sm">{w}</div>)}</div></>
       ):(
-        <><p className="text-center text-sm font-bold text-slate-500">Welche {words.length} Wörter hattest du?</p><div className="grid grid-cols-2 gap-2">{options.map((w,i)=><button key={i} onClick={()=>handleSelect(w)} className={`py-3 rounded-xl font-bold text-sm transition-all ${selected.includes(w)?'bg-indigo-500 text-white scale-95':'bg-slate-100 text-slate-700 hover:bg-indigo-100'}`}>{w}</button>)}</div></>
+        <><p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">Welche {words.length} Wörter hattest du?</p><div className="grid grid-cols-2 gap-2">{options.map((w,i)=><button key={i} onClick={()=>handleSelect(w)} className={`py-3 rounded-xl font-bold text-sm transition-all ${selected.includes(w)?'bg-indigo-500 text-white scale-95':'bg-slate-100 text-slate-700 hover:bg-indigo-100'}`}>{w}</button>)}</div></>
       )}
     </div>
   );
@@ -170,7 +170,7 @@ export function NBackChallenge({ onComplete, level }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between text-sm font-bold text-slate-600"><span>{n}-Back</span><span>{round}/{totalRounds}</span><span className="text-green-600">✓ {score}</span></div>
-      <p className="text-center text-xs text-slate-400">War der Buchstabe von {n} Schritten zuvor gleich?</p>
+      <p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">War der Buchstabe von {n} Schritten zuvor gleich?</p>
       <div className="bg-indigo-50 rounded-2xl p-10 text-center">
         <div className="text-7xl font-black text-indigo-600">{current}</div>
         <div className="flex gap-2 justify-center mt-3">{history.slice(-5).map((l,i)=><span key={i} className="text-sm text-slate-400">{l}</span>)}</div>
@@ -203,7 +203,9 @@ export function PositionMemory({ onComplete, level }) {
 
   return (
     <div className="space-y-4">
-      {phase==='show'?<p className="text-center text-sm font-bold text-slate-500">Merke Positionen! ({timeLeft}s)</p>:<p className="text-center text-sm font-bold text-slate-500">Wo waren ⭐? (Wähle {numTargets})</p>}
+      <p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">
+        {phase==='show' ? `⭐ Merke Positionen! (${timeLeft}s)` : `Wo waren ⭐? (Wähle ${numTargets})`}
+      </p>
       <div className="grid grid-cols-4 gap-2">
         {Array.from({length:gridSize*gridSize},(_,i)=>(
           <button key={i} onClick={()=>handleSelect(i)}
@@ -291,8 +293,8 @@ export function StoryRecall({ onComplete, level }) {
   const q=story.questions[qIdx];
   return (
     <div className="space-y-4">
-      {phase==='read'?(<><p className="text-center text-sm font-bold text-slate-500">Einprägen ({timeLeft}s)</p><div className="bg-indigo-50 rounded-2xl p-6 text-center"><p className="text-base font-semibold text-slate-800 leading-relaxed">{story.text}</p></div></>):(
-        <><p className="text-center text-sm font-bold text-slate-500">Frage {qIdx+1}/{story.questions.length}</p><div className="bg-slate-50 rounded-2xl p-4 text-center font-bold text-slate-800">{q.q}</div><div className="space-y-2">{q.options.map((opt,i)=><button key={i} onClick={()=>handleAnswer(i)} className="w-full py-3 rounded-xl bg-white border-2 border-slate-200 font-semibold text-slate-700 hover:border-indigo-400 active:scale-95">{opt}</button>)}</div></>
+      {phase==='read'?(<><p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">📖 Einprägen ({timeLeft}s)</p><div className="bg-indigo-50 rounded-2xl p-6 text-center"><p className="text-base font-semibold text-slate-800 leading-relaxed">{story.text}</p></div></>):(
+        <><p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">❓ Frage {qIdx+1}/{story.questions.length}</p><div className="bg-slate-50 rounded-2xl p-4 text-center font-bold text-slate-800">{q.q}</div><div className="space-y-2">{q.options.map((opt,i)=><button key={i} onClick={()=>handleAnswer(i)} className="w-full py-3 rounded-xl bg-white border-2 border-slate-200 font-semibold text-slate-700 hover:border-indigo-400 active:scale-95">{opt}</button>)}</div></>
       )}
     </div>
   );
@@ -318,8 +320,8 @@ export function FaceName({ onComplete, level }) {
 
   return (
     <div className="space-y-4">
-      {phase==='study'?(<><p className="text-center text-sm font-bold text-slate-500">Namen merken ({timeLeft}s)</p><div className="grid grid-cols-2 gap-3">{targets.map((p,i)=><div key={i} className={`${p.color} rounded-2xl p-4 text-center`}><div className="text-5xl mb-2">{p.emoji}</div><div className="font-black text-slate-800">{p.name}</div></div>)}</div></>):(
-        <><p className="text-center text-sm font-bold text-slate-500">{qIdx+1}/{targets.length}: Wer ist das?</p><div className="text-center text-8xl py-4">{questions[qIdx].face}</div><div className="grid grid-cols-2 gap-2">{questions[qIdx].options.map((name,i)=><button key={i} onClick={()=>handleAnswer(name)} className="py-3 rounded-xl bg-white border-2 border-slate-200 font-bold text-slate-700 hover:border-indigo-400 active:scale-95">{name}</button>)}</div></>
+      {phase==='study'?(<><p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">🧠 Namen merken ({timeLeft}s)</p><div className="grid grid-cols-2 gap-3">{targets.map((p,i)=><div key={i} className={`${p.color} rounded-2xl p-4 text-center`}><div className="text-5xl mb-2">{p.emoji}</div><div className="font-black text-slate-800">{p.name}</div></div>)}</div></>):(
+        <><p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">👤 {qIdx+1}/{targets.length}: Wer ist das?</p><div className="text-center text-8xl py-4">{questions[qIdx].face}</div><div className="grid grid-cols-2 gap-2">{questions[qIdx].options.map((name,i)=><button key={i} onClick={()=>handleAnswer(name)} className="py-3 rounded-xl bg-white border-2 border-slate-200 font-bold text-slate-700 hover:border-indigo-400 active:scale-95">{name}</button>)}</div></>
       )}
     </div>
   );
@@ -405,7 +407,7 @@ export function StopSignal({ onComplete, level }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between text-sm font-bold text-slate-600"><span>{round}/{total}</span><span className="text-green-600">✓ {score}</span><span className="text-red-400">✗ {errors}</span></div>
-      <p className="text-center text-xs text-slate-400 font-bold">Bei 🟢 tippen — bei 🔴 STOPP!</p>
+      <p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">Bei 🟢 tippen — bei 🔴 STOPP!</p>
       <button onClick={handleTap} className={`w-full h-56 rounded-3xl flex items-center justify-center text-9xl transition-all duration-150 ${current==='🟢'?'bg-green-200':current==='🔴'?'bg-red-200':'bg-slate-100'}`}>{current || '⏳'}</button>
     </div>
   );
@@ -432,7 +434,7 @@ export function StroopChallenge({ onComplete, level }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between text-sm font-bold text-slate-600"><span>⏱ {timeLeft}s</span><span className="text-green-600">✓ {score}</span><span className="text-red-400">✗ {errors}</span></div>
-      <p className="text-center text-xs text-slate-400">Wähle die TINTENFARBE (nicht das Wort)!</p>
+      <p className="text-center text-sm font-black text-slate-700 bg-slate-100 rounded-xl py-2 px-4">Wähle die TINTENFARBE (nicht das Wort)!</p>
       <div className="bg-slate-50 rounded-2xl p-8 text-center"><div className="text-5xl font-black" style={{color:colorMap[item.inkColor]}}>{item.word}</div></div>
       <div className="grid grid-cols-2 gap-2">{colorNames.map(c=><button key={c} onClick={()=>handleAnswer(c)} className="py-4 rounded-xl font-black text-white text-lg active:scale-95" style={{backgroundColor:colorMap[c]}}>{c}</button>)}</div>
     </div>

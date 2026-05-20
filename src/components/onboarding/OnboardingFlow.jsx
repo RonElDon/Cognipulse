@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Send } from 'lucide-react';
 import WelcomeScreen from './WelcomeScreen';
+import { useTheme } from '@/lib/ThemeContext';
 
 const GLOBE_EMOTIONS = {
   happy:    { bg: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)', glow: '#a855f7', y: [-6, 6], dur: 2.6 },
@@ -96,6 +97,7 @@ const QUESTIONS = {
 
 export default function OnboardingFlow({ onComplete }) {
   const navigate = useNavigate();
+  const { accentColor } = useTheme();
   const [phase, setPhase] = useState('welcome');
   const [language, setLanguage] = useState('de');
   const [currentStep, setCurrentStep] = useState(0);
@@ -381,11 +383,14 @@ export default function OnboardingFlow({ onComplete }) {
                     🧠
                   </div>
                 )}
-                <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed font-medium ${
-                  isUser
-                    ? 'bg-indigo-600/90 text-white rounded-br-sm'
-                    : 'bg-white/10 backdrop-blur-sm text-white/95 border border-white/10 rounded-bl-sm'
-                }`}>
+                <div
+                  style={isUser ? { background: accentColor } : {}}
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed font-medium ${
+                    isUser
+                      ? 'text-white rounded-br-sm'
+                      : 'bg-white/10 backdrop-blur-sm text-white/95 border border-white/10 rounded-bl-sm'
+                  }`}
+                >
                   {m.content}
                 </div>
               </motion.div>
@@ -425,7 +430,8 @@ export default function OnboardingFlow({ onComplete }) {
             <button
               onClick={handleSendMessage}
               disabled={!input.trim() || saving}
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-30 flex items-center justify-center transition-all flex-shrink-0 shadow-lg"
+              style={{ background: accentColor }}
+              className="w-10 h-10 rounded-xl disabled:opacity-30 flex items-center justify-center transition-all flex-shrink-0 shadow-lg hover:opacity-90"
             >
               <Send className="w-4 h-4 text-white" />
             </button>
@@ -445,8 +451,8 @@ export default function OnboardingFlow({ onComplete }) {
                 onChange={e => setAgeSlider(parseInt(e.target.value))}
                 className="w-full h-2 rounded-full appearance-none cursor-pointer"
                 style={{
-                  background: `linear-gradient(to right, #7c3aed ${((ageSlider - 13) / 86) * 100}%, rgba(255,255,255,0.15) ${((ageSlider - 13) / 86) * 100}%)`,
-                  accentColor: '#7c3aed',
+                  background: `linear-gradient(to right, ${accentColor} ${((ageSlider - 13) / 86) * 100}%, rgba(255,255,255,0.15) ${((ageSlider - 13) / 86) * 100}%)`,
+                  accentColor: accentColor,
                 }}
               />
               <div className="flex justify-between text-white/30 text-xs mt-2 font-semibold">
@@ -457,7 +463,8 @@ export default function OnboardingFlow({ onComplete }) {
             <button
               onClick={() => handleAnswer(String(ageSlider))}
               disabled={saving}
-              className="w-full py-4 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-30 text-white font-black text-base transition-all shadow-lg"
+              style={{ background: accentColor }}
+              className="w-full py-4 rounded-2xl disabled:opacity-30 text-white font-black text-base transition-all shadow-lg hover:opacity-90"
             >
               Bestätigen ✓
             </button>
@@ -600,9 +607,10 @@ export default function OnboardingFlow({ onComplete }) {
                   key={value}
                   onClick={() => handleAnswer(value)}
                   disabled={saving}
+                  style={selectedOptionIdx === idx ? { background: accentColor } : {}}
                   className={`py-3 px-4 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 text-white border outline-none focus:outline-none cursor-pointer ${
                     selectedOptionIdx === idx
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 border-purple-400 shadow-lg'
+                      ? 'border-transparent shadow-lg'
                       : 'bg-white/10 hover:bg-white/20 border-white/15'
                   }`}
                 >
