@@ -114,6 +114,7 @@ export default function OnboardingFlow({ onComplete }) {
   const inputRef = useRef(null);
   const selectContainerRef = useRef(null);
   const sliderRef = useRef(null);
+  const answeringRef = useRef(false);
 
   const questions = QUESTIONS[language];
   const currentQuestion = questions[currentStep];
@@ -186,6 +187,9 @@ export default function OnboardingFlow({ onComplete }) {
 
   const handleAnswer = async (value) => {
     if (!value && value !== 0) return;
+    if (answeringRef.current) return;
+    answeringRef.current = true;
+    setTimeout(() => { answeringRef.current = false; }, 800);
     
     const newAnswers = { ...answers, [currentQuestion.id]: String(value) };
     setAnswers(newAnswers);
