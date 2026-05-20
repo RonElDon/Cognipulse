@@ -26,7 +26,9 @@ export default function Exercise() {
   const [lastNeuroResult, setLastNeuroResult] = useState(null);
   const [saving, setSaving] = useState(false);
   const [level, setLevel] = useState(exercise?.difficulty || 1);
+  const [timeLeft, setTimeLeft] = useState(90);
   const containerRef = useRef(null);
+  const timerRef = useRef(null);
 
   // Countdown logic
   useEffect(() => {
@@ -38,6 +40,26 @@ export default function Exercise() {
     const t = setTimeout(() => setCountdown(c => c - 1), 1000);
     return () => clearTimeout(t);
   }, [phase, countdown, isTrial]);
+
+  // Game timer (90s)
+  useEffect(() => {
+    if (phase !== 'playing' && phase !== 'trial') {
+      clearInterval(timerRef.current);
+      setTimeLeft(90);
+      return;
+    }
+    setTimeLeft(90);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [phase]);
 
   const goFullscreen = () => {
     document.documentElement.requestFullscreen?.().catch(() => {});
@@ -159,10 +181,11 @@ export default function Exercise() {
     setSaving(false);
   };
 
+  const isGamePhase = phase === 'playing' || phase === 'trial';
   const isFullscreenPhase = ['ready', 'countdown', 'playing', 'trial'].includes(phase);
 
   return (
-    <div ref={containerRef} className={`min-h-screen ${isFullscreenPhase ? 'fixed inset-0 z-50 bg-white overflow-auto' : 'pb-24 md:pb-8'}`}>
+    <div ref={containerRef} className={`min-h-screen ${isFullscreenPhase ? 'fixed inset-0 z-50 overflow-auto' : 'pb-24 md:pb-8'} ${isGamePhase ? 'bg-slate-50' : 'bg-white'}`}>
       {/* Header — hidden during fullscreen phases */}
       <div className={`${domain.gradient} px-4 pt-6 pb-8 ${isFullscreenPhase ? 'hidden' : ''}`}>
         <div className="max-w-lg mx-auto">
@@ -185,8 +208,33 @@ export default function Exercise() {
         </div>
       </div>
 
-      <div className={isFullscreenPhase ? 'flex flex-col items-center justify-center min-h-screen px-4 py-6' : 'max-w-lg mx-auto px-4 -mt-4'}>
-        <div className={isFullscreenPhase ? 'w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-8 border border-slate-100' : 'bg-white rounded-3xl shadow-xl p-5 border border-slate-100'}>
+      <div className={isGamePhase ? 'flex flex-col min-h-screen' : isFullscreenPhase ? 'flex flex-col items-center justify-center min-h-screen px-4 py-6' : 'max-w-lg mx-auto px-4 -mt-4'}>
+        {/* Timer bar — only during active game */}
+        {isGamePhase && (
+          <div className="flex-shrink-0 px-4 pt-4 pb-2 max-w-2xl w-full mx-auto">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-bold text-slate-500">{phase === 'trial' ? '🧪 Testdurchlauf' : exercise.name}</span>
+              <span className={`text-xs font-black tabular-nums ${timeLeft <= 20 ? 'text-red-500' : 'text-slate-500'}`}>{timeLeft}s</span>
+            </div>
+            <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full transition-colors"
+                style={{
+                  width: `${(timeLeft / 90) * 100}%`,
+                  backgroundColor: timeLeft <= 20 ? '#ef4444' : timeLeft <= 45 ? '#f59e0b' : domain.color,
+                  transition: 'width 1s linear, background-color 0.3s',
+                }}
+              />
+            </div>
+            {phase === 'trial' && (
+              <div className="flex justify-end mt-1">
+                <button onClick={() => setPhase('ready')} className="text-xs text-slate-400 hover:text-slate-600">Abbrechen</button>
+              </div>
+            )}
+          </div>
+        )}
+        <div className={isGamePhase ? 'flex-1 flex items-start justify-center px-4 pb-6 pt-2' : isFullscreenPhase ? 'w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-8 border border-slate-100' : 'bg-white rounded-3xl shadow-xl p-5 border border-slate-100'}>
+        <div className={isGamePhase ? 'w-full max-w-2xl bg-white rounded-3xl shadow-xl p-6 border border-slate-100' : 'w-full'}>
           <AnimatePresence mode="wait">
             {phase === 'intro' && (
               <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-4 space-y-5">
@@ -282,12 +330,6 @@ export default function Exercise() {
 
             {(phase === 'playing' || phase === 'trial') && GameComponent && (
               <motion.div key="playing" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                {phase === 'trial' && (
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">🧪 Testdurchlauf</span>
-                    <button onClick={() => { setPhase('ready'); }} className="text-xs text-slate-400 hover:text-slate-600">Abbrechen</button>
-                  </div>
-                )}
                 <GameComponent onComplete={handleComplete} level={level} />
               </motion.div>
             )}
@@ -374,6 +416,7 @@ export default function Exercise() {
               </motion.div>
             )}
           </AnimatePresence>
+        </div>
         </div>
       </div>
       <NeuroMascot lastResult={lastNeuroResult} popupsEnabled={true} />
