@@ -137,24 +137,39 @@ export default function OnboardingFlow({ onComplete }) {
     }
   }, [currentStep, currentQuestion.type]);
 
-  // Global keydown for age slider
+  // Global keydown for age slider and select
   useEffect(() => {
-    if (currentQuestion.type !== 'age') return;
     const handler = (e) => {
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        setAgeSlider(v => Math.max(13, v - 1));
-      } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        setAgeSlider(v => Math.min(99, v + 1));
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        handleAnswer(String(ageSlider));
+      if (currentQuestion.type === 'age') {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          setAgeSlider(v => Math.max(13, v - 1));
+        } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          setAgeSlider(v => Math.min(99, v + 1));
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          handleAnswer(String(ageSlider));
+        }
+      } else if (currentQuestion.type === 'select') {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          // If nothing selected yet, select first option
+          const idx = selectedOptionIdx ?? 0;
+          const opt = currentQuestion.options[idx];
+          if (opt) handleAnswer(opt.value || opt);
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          setSelectedOptionIdx(prev => Math.max(0, (prev ?? 0) - 1));
+        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          setSelectedOptionIdx(prev => Math.min(currentQuestion.options.length - 1, (prev ?? 0) + 1));
+        }
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [currentQuestion.type, ageSlider]);
+  }, [currentQuestion.type, ageSlider, selectedOptionIdx, currentQuestion.options]);
 
   const handleWelcomeDone = (lang) => {
     setLanguage(lang);
