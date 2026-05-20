@@ -109,6 +109,7 @@ export default function OnboardingFlow({ onComplete }) {
   const [dateFocus, setDateFocus] = useState('day');
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
+  const selectContainerRef = useRef(null);
 
   const questions = QUESTIONS[language];
   const currentQuestion = questions[currentStep];
@@ -122,6 +123,12 @@ export default function OnboardingFlow({ onComplete }) {
       inputRef.current.focus();
     }
   }, [dateFocus, currentQuestion.type]);
+
+  useEffect(() => {
+    if (currentQuestion.type === 'select' && selectContainerRef.current) {
+      selectContainerRef.current.focus();
+    }
+  }, [currentStep, currentQuestion.type]);
 
   const handleWelcomeDone = (lang) => {
     setLanguage(lang);
@@ -514,9 +521,9 @@ export default function OnboardingFlow({ onComplete }) {
           </div>
         ) : (
           <div
+            ref={selectContainerRef}
             className="grid grid-cols-2 gap-2"
             tabIndex={0}
-            autoFocus
             onKeyDown={(e) => {
               const cols = 2;
               const len = currentQuestion.options.length;
