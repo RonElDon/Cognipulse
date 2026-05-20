@@ -150,6 +150,10 @@ export default function OnboardingFlow({ onComplete }) {
     }
   }, [currentStep, currentQuestion.type]);
 
+  // Keep a ref to handleAnswer so the keydown handler is never stale
+  const handleAnswerRef = useRef(null);
+  useEffect(() => { handleAnswerRef.current = handleAnswer; });
+
   // Global keydown — single source of truth for keyboard navigation
   useEffect(() => {
     const handler = (e) => {
@@ -162,12 +166,11 @@ export default function OnboardingFlow({ onComplete }) {
           setAgeSlider(v => Math.min(99, v + 1));
         } else if (e.key === 'Enter') {
           e.preventDefault();
-          handleAnswer(String(ageSlider));
+          setAgeSlider(v => { handleAnswerRef.current?.(String(v)); return v; });
         }
       } else if (currentQuestion.type === 'select') {
         const opts = currentQuestion.options;
         const len = opts.length;
-        // Use 1 column for 5 options (dailyExercises), 2 columns otherwise
         const cols = len >= 5 ? 1 : 2;
 
         if (e.key === 'ArrowLeft') {
@@ -196,15 +199,18 @@ export default function OnboardingFlow({ onComplete }) {
           });
         } else if (e.key === 'Enter') {
           e.preventDefault();
-          const idx = selectedOptionIdx ?? 0;
-          const opt = opts[idx];
-          if (opt) handleAnswer(opt.value || opt);
+          setSelectedOptionIdx(prev => {
+            const idx = prev ?? 0;
+            const opt = opts[idx];
+            if (opt) handleAnswerRef.current?.(opt.value || opt);
+            return prev;
+          });
         }
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [currentQuestion.type, currentQuestion.options, ageSlider, selectedOptionIdx]);
+  }, [currentQuestion.type, currentQuestion.options]);
 
   const handleWelcomeDone = (lang) => {
     setLanguage(lang);
