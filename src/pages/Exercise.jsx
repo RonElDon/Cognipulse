@@ -208,21 +208,22 @@ export default function Exercise() {
         </div>
       </div>
 
-      <div className={isGamePhase ? 'flex flex-col min-h-screen' : isFullscreenPhase ? 'flex flex-col items-center justify-center min-h-screen px-4 py-6' : 'max-w-lg mx-auto px-4 -mt-4'}>
-        {/* Timer bar — only during active game */}
-        {isGamePhase && (
-          <div className="flex-shrink-0 px-4 pt-4 pb-2 max-w-2xl w-full mx-auto">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs font-bold text-slate-500">{phase === 'trial' ? '🧪 Testdurchlauf' : exercise.name}</span>
-              <span className={`text-xs font-black tabular-nums ${timeLeft <= 20 ? 'text-red-500' : 'text-slate-500'}`}>{timeLeft}s</span>
+      {/* Timer bar — fixed at top during active game */}
+      {isGamePhase && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-md px-6 py-3">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-slate-600">{phase === 'trial' ? '🧪 Testdurchlauf' : exercise.name}</span>
+              <span className={`text-lg font-black tabular-nums ${timeLeft <= 20 ? 'text-red-500' : 'text-slate-700'}`}>{timeLeft}s</span>
             </div>
-            <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+            <div className="h-4 bg-slate-200 rounded-full overflow-hidden shadow-inner">
               <motion.div
-                className="h-full rounded-full transition-colors"
+                className="h-full rounded-full"
                 style={{
                   width: `${(timeLeft / 90) * 100}%`,
                   backgroundColor: timeLeft <= 20 ? '#ef4444' : timeLeft <= 45 ? '#f59e0b' : domain.color,
                   transition: 'width 1s linear, background-color 0.3s',
+                  boxShadow: `0 0 8px ${timeLeft <= 20 ? '#ef444488' : timeLeft <= 45 ? '#f59e0b88' : domain.color + '88'}`,
                 }}
               />
             </div>
@@ -232,9 +233,12 @@ export default function Exercise() {
               </div>
             )}
           </div>
-        )}
-        <div className={isGamePhase ? 'flex-1 flex items-start justify-center px-4 pb-6 pt-2' : isFullscreenPhase ? 'w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-8 border border-slate-100' : 'bg-white rounded-3xl shadow-xl p-5 border border-slate-100'}>
-        <div className={isGamePhase ? 'w-full max-w-2xl bg-white rounded-3xl shadow-xl p-6 border border-slate-100' : 'w-full'}>
+        </div>
+      )}
+
+      <div className={isGamePhase ? 'flex flex-col min-h-screen pt-20' : isFullscreenPhase ? 'flex flex-col items-center justify-center min-h-screen px-4 py-6' : 'max-w-lg mx-auto px-4 -mt-4'}>
+        <div className={isGamePhase ? 'flex-1 flex items-start justify-center px-4 pb-6 pt-2' : isFullscreenPhase ? 'w-full max-w-5xl bg-white rounded-3xl shadow-2xl p-10 border border-slate-100' : 'bg-white rounded-3xl shadow-xl p-5 border border-slate-100'}>
+        <div className={isGamePhase ? 'w-full max-w-5xl bg-white rounded-3xl shadow-xl p-8 border border-slate-100' : 'w-full'}>
           <AnimatePresence mode="wait">
             {phase === 'intro' && (
               <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-4 space-y-5">
