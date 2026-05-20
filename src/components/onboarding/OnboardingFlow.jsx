@@ -84,14 +84,26 @@ const QUESTIONS = {
     { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'age' },
     { id: 'gender', question: 'Was ist dein Geschlecht? ⚧️', options: [{ label: 'Männlich', value: 'männlich' }, { label: 'Weiblich', value: 'weiblich' }, { label: 'Divers', value: 'divers' }, { label: 'Keine Angabe', value: 'keine Angabe' }], type: 'select' },
     { id: 'goal', question: 'Was treibt dich an? Was möchtest du mit deinem Gehirn erreichen? 🎯', placeholder: 'z.B. Gedächtnis verbessern, fokussierter werden...', type: 'text' },
-    { id: 'dailyExercises', question: 'Wie viel Zeit hast du pro Tag für dein Brain-Workout?', options: ['1', '3', '5', '10'], type: 'select' },
+    { id: 'dailyExercises', question: 'Wie viel Zeit hast du pro Tag für dein Brain-Workout? ⏱️', options: [
+      { label: 'Starter (5 Min.)', value: '3' },
+      { label: 'Advanced (15 Min.)', value: '8' },
+      { label: 'Pro (30 Min.)', value: '15' },
+      { label: 'Elite (45 Min.)', value: '22' },
+      { label: 'Over 9000 (60 Min.)', value: '30' },
+    ], type: 'select' },
   ],
   en: [
     { id: 'name', question: 'Let me get to know you — what\'s your name? 😊', placeholder: 'Your name...', type: 'text' },
     { id: 'age', question: 'How many years of brain power do you have? 🧠', placeholder: 'Your age...', type: 'age' },
     { id: 'gender', question: 'How would you like to be addressed?', options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Diverse', value: 'diverse' }, { label: 'Prefer not to say', value: 'prefer not to say' }], type: 'select' },
     { id: 'goal', question: 'What drives you? What do you want to achieve with your brain? 💪', placeholder: 'e.g. improve memory, better focus...', type: 'text' },
-    { id: 'dailyExercises', question: 'How much time do you have for your daily brain training?', options: ['1', '3', '5', '10'], type: 'select' },
+    { id: 'dailyExercises', question: 'How much time do you have for your daily brain training? ⏱️', options: [
+      { label: 'Starter (5 min)', value: '3' },
+      { label: 'Advanced (15 min)', value: '8' },
+      { label: 'Pro (30 min)', value: '15' },
+      { label: 'Elite (45 min)', value: '22' },
+      { label: 'Over 9000 (60 min)', value: '30' },
+    ], type: 'select' },
   ],
 };
 
@@ -212,6 +224,20 @@ export default function OnboardingFlow({ onComplete }) {
       if (currentStep < questions.length - 1) {
         const nextStep = currentStep + 1;
         setCurrentStep(nextStep);
+
+        // Upsell message after dailyExercises selection for high tiers
+        if (currentQuestion.id === 'dailyExercises') {
+          const highTiers = ['15', '22', '30'];
+          if (highTiers.includes(String(value))) {
+            const upsell = language === 'de'
+              ? 'Großartige Wahl! 🔥 Für so intensive Sessions empfehle ich dir unseren Premium-Plan oder werbefreies Training mit Coins — damit bleibt nichts dein Trainingsfluss unterbrochen!'
+              : 'Great choice! 🔥 For such intensive sessions, I recommend our Premium Plan or ad-free training with coins — so nothing interrupts your training flow!';
+            setMessages(prev => [...prev, { role: 'assistant', content: upsell }]);
+            setEmotion('excited');
+            await new Promise(r => setTimeout(r, 1200));
+          }
+        }
+
         setMessages(prev => [...prev, { role: 'assistant', content: QUESTIONS[language][nextStep].question }]);
         setEmotion('happy');
       } else {
