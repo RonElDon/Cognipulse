@@ -113,6 +113,7 @@ export default function OnboardingFlow({ onComplete }) {
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const selectContainerRef = useRef(null);
+  const sliderRef = useRef(null);
 
   const questions = QUESTIONS[language];
   const currentQuestion = questions[currentStep];
@@ -131,7 +132,29 @@ export default function OnboardingFlow({ onComplete }) {
     if (currentQuestion.type === 'select' && selectContainerRef.current) {
       selectContainerRef.current.focus();
     }
+    if (currentQuestion.type === 'age' && sliderRef.current) {
+      sliderRef.current.focus();
+    }
   }, [currentStep, currentQuestion.type]);
+
+  // Global keydown for age slider
+  useEffect(() => {
+    if (currentQuestion.type !== 'age') return;
+    const handler = (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        setAgeSlider(v => Math.max(13, v - 1));
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        setAgeSlider(v => Math.min(99, v + 1));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAnswer(String(ageSlider));
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [currentQuestion.type, ageSlider]);
 
   const handleWelcomeDone = (lang) => {
     setLanguage(lang);
@@ -444,6 +467,7 @@ export default function OnboardingFlow({ onComplete }) {
             </div>
             <div className="px-2">
               <input
+                ref={sliderRef}
                 type="range"
                 min={13}
                 max={99}
