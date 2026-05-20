@@ -51,7 +51,7 @@ export default function OnboardingGate({ children }) {
   if (status === 'loading') return null;
 
   if (status === 'onboarding') {
-    return <OnboardingFlow onComplete={() => setStatus('done')} />;
+    return <OnboardingFlow onComplete={() => setStatus('baseline')} />;
   }
 
   return children;
