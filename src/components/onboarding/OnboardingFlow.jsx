@@ -80,14 +80,14 @@ function NeuroGlobe({ size = 100, emotion = 'happy' }) {
 const QUESTIONS = {
   de: [
     { id: 'name', question: 'Lass mich dich kennenlernen — wie heißt du? 😊', placeholder: 'Dein Name...', type: 'text' },
-    { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'date' },
+    { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'age' },
     { id: 'gender', question: 'Was ist dein Geschlecht? ⚧️', options: [{ label: 'Männlich', value: 'männlich' }, { label: 'Weiblich', value: 'weiblich' }, { label: 'Divers', value: 'divers' }, { label: 'Keine Angabe', value: 'keine Angabe' }], type: 'select' },
     { id: 'goal', question: 'Was treibt dich an? Was möchtest du mit deinem Gehirn erreichen? 🎯', placeholder: 'z.B. Gedächtnis verbessern, fokussierter werden...', type: 'text' },
     { id: 'dailyExercises', question: 'Wie viel Zeit hast du pro Tag für dein Brain-Workout?', options: ['1', '3', '5', '10'], type: 'select' },
   ],
   en: [
     { id: 'name', question: 'Let me get to know you — what\'s your name? 😊', placeholder: 'Your name...', type: 'text' },
-    { id: 'age', question: 'How many years of brain power do you have? 🧠', placeholder: 'Your age...', type: 'date' },
+    { id: 'age', question: 'How many years of brain power do you have? 🧠', placeholder: 'Your age...', type: 'age' },
     { id: 'gender', question: 'How would you like to be addressed?', options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Diverse', value: 'diverse' }, { label: 'Prefer not to say', value: 'prefer not to say' }], type: 'select' },
     { id: 'goal', question: 'What drives you? What do you want to achieve with your brain? 💪', placeholder: 'e.g. improve memory, better focus...', type: 'text' },
     { id: 'dailyExercises', question: 'How much time do you have for your daily brain training?', options: ['1', '3', '5', '10'], type: 'select' },
@@ -105,6 +105,7 @@ export default function OnboardingFlow({ onComplete }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [selectedOptionIdx, setSelectedOptionIdx] = useState(null);
+  const [ageSlider, setAgeSlider] = useState(25);
   const [dateInput, setDateInput] = useState({ day: '', month: '', year: '' });
   const [dateFocus, setDateFocus] = useState('day');
   const chatEndRef = useRef(null);
@@ -427,6 +428,38 @@ export default function OnboardingFlow({ onComplete }) {
               className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-30 flex items-center justify-center transition-all flex-shrink-0 shadow-lg"
             >
               <Send className="w-4 h-4 text-white" />
+            </button>
+          </div>
+        ) : currentQuestion.type === 'age' ? (
+          <div className="space-y-5">
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-white font-black text-6xl">{ageSlider}</div>
+              <div className="text-white/40 text-sm font-semibold">Jahre</div>
+            </div>
+            <div className="px-2">
+              <input
+                type="range"
+                min={13}
+                max={99}
+                value={ageSlider}
+                onChange={e => setAgeSlider(parseInt(e.target.value))}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, #7c3aed ${((ageSlider - 13) / 86) * 100}%, rgba(255,255,255,0.15) ${((ageSlider - 13) / 86) * 100}%)`,
+                  accentColor: '#7c3aed',
+                }}
+              />
+              <div className="flex justify-between text-white/30 text-xs mt-2 font-semibold">
+                <span>13</span>
+                <span>99</span>
+              </div>
+            </div>
+            <button
+              onClick={() => handleAnswer(String(ageSlider))}
+              disabled={saving}
+              className="w-full py-4 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-30 text-white font-black text-base transition-all shadow-lg"
+            >
+              Bestätigen ✓
             </button>
           </div>
         ) : currentQuestion.type === 'date' ? (
