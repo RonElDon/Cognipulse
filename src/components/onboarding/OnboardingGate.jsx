@@ -30,9 +30,6 @@ export default function OnboardingGate({ children }) {
         setStatus('onboarding');
       } else if (!profiles[0]?.onboarding_completed) {
         setStatus('onboarding');
-      } else if (!profiles[0]?.baseline_assessment_completed) {
-        // Onboarding done but baseline not yet completed — go straight to baseline
-        setStatus('baseline');
       } else {
         setStatus('done');
       }
