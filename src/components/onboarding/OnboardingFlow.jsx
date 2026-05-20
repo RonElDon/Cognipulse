@@ -139,7 +139,8 @@ export default function OnboardingFlow({ onComplete }) {
   const handleAnswer = async (value) => {
     if (!value && value !== 0) return;
     
-    setAnswers(prev => ({ ...prev, [currentQuestion.id]: String(value) }));
+    const newAnswers = { ...answers, [currentQuestion.id]: String(value) };
+    setAnswers(newAnswers);
     setInput('');
     setDateInput({ day: '', month: '', year: '' });
     setSelectedOptionIdx(null);
@@ -162,7 +163,7 @@ export default function OnboardingFlow({ onComplete }) {
         setMessages(prev => [...prev, { role: 'assistant', content: QUESTIONS[language][nextStep].question }]);
         setEmotion('happy');
       } else {
-        // Save all data
+        // Save all data — use newAnswers (has current answer included)
         setSaving(true);
         try {
           const user = await base44.auth.me();
@@ -171,12 +172,12 @@ export default function OnboardingFlow({ onComplete }) {
           if (profiles.length > 0) {
             const profileId = profiles[0].id;
             await base44.entities.UserProfile.update(profileId, {
-              display_name: answers.name || user.full_name,
-              age: parseInt(answers.age) || null,
-              gender: answers.gender || null,
+              display_name: newAnswers.name || user.full_name,
+              age: parseInt(newAnswers.age) || null,
+              gender: newAnswers.gender || null,
               preferred_language: language,
               goals: {
-                daily_exercises: parseInt(answers.dailyExercises, 10) || 3,
+                daily_exercises: parseInt(newAnswers.dailyExercises, 10) || 3,
                 focus_domains: []
               },
             });
