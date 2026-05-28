@@ -195,14 +195,7 @@ export default function AppLayout() {
         })}
       </div>
 
-      {/* Debug Back Button */}
-      <button
-        onClick={handleDebugBack}
-        className="fixed top-6 right-6 z-40 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-lg transition-colors"
-        title="Debug: Ein Schritt zurück"
-      >
-        ← BACK
-      </button>
+
 
       {/* Neuro Mascot — global */}
       <NeuroMascot popupsEnabled={true} />

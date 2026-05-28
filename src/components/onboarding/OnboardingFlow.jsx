@@ -480,10 +480,9 @@ export default function OnboardingFlow({ onComplete }) {
         <button
           onClick={handleBack}
           disabled={saving}
-          className="absolute top-3 left-4 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all text-xs font-bold disabled:opacity-30"
+          className="absolute top-3 left-3 z-30 p-2 rounded-full text-white/40 hover:text-white/70 transition-all disabled:opacity-20"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          {language === 'de' ? 'Zurück' : 'Back'}
+          <ArrowLeft className="w-4 h-4" />
         </button>
       )}
 
