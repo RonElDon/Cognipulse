@@ -207,6 +207,12 @@ export const T = {
       clicksRemaining1: 'Noch 1 Klick, um die Admin-Optionen freizuschalten!',
       clicksRemaining2: 'Noch 2 Klicks, um die Admin-Optionen freizuschalten!',
       clicksRemaining3: 'Noch 3 Klicks, um die Admin-Optionen freizuschalten!',
+      clicksRemaining4: 'Noch 4 Klicks, um die Admin-Optionen freizuschalten!',
+      clicksRemaining5: 'Noch 5 Klicks, um die Admin-Optionen freizuschalten!',
+      clicksRemaining6: 'Noch 6 Klicks, um die Admin-Optionen freizuschalten!',
+      clicksRemaining7: 'Noch 7 Klicks, um die Admin-Optionen freizuschalten!',
+      clicksRemaining8: 'Noch 8 Klicks, um die Admin-Optionen freizuschalten!',
+      clicksRemaining9: 'Noch 9 Klicks, um die Admin-Optionen freizuschalten!',
     },
     // Common
     common: {
@@ -415,6 +421,12 @@ export const T = {
       clicksRemaining1: '1 click left to activate admin options!',
       clicksRemaining2: '2 clicks left to activate admin options!',
       clicksRemaining3: '3 clicks left to activate admin options!',
+      clicksRemaining4: '4 clicks left to activate admin options!',
+      clicksRemaining5: '5 clicks left to activate admin options!',
+      clicksRemaining6: '6 clicks left to activate admin options!',
+      clicksRemaining7: '7 clicks left to activate admin options!',
+      clicksRemaining8: '8 clicks left to activate admin options!',
+      clicksRemaining9: '9 clicks left to activate admin options!',
     },
     common: {
       back: 'Back',
