@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Send } from 'lucide-react';
+import { Send, ArrowLeft } from 'lucide-react';
 import WelcomeScreen from './WelcomeScreen';
 import DeviceCheckScreen from './DeviceCheckScreen';
 import { useTheme } from '@/lib/ThemeContext';
@@ -155,9 +155,23 @@ export default function OnboardingFlow({ onComplete }) {
   const handleAnswerRef = useRef(null);
   useEffect(() => { handleAnswerRef.current = handleAnswer; });
 
+  // Keep a ref to handleBack so the keydown handler is never stale
+  const handleBackRef = useRef(null);
+  useEffect(() => { handleBackRef.current = handleBack; });
+
   // Global keydown — single source of truth for keyboard navigation
   useEffect(() => {
     const handler = (e) => {
+      // Backspace/Delete → go back a step (only when not typing in a text input)
+      if ((e.key === 'Backspace' || e.key === 'Delete') && currentStep > 0) {
+        const tag = document.activeElement?.tagName;
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+          e.preventDefault();
+          handleBackRef.current?.();
+          return;
+        }
+      }
+
       if (currentQuestion.type === 'age') {
         if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
           e.preventDefault();
@@ -420,6 +434,45 @@ export default function OnboardingFlow({ onComplete }) {
     <div className="fixed inset-0 z-50 overflow-hidden flex flex-col"
       style={{ background: 'radial-gradient(ellipse at 50% 0%, #4c1d95 0%, #1e1b4b 40%, #0f0a1e 100%)' }}
     >
+      {/* Progress bar — top, full width */}
+      <div className="absolute top-0 left-0 right-0 h-1.5 bg-white/10 z-30">
+        <motion.div
+          className="h-full rounded-r-full"
+          style={{ background: 'linear-gradient(to right, #a855f7, #6366f1)' }}
+          initial={{ width: '0%' }}
+          animate={{ width: `${((currentStep + 1) / questions.length) * 100}%` }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+        />
+      </div>
+
+      {/* Step dots — centered below progress bar */}
+      <div className="absolute top-3 left-0 right-0 flex justify-center gap-1.5 z-30">
+        {questions.map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{ scale: i === currentStep ? 1.3 : 1, opacity: i <= currentStep ? 1 : 0.3 }}
+            className="rounded-full"
+            style={{
+              width: i === currentStep ? 8 : 6,
+              height: i === currentStep ? 8 : 6,
+              background: i <= currentStep ? '#a855f7' : 'rgba(255,255,255,0.3)',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Back button — top left */}
+      {currentStep > 0 && (
+        <button
+          onClick={handleBack}
+          disabled={saving}
+          className="absolute top-3 left-4 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all text-xs font-bold disabled:opacity-30"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          {language === 'de' ? 'Zurück' : 'Back'}
+        </button>
+      )}
+
       {/* Background particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(12)].map((_, i) => (
@@ -483,19 +536,6 @@ export default function OnboardingFlow({ onComplete }) {
         </AnimatePresence>
         <div ref={chatEndRef} />
       </div>
-
-      {/* Back Button */}
-      {currentStep > 0 && (
-        <div className="relative z-10 flex-shrink-0 px-4 pt-2">
-          <button
-            onClick={handleBack}
-            disabled={saving}
-            className="text-white/60 hover:text-white text-xs font-semibold transition-colors disabled:opacity-30"
-          >
-            ← {language === 'de' ? 'Zurück' : 'Back'}
-          </button>
-        </div>
-      )}
 
       {/* Input */}
       <div className="relative z-10 flex-shrink-0 px-4 pb-6 pt-2">
