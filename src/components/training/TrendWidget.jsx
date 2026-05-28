@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useTheme } from '@/lib/ThemeContext';
+import { useLanguage } from '@/lib/LanguageContext';
 
 function buildDailyData(results, days) {
   const today = new Date();
@@ -40,6 +41,7 @@ export default function TrendWidget() {
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState(7);
   const { accentColor } = useTheme();
+  const { t } = useLanguage();
 
   useEffect(() => {
     base44.entities.ExerciseResult.list('-created_date', 200)
@@ -54,7 +56,7 @@ export default function TrendWidget() {
 
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
   const trendColor = trend === 'up' ? 'text-emerald-400' : trend === 'down' ? 'text-rose-400' : 'text-slate-400';
-  const trendLabel = trend === 'up' ? 'Verbesserung' : trend === 'down' ? 'Leichter Rückgang' : 'Stabil';
+  const trendLabel = trend === 'up' ? t('trend.up') : trend === 'down' ? t('trend.down') : t('trend.neutral');
 
   if (loading) return (
     <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-100 dark:border-slate-700 shadow-xl">
@@ -72,9 +74,9 @@ export default function TrendWidget() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <TrendIcon className={`w-5 h-5 ${trendColor}`} />
-          <h2 className="font-black text-slate-800 dark:text-slate-100 text-sm">Performance-Trend</h2>
+          <h2 className="font-black text-slate-800 dark:text-slate-100 text-sm">{t('trend.title')}</h2>
           {latestScore && (
-            <span className="text-xs font-bold text-slate-400">Ø {latestScore}%</span>
+            <span className="text-xs font-bold text-slate-400">{t('trend.avgScore', { score: latestScore })}</span>
           )}
         </div>
         {/* Range toggle */}
@@ -89,7 +91,7 @@ export default function TrendWidget() {
                   : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
               }`}
             >
-              {r}T
+              {r === 7 ? t('trend.days7') : t('trend.days30')}
             </button>
           ))}
         </div>
@@ -135,7 +137,7 @@ export default function TrendWidget() {
         </ResponsiveContainer>
       ) : (
         <div className="h-24 flex items-center justify-center text-slate-400 text-sm">
-          Noch keine Trainingsdaten
+          {t('trend.noData')}
         </div>
       )}
     </motion.div>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { DOMAINS } from '@/lib/exercises';
 import { Target, CheckCircle2, Circle, Zap, Trophy, Flame } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 function todayStr() {
   return new Date().toISOString().split('T')[0];
@@ -50,6 +51,7 @@ export default function DailyChallengeCard() {
   const [challenge, setChallenge] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bonusActive, setBonusActive] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     loadChallenge();
@@ -155,11 +157,11 @@ export default function DailyChallengeCard() {
           >
             <span className="text-2xl">🎉</span>
             <div className="flex-1">
-              <div className="font-black text-white text-sm">Bonus aktiv! ×1.5 XP heute</div>
-              <div className="text-white/80 text-xs">Du hast gestern alle Ziele erreicht!</div>
+              <div className="font-black text-white text-sm">{t('dailyChallenge.bonusBanner')}</div>
+              <div className="text-white/80 text-xs">{t('dailyChallenge.bonusBannerSub')}</div>
             </div>
             <button onClick={claimBonus} className="bg-white/30 hover:bg-white/50 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-colors">
-              OK
+              {t('dailyChallenge.ok')}
             </button>
           </motion.div>
         )}
@@ -169,7 +171,7 @@ export default function DailyChallengeCard() {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5 text-rose-500" />
-          <h2 className="font-black text-slate-800 dark:text-slate-100">Tages-Challenge</h2>
+          <h2 className="font-black text-slate-800 dark:text-slate-100">{t('dailyChallenge.title')}</h2>
         </div>
         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400">
           {completedCount}/{total}
@@ -211,7 +213,7 @@ export default function DailyChallengeCard() {
         <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center gap-2">
           <Zap className="w-4 h-4 text-yellow-500 flex-shrink-0" />
           <span className="text-xs text-slate-500 dark:text-slate-400">
-            Alle Ziele erreichen → <span className="font-black text-yellow-600 dark:text-yellow-400">×1.5 XP-Bonus morgen!</span>
+            {t('dailyChallenge.reward')} <span className="font-black text-yellow-600 dark:text-yellow-400">{t('dailyChallenge.bonus')}</span>
           </span>
         </div>
       ) : (
@@ -222,7 +224,7 @@ export default function DailyChallengeCard() {
         >
           <Flame className="w-4 h-4 text-orange-500" />
           <span className="text-xs font-black text-emerald-700 dark:text-emerald-400">
-            🏆 Challenge abgeschlossen! Morgen ×1.5 XP auf alle Übungen!
+            {t('dailyChallenge.completed')}
           </span>
         </motion.div>
       )}

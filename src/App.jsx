@@ -6,6 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { ThemeProvider } from '@/lib/ThemeContext';
+import { LanguageProvider } from '@/lib/LanguageContext';
 // Add page imports here
 import AppLayout from './components/layout/AppLayout.jsx';
 import OnboardingGate from './components/onboarding/OnboardingGate';
@@ -67,14 +68,16 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <Router>
-            <OnboardingGate>
-              <AuthenticatedApp />
-            </OnboardingGate>
-          </Router>
-          <Toaster />
-        </QueryClientProvider>
+        <LanguageProvider>
+          <QueryClientProvider client={queryClientInstance}>
+            <Router>
+              <OnboardingGate>
+                <AuthenticatedApp />
+              </OnboardingGate>
+            </Router>
+            <Toaster />
+          </QueryClientProvider>
+        </LanguageProvider>
       </AuthProvider>
     </ThemeProvider>
   )

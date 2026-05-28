@@ -2,25 +2,28 @@ import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight, Swords } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
+import { useLanguage } from '@/lib/LanguageContext';
 import { base44 } from '@/api/base44Client';
 import NeuroMascot from '@/components/mascot/NeuroMascot';
 
-const NAV_ITEMS = [
-  { path: '/', icon: Home, label: 'Home', labelDE: 'Startseite' },
-  { path: '/train', icon: Brain, label: 'Train', labelDE: 'Trainieren' },
-  { path: '/duel', icon: Swords, label: 'Duel', labelDE: 'Duell' },
-  { path: '/progress', icon: BarChart2, label: 'Progress', labelDE: 'Fortschritt' },
-  { path: '/leaderboard', icon: Trophy, label: 'Leaderboard', labelDE: 'Rangliste' },
-  { path: '/profile', icon: User, label: 'Profile', labelDE: 'Profil' },
-];
+export default function AppLayout() {
+  const { t } = useLanguage();
 
-export default function AppLayout({ lang = 'de' }) {
+  const NAV_ITEMS = [
+    { path: '/', icon: Home, label: t('nav.home') },
+    { path: '/train', icon: Brain, label: t('nav.train') },
+    { path: '/duel', icon: Swords, label: t('nav.duel') },
+    { path: '/progress', icon: BarChart2, label: t('nav.progress') },
+    { path: '/leaderboard', icon: Trophy, label: t('nav.leaderboard') },
+    { path: '/profile', icon: User, label: t('nav.profile') },
+  ];
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
   const appRef = useRef(null);
+  
 
   // Prevent arrow keys / space from ever scrolling the browser page
   useEffect(() => {
@@ -102,7 +105,7 @@ export default function AppLayout({ lang = 'de' }) {
                 style={active ? { backgroundColor: accentColor, boxShadow: `0 4px 15px ${accentColor}55` } : {}}
               >
                 <item.icon className="w-5 h-5" />
-                {lang === 'de' ? item.labelDE : item.label}
+                {item.label}
               </Link>
             );
           })}
@@ -149,11 +152,11 @@ export default function AppLayout({ lang = 'de' }) {
                   style={active ? { backgroundColor: accentColor } : {}}
                 >
                   <item.icon className="w-6 h-6" />
-                  {lang === 'de' ? item.labelDE : item.label}
-                </Link>
-              );
-            })}
-          </nav>
+                  {item.label}
+                  </Link>
+                  );
+                  })}
+                  </nav>
           <div className="mt-6 flex justify-center">
             <DarkToggle />
           </div>
@@ -186,7 +189,7 @@ export default function AppLayout({ lang = 'de' }) {
               style={{ color: active ? accentColor : undefined }}
             >
               <item.icon className="w-5 h-5" style={{ color: active ? accentColor : undefined }} />
-              {lang === 'de' ? item.labelDE : item.label}
+              {item.label}
             </Link>
           );
         })}

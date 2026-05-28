@@ -11,21 +11,16 @@ import DailyPlanCard from '@/components/training/DailyPlanCard';
 import TrendWidget from '@/components/training/TrendWidget';
 import DailyChallengeCard from '@/components/training/DailyChallengeCard';
 import { useTheme } from '@/lib/ThemeContext';
+import { useLanguage } from '@/lib/LanguageContext';
 
-const MOTIVATIONAL = [
-  "Dein Gehirn ist ein Muskel — trainiere es täglich! 🧠",
-  "Jede Wiederholung zählt. Du schaffst das! 💪",
-  "Ein schärferer Geist, ein besseres Leben! ⚡",
-  "5 Minuten täglich halten den Kopf klar! 🌟",
-  "Level up deinen Verstand! 🚀",
-];
 
 export default function Home() {
   const { profile, loading } = useProfile();
   const [recentResults, setRecentResults] = useState([]);
   const [user, setUser] = useState(null);
   const { heroStyle, heroClass } = useTheme();
-  const quote = MOTIVATIONAL[new Date().getDay() % MOTIVATIONAL.length];
+  const { t, lang } = useLanguage();
+  const quote = t(`home.quote${new Date().getDay() % 5}`);
 
 
   useEffect(() => {
@@ -75,7 +70,7 @@ export default function Home() {
               {new Date().toLocaleDateString('de-DE', { weekday: 'long', month: 'long', day: 'numeric' })}
             </p>
             <h1 className="text-3xl font-black text-white mb-1">
-              Hey, {profile?.display_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || 'Champion'}! 👋
+              {t('home.greeting', { name: profile?.display_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || 'Champion' })}
             </h1>
             <p className="text-white/90 text-base font-medium">{quote}</p>
           </motion.div>
@@ -86,9 +81,9 @@ export default function Home() {
             className="mt-5 grid grid-cols-3 gap-3"
           >
             {[
-              { icon: Zap, label: 'XP', value: xp.toLocaleString('de'), color: 'bg-yellow-400/20 text-yellow-100' },
-              { icon: Flame, label: 'Serie', value: `${streak}T`, color: 'bg-orange-400/20 text-orange-100' },
-              { icon: Star, label: 'Level', value: lvl.level, color: 'bg-purple-400/20 text-purple-100' },
+              { icon: Zap, label: t('home.xp'), value: xp.toLocaleString(lang === 'de' ? 'de' : 'en'), color: 'bg-yellow-400/20 text-yellow-100' },
+              { icon: Flame, label: t('home.streak'), value: `${streak}${lang === 'de' ? 'T' : 'D'}`, color: 'bg-orange-400/20 text-orange-100' },
+              { icon: Star, label: t('home.level'), value: lvl.level, color: 'bg-purple-400/20 text-purple-100' },
             ].map(s => (
               <div key={s.label} className={`${s.color} rounded-2xl p-3 text-center backdrop-blur-sm`}>
                 <s.icon className="w-5 h-5 mx-auto mb-1 opacity-90" />
@@ -106,13 +101,13 @@ export default function Home() {
                 className="w-full mt-2 flex items-center justify-center gap-2 bg-white/8 border border-white/15 rounded-xl px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/12 transition-all text-xs font-semibold"
               >
                 <Shield className="w-3.5 h-3.5 text-indigo-300" />
-                Serie-Schutz aktivieren (1× diese Woche)
+                {t('home.streakProtect')}
               </button>
             </motion.div>
           )}
           {graceUsed && streak > 0 && (
             <div className="w-full mt-2 flex items-center justify-center gap-2 bg-indigo-900/20 border border-indigo-500/20 rounded-xl px-4 py-2 text-indigo-300 text-xs font-semibold">
-              <Shield className="w-3.5 h-3.5" /> Serie-Schutz aktiv diese Woche
+              <Shield className="w-3.5 h-3.5" /> {t('home.streakActive')}
             </div>
           )}
 
@@ -138,8 +133,8 @@ export default function Home() {
               <Clock className="w-5 h-5 text-indigo-300" />
             </div>
             <div className="flex-1">
-              <div className="text-white font-black text-sm dark:text-white">⚡ 3-Minuten Micro-Training</div>
-              <div className="text-white/50 text-xs mt-0.5">Eine kurze Übung, perfekt für zwischendurch</div>
+              <div className="text-white font-black text-sm dark:text-white">{t('home.microTraining')}</div>
+              <div className="text-white/50 text-xs mt-0.5">{t('home.microTrainingSub')}</div>
             </div>
             <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
           </Link>
@@ -159,10 +154,10 @@ export default function Home() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
               <Target className="w-4 h-4 text-indigo-500" />
-              Kognitive Bereiche
+              {t('home.cognitiveAreas')}
             </h2>
             <Link to="/train" className="text-xs text-purple-600 font-bold flex items-center gap-1 hover:text-purple-700">
-              Alle Übungen <ChevronRight className="w-3.5 h-3.5" />
+              {t('home.allExercises')} <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           <div className="space-y-2">
@@ -185,7 +180,7 @@ export default function Home() {
                       <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{d.nameDE || d.name}</span>
                       {d.avgScore !== null
                         ? <span className="text-xs font-black" style={{ color: d.color }}>{d.avgScore}%</span>
-                        : <span className="text-xs font-semibold text-slate-400">Neu</span>
+                        : <span className="text-xs font-semibold text-slate-400">{t('home.newBadge')}</span>
                       }
                     </div>
                     <div className="mt-1.5 bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
@@ -211,11 +206,11 @@ export default function Home() {
         >
           <Link to="/progress" className="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
             <TrendingUp className="w-5 h-5 text-indigo-500 flex-shrink-0" />
-            <span className="font-bold text-sm">Mein Fortschritt</span>
+            <span className="font-bold text-sm">{t('home.myProgress')}</span>
           </Link>
           <Link to="/leaderboard" className="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
             <Trophy className="w-5 h-5 text-amber-500 flex-shrink-0" />
-            <span className="font-bold text-sm">Rangliste</span>
+            <span className="font-bold text-sm">{t('home.leaderboard')}</span>
           </Link>
         </motion.div>
       </div>
