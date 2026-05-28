@@ -44,10 +44,12 @@ export default function BaselineTimer({ exerciseIdx, onTimeout }) {
         </span>
       </div>
       <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-        <motion.div
-          className={`h-full rounded-full transition-colors ${isUrgent ? 'bg-red-400' : 'bg-gradient-to-r from-purple-400 to-indigo-400'}`}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.9, ease: 'linear' }}
+        <div
+          className={`h-full rounded-full ${isUrgent ? 'bg-red-400' : 'bg-gradient-to-r from-purple-400 to-indigo-400'}`}
+          style={{
+            width: `${pct}%`,
+            transition: 'width 1s linear, background-color 0.3s',
+          }}
         />
       </div>
     </div>
