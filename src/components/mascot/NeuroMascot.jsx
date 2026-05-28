@@ -343,10 +343,10 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
       {/* Mascot button — simple, no distraction */}
       <motion.button
         onClick={() => {
+          handleClickBrain();
           if (open) {
             setOpen(false);
           } else {
-            handleClickBrain();
             handleOpen();
           }
         }}
