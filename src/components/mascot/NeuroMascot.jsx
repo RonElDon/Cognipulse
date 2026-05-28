@@ -242,8 +242,8 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
       clickCountRef.current = 0;
     }, 5000);
 
-    // Show toast for last 3 clicks
-    if (remaining <= 3 && remaining > 0) {
+    // Show toast for clicks 1-9 (as we count down to 0)
+    if (remaining > 0 && remaining <= 9) {
       const key = `devMode.clicksRemaining${remaining}`;
       toast.info(t(key), { duration: 2000 });
     }
