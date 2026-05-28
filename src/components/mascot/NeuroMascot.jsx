@@ -2,8 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '@/lib/ThemeContext';
+import { useAuth } from '@/lib/AuthContext';
 import { X, Send, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 import NeuroCharacter from './NeuroCharacter';
+import DeveloperModeOverlay from '@/components/DeveloperModeOverlay';
 
 // Emotion configs for the animated globe
 const GLOBE_EMOTIONS = {
@@ -145,6 +148,7 @@ const QUICK_ACTIONS = [
 
 export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
   const { applyExternalTheme } = useTheme();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [face, setFace] = useState('happy');
   const [bubble, setBubble] = useState(null);
@@ -153,8 +157,11 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [devModeOpen, setDevModeOpen] = useState(false);
   const chatEndRef = useRef(null);
   const unsubRef = useRef(null);
+  const clickCountRef = useRef(0);
+  const clickTimeoutRef = useRef(null);
   // Track last applied theme to avoid re-applying same values
   const lastThemeRef = useRef(null);
 
@@ -219,6 +226,43 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
   // Theme changes only come from the backend (applyThemeSetting), not from parsing message text
   const applyThemeFromMessage = (_content) => {
     // intentionally empty — theme is applied via syncThemeFromProfile after backend call
+  };
+
+  const handleClickBrain = () => {
+    clickCountRef.current += 1;
+    const remaining = 20 - clickCountRef.current;
+
+    // Clear existing timeout
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+
+    // Reset counter after 5 seconds of inactivity
+    clickTimeoutRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+    }, 5000);
+
+    // Show toast for last 3 clicks
+    if (remaining <= 3 && remaining > 0) {
+      const messages = {
+        3: '🧠 Noch 3x klicken...',
+        2: '🧠 Noch 2x klicken...',
+        1: '🧠 Noch 1x klicken...',
+      };
+      toast.info(messages[remaining], { duration: 2000 });
+    }
+
+    // Unlock dev mode at 20 clicks
+    if (clickCountRef.current === 20) {
+      clickCountRef.current = 0;
+      if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+
+      // Check if user is admin
+      if (user?.role === 'admin') {
+        toast.success('🔓 Entwicklermodus freigeschaltet! ⚙️', { duration: 2000 });
+        setDevModeOpen(true);
+      } else {
+        toast.error('🚫 Nur für Administratoren!', { duration: 2000 });
+      }
+    }
   };
 
   const handleOpen = async () => {
@@ -305,7 +349,14 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
 
       {/* Mascot button — simple, no distraction */}
       <motion.button
-        onClick={() => open ? setOpen(false) : handleOpen()}
+        onClick={() => {
+          if (open) {
+            setOpen(false);
+          } else {
+            handleClickBrain();
+            handleOpen();
+          }
+        }}
         className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-300/40 dark:shadow-purple-900/40 flex items-center justify-center border-2 border-white/30"
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.93 }}
@@ -442,6 +493,9 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Developer Mode Overlay */}
+      <DeveloperModeOverlay isOpen={devModeOpen} onClose={() => setDevModeOpen(false)} />
     </>
   );
 }
