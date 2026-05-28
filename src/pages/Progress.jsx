@@ -18,7 +18,7 @@ export default function Progress() {
   const [results, setResults] = useState([]);
   const [loadingResults, setLoadingResults] = useState(true);
   const [activePageTab, setActivePageTab] = useState('stats');
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     base44.entities.ExerciseResult.list('-created_date', 200)
@@ -42,7 +42,8 @@ export default function Progress() {
     const avg = domainResults.length > 0
       ? Math.round(domainResults.reduce((s, r) => s + (r.score || 0), 0) / domainResults.length)
       : 0;
-    return { domain: d.icon + ' ' + d.name.split(' ')[0], score: avg, fullMark: 100 };
+    const label = language === 'de' ? d.nameDE : d.name;
+    return { domain: d.icon + ' ' + label.split(' ')[0], score: avg, fullMark: 100 };
   });
 
   // Last 7 days activity
@@ -221,7 +222,7 @@ export default function Progress() {
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-center mb-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate">{d.nameDE || d.name}</span>
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate">{language === 'de' ? d.nameDE : d.name}</span>
                         {mastery && (
                           <span className="text-xs font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 flex-shrink-0">
                             {mastery}
