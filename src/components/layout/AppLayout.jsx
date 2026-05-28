@@ -1,5 +1,5 @@
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight, Swords } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -9,14 +9,14 @@ import NeuroMascot from '@/components/mascot/NeuroMascot';
 export default function AppLayout() {
   const { t } = useLanguage();
 
-  const NAV_ITEMS = [
+  const NAV_ITEMS = useMemo(() => [
     { path: '/', icon: Home, label: t('nav.home') },
     { path: '/train', icon: Brain, label: t('nav.train') },
     { path: '/duel', icon: Swords, label: t('nav.duel') },
     { path: '/progress', icon: BarChart2, label: t('nav.progress') },
     { path: '/leaderboard', icon: Trophy, label: t('nav.leaderboard') },
     { path: '/profile', icon: User, label: t('nav.profile') },
-  ];
+  ], [t]);
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);

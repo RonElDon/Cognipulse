@@ -2,20 +2,21 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { T, interpolate } from './i18n';
 
-const LanguageContext = createContext({ lang: 'de', t: () => '', setLang: () => {} });
+const LanguageContext = createContext({ lang: 'de', t: () => '', setLang: () => {}, loading: true });
 
 export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState('de');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load language from user profile
     base44.auth.me()
       .then(user => base44.entities.UserProfile.filter({ created_by: user.email }))
       .then(profiles => {
         const l = profiles[0]?.preferred_language;
         if (l === 'en' || l === 'de') setLangState(l);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const setLang = async (newLang) => {
@@ -29,7 +30,6 @@ export function LanguageProvider({ children }) {
     } catch (e) {}
   };
 
-  /** t('train.title') or t('common.back') — supports dot-path */
   const t = (key, vars) => {
     const parts = key.split('.');
     let val = T[lang];
@@ -39,6 +39,9 @@ export function LanguageProvider({ children }) {
     }
     return vars ? interpolate(String(val), vars) : String(val);
   };
+
+  // Don't render children until we know the correct language
+  if (loading) return null;
 
   return (
     <LanguageContext.Provider value={{ lang, t, setLang }}>
