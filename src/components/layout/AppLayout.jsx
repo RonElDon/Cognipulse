@@ -1,5 +1,5 @@
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Home, Brain, Trophy, BarChart2, User, Menu, X, Zap, Moon, Sun, Monitor, ChevronLeft, ChevronRight, Swords } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
 import { base44 } from '@/api/base44Client';
@@ -20,6 +20,20 @@ export default function AppLayout({ lang = 'de' }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
+  const appRef = useRef(null);
+
+  // Prevent arrow keys from scrolling the page out of the app
+  useEffect(() => {
+    const handler = (e) => {
+      const tag = document.activeElement?.tagName;
+      const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+      if (!isInput && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', handler, { passive: false });
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   const handleDebugBack = () => {
     navigate(-1);
