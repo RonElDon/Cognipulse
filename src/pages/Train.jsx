@@ -9,7 +9,7 @@ export default function Train() {
   const [selectedDomain, setSelectedDomain] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const urlParams = new URLSearchParams(window.location.search);
   const domainParam = urlParams.get('domain');
@@ -96,7 +96,7 @@ export default function Train() {
                 }`}
                 style={selectedDomain === d.id ? { backgroundColor: d.color } : {}}
               >
-                {d.icon} {d.name.split(' ')[0]}
+                {d.icon} {(language === 'de' ? d.nameDE : d.name).split(' ')[0]}
               </button>
             ))}
           </div>
@@ -136,8 +136,8 @@ export default function Train() {
               transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
             >
               <div className="text-3xl mb-2">{DOMAINS[selectedDomain].icon}</div>
-              <h2 className="text-xl font-black">{DOMAINS[selectedDomain].name}</h2>
-              <p className="text-white/90 text-sm mt-1">{DOMAINS[selectedDomain].description}</p>
+              <h2 className="text-xl font-black">{language === 'de' ? DOMAINS[selectedDomain].nameDE : DOMAINS[selectedDomain].name}</h2>
+              <p className="text-white/90 text-sm mt-1">{language === 'de' ? DOMAINS[selectedDomain].descriptionDE : DOMAINS[selectedDomain].description}</p>
             </motion.div>
           </motion.div>
         )}
@@ -164,7 +164,7 @@ export default function Train() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <div className="font-black text-slate-800 dark:text-slate-100">{ex.name}</div>
+                          <div className="font-black text-slate-800 dark:text-slate-100">{language === 'de' && ex.nameDE ? ex.nameDE : ex.name}</div>
                           <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{ex.description}</div>
                         </div>
                         <div className="flex-shrink-0 text-right">
@@ -173,7 +173,7 @@ export default function Train() {
                       </div>
                       <div className="mt-2 flex items-center gap-3">
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${domain.bgLight} ${domain.textColor}`}>
-                          {domain.icon} {domain.name}
+                          {domain.icon} {language === 'de' ? domain.nameDE : domain.name}
                         </span>
                         <div className="flex items-center gap-1">
                           {Array.from({ length: 3 }).map((_, j) => (

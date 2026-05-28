@@ -177,7 +177,7 @@ export default function Home() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{d.nameDE || d.name}</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{lang === 'de' ? d.nameDE : d.name}</span>
                       {d.avgScore !== null
                         ? <span className="text-xs font-black" style={{ color: d.color }}>{d.avgScore}%</span>
                         : <span className="text-xs font-semibold text-slate-400">{t('home.newBadge')}</span>
