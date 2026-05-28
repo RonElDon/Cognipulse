@@ -253,13 +253,8 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
       clickCountRef.current = 0;
       if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
 
-      // Check if user is admin
-      if (user?.role === 'admin') {
-        toast.success(t('devMode.activated'), { duration: 2000 });
-        setDevModeOpen(true);
-      } else {
-        toast.error(t('devMode.notAdmin'), { duration: 2000 });
-      }
+      toast.success(t('devMode.activated'), { duration: 2000 });
+      setDevModeOpen(true);
     }
   };
 
