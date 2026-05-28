@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { DOMAINS, getLevel } from '@/lib/exercises';
 import { Trophy, Medal, Zap, Share2, Swords } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 import { ShareAchievementModal } from '@/components/social/SocialShareWidget';
 
 export default function Leaderboard() {
@@ -11,6 +12,7 @@ export default function Leaderboard() {
   const [currentUser, setCurrentUser] = useState(null);
   const [filterDomain, setFilterDomain] = useState('overall');
   const [showShareModal, setShowShareModal] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     Promise.all([
@@ -44,8 +46,8 @@ export default function Leaderboard() {
       <div className="bg-gradient-to-br from-amber-500 to-orange-600 px-4 pt-8 pb-12">
         <div className="max-w-lg mx-auto text-center">
           <Trophy className="w-10 h-10 text-white mx-auto mb-3" />
-          <h1 className="text-3xl font-black text-white">Rangliste</h1>
-          <p className="text-white/80 text-sm mt-1">Wer hat den schärfsten Verstand? 🧠</p>
+          <h1 className="text-3xl font-black text-white">{t('leaderboard.title2')}</h1>
+          <p className="text-white/80 text-sm mt-1">{t('leaderboard.subtitle')}</p>
         </div>
       </div>
 
@@ -98,14 +100,14 @@ export default function Leaderboard() {
             <div className="flex items-center gap-3">
               <div className="text-2xl font-black">#{myRank.rank}</div>
               <div className="flex-1">
-                <div className="font-black">Du · {myRank.display_name || 'Champion'}</div>
+                <div className="font-black">{t('leaderboard.you')} · {myRank.display_name || 'Champion'}</div>
                 <div className="text-white/80 text-sm">{myRank.total_xp || 0} XP</div>
               </div>
               <button
                 onClick={() => setShowShareModal(true)}
                 className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all"
               >
-                <Share2 className="w-3.5 h-3.5" /> Teilen
+                <Share2 className="w-3.5 h-3.5" /> {t('leaderboard.share')}
               </button>
             </div>
           </motion.div>
@@ -116,7 +118,7 @@ export default function Leaderboard() {
           className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden"
         >
           <div className="p-4 border-b border-slate-100 dark:border-slate-700">
-            <h2 className="font-black text-slate-800 dark:text-slate-100">Alle Spieler</h2>
+            <h2 className="font-black text-slate-800 dark:text-slate-100">{t('leaderboard.allPlayers')}</h2>
           </div>
           <div className="divide-y divide-slate-50 dark:divide-slate-700">
             {ranked.map((p, i) => {
@@ -143,7 +145,7 @@ export default function Leaderboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className={`font-black text-sm ${isMe ? 'text-purple-700 dark:text-purple-400' : 'text-slate-800 dark:text-slate-100'} truncate`}>
-                      {p.display_name || 'Gehirn-Entdecker'} {isMe && '(Du)'}
+                      {p.display_name || t('leaderboard.defaultName')} {isMe && `(${t('leaderboard.you')})`}
                     </div>
                     <div className="text-xs font-bold px-1.5 py-0.5 rounded-full inline-block mt-0.5" style={{ backgroundColor: lvl.color + '20', color: lvl.color }}>
                       Lv.{lvl.level} {lvl.name}
@@ -160,7 +162,7 @@ export default function Leaderboard() {
           {ranked.length === 0 && (
             <div className="text-center py-12 text-slate-400">
               <div className="text-4xl mb-3">🏆</div>
-              <div className="font-semibold">Sei der Erste, der trainiert!</div>
+              <div className="font-semibold">{t('leaderboard.beFirst')}</div>
             </div>
           )}
         </motion.div>

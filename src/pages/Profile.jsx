@@ -5,6 +5,7 @@ import { useProfile } from '@/lib/useProfile';
 import { BADGES, DOMAINS, EXERCISES, getLevel } from '@/lib/exercises';
 import XPBar from '@/components/ui/XPBar';
 import { User, Settings, Globe, Target, LogOut, Check, Edit2, Palette } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 import AppearanceSettings from '@/components/profile/AppearanceSettings';
 import { toast } from 'sonner';
 
@@ -14,6 +15,7 @@ export default function Profile() {
   const [editName, setEditName] = useState(false);
   const [newName, setNewName] = useState('');
   const [results, setResults] = useState([]);
+  const { t } = useLanguage();
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -43,17 +45,17 @@ export default function Profile() {
     if (!newName.trim()) return;
     await updateProfile({ display_name: newName.trim() });
     setEditName(false);
-    toast.success('Name aktualisiert!');
+    toast.success(t('profile.nameSaved'));
   };
 
   const handleLanguageChange = async (lang) => {
     await updateProfile({ preferred_language: lang });
-    toast.success(`Sprache geändert zu ${lang === 'en' ? 'Englisch' : 'Deutsch'}`);
+    toast.success(t('profile.languageChanged'));
   };
 
   const handleGoalChange = async (daily) => {
     await updateProfile({ goals: { ...profile?.goals, daily_exercises: daily } });
-    toast.success('Ziel aktualisiert!');
+    toast.success(t('profile.goalSaved'));
   };
 
   const handleLogout = () => {
@@ -103,7 +105,7 @@ export default function Profile() {
             </div>
           ) : (
             <div className="flex items-center gap-2 justify-center">
-              <h1 className="text-xl font-black text-white">{profile?.display_name || user?.full_name || 'Gehirn-Entdecker'}</h1>
+              <h1 className="text-xl font-black text-white">{profile?.display_name || user?.full_name || t('leaderboard.defaultName')}</h1>
               <button onClick={() => { setNewName(profile?.display_name || ''); setEditName(true); }}
                 className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
                 <Edit2 className="w-3 h-3 text-white/70" />
@@ -148,7 +150,7 @@ export default function Profile() {
           className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
         >
           <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-            <Globe className="w-5 h-5 text-blue-600" /> Sprache
+            <Globe className="w-5 h-5 text-blue-600" /> {t('profile.language')}
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {[{ code: 'en', label: '🇬🇧 English' }, { code: 'de', label: '🇩🇪 Deutsch' }].map(l => (
@@ -172,9 +174,9 @@ export default function Profile() {
           className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
         >
           <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5 text-emerald-600" /> Tagesziel
+            <Target className="w-5 h-5 text-emerald-600" /> {t('profile.dailyGoal')}
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">Wie viele Übungen pro Tag?</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t('profile.dailyGoalSub')}</p>
           <div className="grid grid-cols-4 gap-2">
             {[1, 3, 5, 10].map(n => (
               <button
@@ -196,13 +198,13 @@ export default function Profile() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
           className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
         >
-          <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4">📊 Meine Statistiken</h2>
+          <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4">{t('profile.myStats')}</h2>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'Übungen gesamt', value: totalGames, icon: '🎯' },
-              { label: 'Gesamt-XP', value: xp, icon: '⚡' },
-              { label: 'Beste Serie', value: `${profile?.longest_streak || 0} Tage`, icon: '🔥' },
-              { label: 'Bereiche versucht', value: `${domainsPlayed}/6`, icon: '🧠' },
+              { label: t('profile.totalExercises'), value: totalGames, icon: '🎯' },
+              { label: t('profile.totalXP'), value: xp, icon: '⚡' },
+              { label: t('profile.bestStreak'), value: `${profile?.longest_streak || 0} ${t('common.days')}`, icon: '🔥' },
+              { label: t('profile.domainsTried'), value: `${domainsPlayed}/6`, icon: '🧠' },
             ].map(s => (
               <div key={s.label} className="bg-slate-50 dark:bg-slate-700/60 rounded-2xl p-3">
                 <div className="text-2xl">{s.icon}</div>
@@ -218,7 +220,7 @@ export default function Profile() {
           className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
         >
           <h2 className="font-black text-slate-800 dark:text-slate-100 mb-5 flex items-center gap-2">
-            <Palette className="w-5 h-5 text-purple-500" /> Erscheinungsbild
+            <Palette className="w-5 h-5 text-purple-500" /> {t('profile.appearance')}
           </h2>
           <AppearanceSettings />
         </motion.div>
@@ -229,13 +231,13 @@ export default function Profile() {
             onClick={handleResetOnboarding}
             className="w-full py-3 rounded-2xl border-2 border-amber-100 dark:border-amber-900/40 text-amber-600 font-bold flex items-center justify-center gap-2 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors text-sm"
           >
-            🔄 Onboarding neu starten
+            🔄 {t('profile.restartOnboarding')}
           </button>
           <button
             onClick={handleLogout}
             className="w-full py-3 rounded-2xl border-2 border-red-100 dark:border-red-900/40 text-red-500 font-bold flex items-center justify-center gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
           >
-            <LogOut className="w-4 h-4" /> Abmelden
+            <LogOut className="w-4 h-4" /> {t('profile.logout')}
           </button>
         </motion.div>
       </div>

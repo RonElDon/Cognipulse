@@ -7,11 +7,13 @@ import XPBar from '@/components/ui/XPBar';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { TrendingUp, Calendar, Zap, Brain, Award, History } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function Progress() {
   const { profile, loading } = useProfile();
   const [results, setResults] = useState([]);
   const [loadingResults, setLoadingResults] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     base44.entities.ExerciseResult.list('-created_date', 100)
@@ -70,12 +72,12 @@ export default function Progress() {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-2xl font-black text-white mb-1 flex items-center gap-2">
-                <TrendingUp className="w-6 h-6" /> Mein Fortschritt
+                <TrendingUp className="w-6 h-6" /> {t('progress.title')}
               </h1>
-              <p className="text-white/80 text-sm">Verfolge deine kognitive Entwicklung</p>
+              <p className="text-white/80 text-sm">{t('progress.subtitle')}</p>
             </div>
             <Link to="/history" className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-2 rounded-full transition-all">
-              <History className="w-3.5 h-3.5" /> Detaillierte Historie
+              <History className="w-3.5 h-3.5" /> {t('progress.history')}
             </Link>
           </div>
         </div>
@@ -88,7 +90,7 @@ export default function Progress() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Zap className="w-5 h-5 text-yellow-500" />
-            <h2 className="font-black text-slate-800 dark:text-slate-100">XP & Stufe</h2>
+            <h2 className="font-black text-slate-800 dark:text-slate-100">{t('progress.xpLevel')}</h2>
           </div>
           <XPBar xp={xp} />
         </motion.div>
@@ -98,9 +100,9 @@ export default function Progress() {
           className="grid grid-cols-3 gap-3"
         >
           {[
-            { label: 'Übungen', value: totalExercises, icon: '🎯', color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' },
-            { label: 'Tages-Serie', value: `${profile?.current_streak || 0}🔥`, icon: '🔥', color: 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300' },
-            { label: 'Bester Bereich', value: bestDomain ? bestDomain.icon : '—', icon: '🏆', color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' },
+            { label: t('progress.exercises'), value: totalExercises, icon: '🎯', color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' },
+            { label: t('progress.currentStreak'), value: `${profile?.current_streak || 0}🔥`, icon: '🔥', color: 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300' },
+            { label: t('progress.bestDomain'), value: bestDomain ? bestDomain.icon : '—', icon: '🏆', color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' },
           ].map(s => (
             <div key={s.label} className={`${s.color} rounded-2xl p-3 text-center`}>
               <div className="text-2xl font-black">{s.value}</div>
@@ -116,7 +118,7 @@ export default function Progress() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Brain className="w-5 h-5 text-indigo-600" />
-              <h2 className="font-black text-slate-800 dark:text-slate-100">Gehirnkarte</h2>
+              <h2 className="font-black text-slate-800 dark:text-slate-100">{t('progress.brainMap')}</h2>
             </div>
             <ResponsiveContainer width="100%" height={260}>
               <RadarChart data={radarData}>
@@ -134,7 +136,7 @@ export default function Progress() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Calendar className="w-5 h-5 text-emerald-600" />
-            <h2 className="font-black text-slate-800 dark:text-slate-100">Diese Woche</h2>
+            <h2 className="font-black text-slate-800 dark:text-slate-100">{t('progress.thisWeek')}</h2>
           </div>
           <div className="flex items-end justify-between gap-1 h-28">
             {(() => {
@@ -166,12 +168,12 @@ export default function Progress() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Award className="w-5 h-5 text-amber-500" />
-            <h2 className="font-black text-slate-800 dark:text-slate-100">Bereichs-Leistung</h2>
+            <h2 className="font-black text-slate-800 dark:text-slate-100">{t('progress.domainPerformance')}</h2>
           </div>
           <div className="space-y-4">
             {domainStats.map(d => {
               const clampedScore = Math.min(d.avgScore ?? 0, 100);
-              const mastery = d.count === 0 ? null : d.count >= 50 ? 'Experte' : d.count >= 20 ? 'Fortgeschritten' : d.count >= 5 ? 'Lernend' : 'Einsteiger';
+              const mastery = d.count === 0 ? null : d.count >= 50 ? t('progress.expert') : d.count >= 20 ? t('progress.advanced') : d.count >= 5 ? t('progress.learning') : t('progress.beginner');
               return (
                 <div key={d.id} className="flex items-center gap-3">
                   <div className={`w-9 h-9 rounded-xl ${d.gradient} flex items-center justify-center text-lg flex-shrink-0`}>
@@ -213,7 +215,7 @@ export default function Progress() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
             className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
           >
-            <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4">Letzte Sitzungen</h2>
+            <h2 className="font-black text-slate-800 dark:text-slate-100 mb-4">{t('progress.recentActivity')}</h2>
             <div className="space-y-2">
               {results.slice(0, 10).map(r => {
                 const d = DOMAINS[r.domain];
@@ -242,8 +244,8 @@ export default function Progress() {
         {results.length === 0 && !loadingResults && (
           <div className="text-center py-12">
             <div className="text-5xl mb-4">🧠</div>
-            <div className="font-black text-slate-600 text-lg">Noch keine Übungen!</div>
-            <p className="text-slate-400 mt-2">Starte dein Training, um deinen Fortschritt hier zu sehen.</p>
+            <div className="font-black text-slate-600 text-lg">{t('progress.noDataTitle')}</div>
+            <p className="text-slate-400 mt-2">{t('progress.noDataSub')}</p>
           </div>
         )}
       </div>

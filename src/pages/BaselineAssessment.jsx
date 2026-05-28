@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLanguage } from '@/lib/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import GAME_MAP from '@/components/games/GameMap';
@@ -63,6 +64,7 @@ const BASELINE_EXERCISES = Object.entries(BASELINE_POOL).map(([domain, pool]) =>
 
 export default function BaselineAssessment() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [phase, setPhase] = useState('intro'); // intro | precontext | between | exercise | done
   const [currentIdx, setCurrentIdx] = useState(0);
   const [results, setResults] = useState([]);
@@ -157,31 +159,31 @@ export default function BaselineAssessment() {
           <div className="text-5xl">{lastResult.icon}</div>
           <div>
             <div className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">{lastResult.exercise_name}</div>
-            <h2 className="text-2xl font-black text-white mb-1">Ergebnis</h2>
+            <h2 className="text-2xl font-black text-white mb-1">{t('baseline.result')}</h2>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
               <div className="text-3xl font-black text-white">{lastResult.score ?? '—'}%</div>
-              <div className="text-white/40 text-xs mt-1">Score</div>
+              <div className="text-white/40 text-xs mt-1">{t('baseline.scoreLabel')}</div>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
               <div className="text-3xl font-black text-white">
                 {lastResult.accuracy != null ? `${Math.round(lastResult.accuracy)}%` : '—'}
               </div>
-              <div className="text-white/40 text-xs mt-1">Genauigkeit</div>
+              <div className="text-white/40 text-xs mt-1">{t('baseline.accuracyLabel')}</div>
             </div>
             {lastResult.reaction_time_ms > 0 && (
               <div className="col-span-2 bg-white/5 border border-white/10 rounded-2xl p-4">
                 <div className="text-3xl font-black text-white">{Math.round(lastResult.reaction_time_ms)} ms</div>
-                <div className="text-white/40 text-xs mt-1">Reaktionszeit</div>
+                <div className="text-white/40 text-xs mt-1">{t('baseline.reactionLabel')}</div>
               </div>
             )}
           </div>
 
           {/* Progress */}
           <div className="text-white/40 text-xs">
-            {results.length} / {BASELINE_EXERCISES.length} Übungen abgeschlossen
+            {t('baseline.completed', { done: results.length, total: BASELINE_EXERCISES.length })}
           </div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
             <div
@@ -195,16 +197,16 @@ export default function BaselineAssessment() {
               onClick={() => setPhase('done')}
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-base shadow-xl hover:opacity-90 transition-all"
             >
-              Auswertung ansehen 🏆
+              {t('baseline.seeResults')}
             </button>
           ) : (
             <div className="space-y-3">
-              <div className="text-white/40 text-xs">Nächste Übung: <span className="text-white/70 font-bold">{nextEx?.nameExercise}</span></div>
+              <div className="text-white/40 text-xs">{t('baseline.nextExercise')}: <span className="text-white/70 font-bold">{nextEx?.nameExercise}</span></div>
               <button
                 onClick={() => setPhase('exercise')}
                 className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all"
               >
-                Weiter → {nextEx?.icon}
+                {t('baseline.next')} → {nextEx?.icon}
               </button>
             </div>
           )}
@@ -227,9 +229,9 @@ export default function BaselineAssessment() {
         >
           <div className="text-6xl">🧪</div>
           <div>
-            <h1 className="text-2xl font-black text-white mb-2">Einschätzungstest</h1>
+            <h1 className="text-2xl font-black text-white mb-2">{t('baseline.title')}</h1>
             <p className="text-white/60 text-sm leading-relaxed">
-              {BASELINE_EXERCISES.length} kurze Übungen aus verschiedenen Bereichen — je etwa 30–60 Sekunden. Kein Richtig oder Falsch, ich möchte nur verstehen, wo du gerade stehst.
+              {t('baseline.subtitle', { count: BASELINE_EXERCISES.length })}
             </p>
           </div>
           <div className="space-y-2">
@@ -248,10 +250,10 @@ export default function BaselineAssessment() {
             onClick={() => setPhase('precontext')}
             className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all"
           >
-            Test starten 🚀
+            {t('baseline.start')}
           </button>
           <button onClick={() => navigate(-1)} className="text-white/30 text-xs hover:text-white/50 transition-colors">
-            Zurück
+            {t('baseline.back')}
           </button>
         </motion.div>
       </div>
