@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Send } from 'lucide-react';
 import WelcomeScreen from './WelcomeScreen';
+import DeviceCheckScreen from './DeviceCheckScreen';
 import { useTheme } from '@/lib/ThemeContext';
 
 const GLOBE_EMOTIONS = {
@@ -80,9 +81,9 @@ function NeuroGlobe({ size = 100, emotion = 'happy' }) {
 
 const QUESTIONS = {
   de: [
-    { id: 'name', question: 'Lass mich dich kennenlernen — wie heißt du? 😊', placeholder: 'Dein Name...', type: 'text' },
+    { id: 'name', question: 'Lass mich dich kennenlernen — wie heißt du? (optional) 😊', placeholder: 'Dein Name oder Spitzname...', type: 'text', optional: true },
     { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'age' },
-    { id: 'gender', question: 'Was ist dein Geschlecht? ⚧️', options: [{ label: 'Männlich', value: 'männlich' }, { label: 'Weiblich', value: 'weiblich' }, { label: 'Divers', value: 'divers' }, { label: 'Keine Angabe', value: 'keine Angabe' }], type: 'select', defaultIdx: 0 },
+    { id: 'gender', question: 'Geschlecht? (freiwillig) ⚧️', options: [{ label: 'Männlich', value: 'männlich' }, { label: 'Weiblich', value: 'weiblich' }, { label: 'Divers', value: 'divers' }, { label: 'Keine Angabe', value: 'keine Angabe' }], type: 'select', defaultIdx: 3 },
     { id: 'goal', question: 'Was treibt dich an? Was möchtest du mit deinem Gehirn erreichen? 🎯', placeholder: 'z.B. Gedächtnis verbessern, fokussierter werden...', type: 'text' },
     { id: 'dailyExercises', question: 'Wie viel Zeit hast du pro Tag für dein Brain-Workout? ⏱️', options: [
       { label: 'Starter (5 Min.)', value: '3' },
@@ -93,9 +94,9 @@ const QUESTIONS = {
     ], type: 'select' },
   ],
   en: [
-    { id: 'name', question: 'Let me get to know you — what\'s your name? 😊', placeholder: 'Your name...', type: 'text' },
+    { id: 'name', question: 'Let me get to know you — what\'s your name? (optional) 😊', placeholder: 'Your name or nickname...', type: 'text', optional: true },
     { id: 'age', question: 'How many years of brain power do you have? 🧠', placeholder: 'Your age...', type: 'age' },
-    { id: 'gender', question: 'How would you like to be addressed?', options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Diverse', value: 'diverse' }, { label: 'Prefer not to say', value: 'prefer not to say' }], type: 'select' },
+    { id: 'gender', question: 'Gender? (optional) ⚧️', options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Diverse', value: 'diverse' }, { label: 'Prefer not to say', value: 'prefer not to say' }], type: 'select', defaultIdx: 3 },
     { id: 'goal', question: 'What drives you? What do you want to achieve with your brain? 💪', placeholder: 'e.g. improve memory, better focus...', type: 'text' },
     { id: 'dailyExercises', question: 'How much time do you have for your daily brain training? ⏱️', options: [
       { label: 'Starter (5 min)', value: '3' },
@@ -110,7 +111,7 @@ const QUESTIONS = {
 export default function OnboardingFlow({ onComplete }) {
   const navigate = useNavigate();
   const { accentColor } = useTheme();
-  const [phase, setPhase] = useState('welcome');
+  const [phase, setPhase] = useState('welcome'); // welcome | devicecheck | chat
   const [language, setLanguage] = useState('de');
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -212,17 +213,10 @@ export default function OnboardingFlow({ onComplete }) {
     return () => window.removeEventListener('keydown', handler);
   }, [currentQuestion.type, currentQuestion.options]);
 
-  const handleWelcomeDone = (lang) => {
+  const handleWelcomeDone = (lang, consents) => {
     setLanguage(lang);
-    setPhase('chat');
-    // Start with welcome message and first question
-    const welcome = lang === 'de'
-      ? 'Hey, willkommen bei mir! 🎉 Ich bin Neuro, dein persönlicher Trainingsbegleiter, und ich freue mich riesig, dich kennenzulernen! Lass mich einfach ein paar schnelle Fragen stellen, dann personalisiere ich dein gesamtes Training speziell für dich. Los geht\'s!'
-      : 'Hey there, welcome! 🎉 I\'m Neuro, your personal training coach, and I\'m excited to get to know you! Let me ask you a few quick questions so I can personalize your entire training just for you. Let\'s go!';
-    setMessages([
-      { role: 'assistant', content: welcome },
-      { role: 'assistant', content: QUESTIONS[lang][0].question }
-    ]);
+    window._cogniConsents = consents;
+    setPhase('devicecheck');
   };
 
   const handleAnswer = async (value) => {
@@ -408,6 +402,20 @@ export default function OnboardingFlow({ onComplete }) {
     return <WelcomeScreen onStart={handleWelcomeDone} />;
   }
 
+  if (phase === 'devicecheck') {
+    return <DeviceCheckScreen onDone={() => {
+      setPhase('chat');
+      const lang = language;
+      const welcome = lang === 'de'
+        ? 'Hey, willkommen bei mir! 🎉 Ich bin Neuro, dein persönlicher Trainingsbegleiter, und ich freue mich riesig, dich kennenzulernen! Lass mich einfach ein paar schnelle Fragen stellen, dann personalisiere ich dein gesamtes Training speziell für dich. Los geht\'s!'
+        : 'Hey there, welcome! 🎉 I\'m Neuro, your personal training coach, and I\'m excited to get to know you! Let me ask you a few quick questions so I can personalize your entire training just for you. Let\'s go!';
+      setMessages([
+        { role: 'assistant', content: welcome },
+        { role: 'assistant', content: QUESTIONS[lang][0].question }
+      ]);
+    }} />;
+  }
+
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex flex-col"
       style={{ background: 'radial-gradient(ellipse at 50% 0%, #4c1d95 0%, #1e1b4b 40%, #0f0a1e 100%)' }}
@@ -492,25 +500,35 @@ export default function OnboardingFlow({ onComplete }) {
       {/* Input */}
       <div className="relative z-10 flex-shrink-0 px-4 pb-6 pt-2">
         {currentQuestion.type === 'text' ? (
-          <div className="flex gap-2 bg-white/5 backdrop-blur-md border border-white/15 rounded-2xl p-2">
-            <input
-              ref={inputRef}
-              autoFocus
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={currentQuestion.placeholder}
-              className="flex-1 text-sm bg-transparent text-white px-3 py-2 focus:outline-none placeholder:text-white/25 font-medium"
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={!input.trim() || saving}
-              style={{ background: accentColor }}
-              className="w-10 h-10 rounded-xl disabled:opacity-30 flex items-center justify-center transition-all flex-shrink-0 shadow-lg hover:opacity-90"
-            >
-              <Send className="w-4 h-4 text-white" />
-            </button>
+          <div className="space-y-2">
+            <div className="flex gap-2 bg-white/5 backdrop-blur-md border border-white/15 rounded-2xl p-2">
+              <input
+                ref={inputRef}
+                autoFocus
+                type="text"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={currentQuestion.placeholder}
+                className="flex-1 text-sm bg-transparent text-white px-3 py-2 focus:outline-none placeholder:text-white/25 font-medium"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!input.trim() || saving}
+                style={{ background: accentColor }}
+                className="w-10 h-10 rounded-xl disabled:opacity-30 flex items-center justify-center transition-all flex-shrink-0 shadow-lg hover:opacity-90"
+              >
+                <Send className="w-4 h-4 text-white" />
+              </button>
+            </div>
+            {currentQuestion.optional && (
+              <button
+                onClick={() => handleAnswer('—')}
+                className="w-full text-center text-white/30 hover:text-white/50 text-xs font-semibold transition-colors py-1"
+              >
+                {language === 'de' ? 'Überspringen' : 'Skip'}
+              </button>
+            )}
           </div>
         ) : currentQuestion.type === 'age' ? (
           <div className="space-y-5">

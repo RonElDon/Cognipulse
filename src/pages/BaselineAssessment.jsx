@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import GAME_MAP from '@/components/games/GameMap';
 import { base44 } from '@/api/base44Client';
-import PostAssessmentNeuro from '@/components/onboarding/PostAssessmentNeutro';
+import PostAssessmentNeuro from '@/components/onboarding/PostAssessmentNeuro';
 import ExerciseTemplate from '@/components/exercise/ExerciseTemplate';
+import PreBaselineContext from '@/components/onboarding/PreBaselineContext';
 
 const BASELINE_POOL = {
   attention:  [
@@ -62,16 +63,17 @@ const BASELINE_EXERCISES = Object.entries(BASELINE_POOL).map(([domain, pool]) =>
 
 export default function BaselineAssessment() {
   const navigate = useNavigate();
-  const [phase, setPhase] = useState('intro'); // intro | between | exercise | done
+  const [phase, setPhase] = useState('intro'); // intro | precontext | between | exercise | done
   const [currentIdx, setCurrentIdx] = useState(0);
   const [results, setResults] = useState([]);
   const [lastResult, setLastResult] = useState(null);
+  const [contextData, setContextData] = useState(null);
   const completedRef = useRef(false);
 
   // Enter to start test from intro
   useEffect(() => {
     const handler = (e) => {
-      if (e.key === 'Enter' && phase === 'intro') setPhase('exercise');
+      if (e.key === 'Enter' && phase === 'intro') setPhase('precontext');
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -211,6 +213,11 @@ export default function BaselineAssessment() {
     );
   }
 
+  // ── PRE-CONTEXT ────────────────────────────────────────────
+  if (phase === 'precontext') {
+    return <PreBaselineContext onDone={(data) => { setContextData(data); setPhase('exercise'); }} />;
+  }
+
   // ── INTRO ──────────────────────────────────────────────────
   if (phase === 'intro') {
     return (
@@ -238,7 +245,7 @@ export default function BaselineAssessment() {
             ))}
           </div>
           <button
-            onClick={() => setPhase('exercise')}
+            onClick={() => setPhase('precontext')}
             className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all"
           >
             Test starten 🚀

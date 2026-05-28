@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 // Dark mode classes via ThemeContext in AppLayout
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -6,9 +6,9 @@ import { base44 } from '@/api/base44Client';
 import { useProfile } from '@/lib/useProfile';
 import { DOMAINS, getLevel } from '@/lib/exercises';
 import XPBar from '@/components/ui/XPBar';
-import { Brain, Flame, Trophy, Zap, ChevronRight, Star, TrendingUp, Target } from 'lucide-react';
+import { Brain, Flame, Trophy, Zap, ChevronRight, Star, TrendingUp, Target, Clock, Shield } from 'lucide-react';
 import DailyPlanCard from '@/components/training/DailyPlanCard';
-import ProgressWidget from '@/components/training/ProgressWidget';
+import TrendWidget from '@/components/training/TrendWidget';
 import DailyChallengeCard from '@/components/training/DailyChallengeCard';
 import { useTheme } from '@/lib/ThemeContext';
 
@@ -36,6 +36,14 @@ export default function Home() {
   const xp = profile?.total_xp || 0;
   const { current: lvl } = getLevel(xp);
   const streak = profile?.current_streak || 0;
+  // Grace freeze: user gets 1 freeze per week (stored in localStorage for simplicity)
+  const graceKey = `streak_grace_${new Date().getISOWeekYear?.() || new Date().getFullYear()}_${Math.ceil(new Date().getDate() / 7)}`;
+  const [graceUsed, setGraceUsed] = useState(() => localStorage.getItem(graceKey) === 'true');
+
+  const handleGraceFreeze = () => {
+    localStorage.setItem(graceKey, 'true');
+    setGraceUsed(true);
+  };
 
   // Domain scores: which areas need attention?
   const domainScores = Object.keys(DOMAINS).map(key => {
@@ -54,7 +62,6 @@ export default function Home() {
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
     </div>
-  
   );
 
   return (
@@ -79,7 +86,7 @@ export default function Home() {
             className="mt-5 grid grid-cols-3 gap-3"
           >
             {[
-              { icon: Zap, label: 'XP', value: xp, color: 'bg-yellow-400/20 text-yellow-100' },
+              { icon: Zap, label: 'XP', value: xp.toLocaleString('de'), color: 'bg-yellow-400/20 text-yellow-100' },
               { icon: Flame, label: 'Serie', value: `${streak}T`, color: 'bg-orange-400/20 text-orange-100' },
               { icon: Star, label: 'Level', value: lvl.level, color: 'bg-purple-400/20 text-purple-100' },
             ].map(s => (
@@ -90,6 +97,24 @@ export default function Home() {
               </div>
             ))}
           </motion.div>
+
+          {/* Grace Freeze Button */}
+          {streak > 0 && !graceUsed && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}>
+              <button
+                onClick={handleGraceFreeze}
+                className="w-full mt-2 flex items-center justify-center gap-2 bg-white/8 border border-white/15 rounded-xl px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/12 transition-all text-xs font-semibold"
+              >
+                <Shield className="w-3.5 h-3.5 text-indigo-300" />
+                Serie-Schutz aktivieren (1× diese Woche)
+              </button>
+            </motion.div>
+          )}
+          {graceUsed && streak > 0 && (
+            <div className="w-full mt-2 flex items-center justify-center gap-2 bg-indigo-900/20 border border-indigo-500/20 rounded-xl px-4 py-2 text-indigo-300 text-xs font-semibold">
+              <Shield className="w-3.5 h-3.5" /> Serie-Schutz aktiv diese Woche
+            </div>
+          )}
 
           {/* XP Bar */}
           <motion.div
@@ -103,14 +128,31 @@ export default function Home() {
 
       <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-5">
 
+        {/* Micro-Modus */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+          <Link
+            to="/train?micro=1"
+            className="flex items-center gap-4 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border border-indigo-500/25 rounded-2xl p-4 hover:from-indigo-600/30 hover:to-purple-600/30 transition-all group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+              <Clock className="w-5 h-5 text-indigo-300" />
+            </div>
+            <div className="flex-1">
+              <div className="text-white font-black text-sm dark:text-white">⚡ 3-Minuten Micro-Training</div>
+              <div className="text-white/50 text-xs mt-0.5">Eine kurze Übung, perfekt für zwischendurch</div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
+          </Link>
+        </motion.div>
+
         {/* Daily Training Plan by Neuro — primary focus */}
         <DailyPlanCard />
 
         {/* Daily Challenge */}
         <DailyChallengeCard />
 
-        {/* Performance over time */}
-        <ProgressWidget />
+        {/* Performance over time — 7/30-day trends */}
+        <TrendWidget />
 
         {/* Cognitive Focus Areas — sorted by weakest first */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>

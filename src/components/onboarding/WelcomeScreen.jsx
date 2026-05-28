@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import ConsentScreen from './ConsentScreen';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
+  const [showConsent, setShowConsent] = useState(false);
   const [focusLevel, setFocusLevel] = useState(1); // 0 = Sprachen, 1 = Brain-Icon, 2 = Button-Ebene
   const [isPressingBrain, setIsPressingBrain] = useState(false);
 
@@ -73,6 +75,10 @@ export default function WelcomeScreen({ onStart }) {
       onStart(lang);
     }
   };
+
+  if (showConsent) {
+    return <ConsentScreen lang={lang} onAccept={(consents) => onStart(lang, consents)} />;
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex items-center justify-center p-6" onKeyDown={handleKeyDown}>
@@ -161,7 +167,7 @@ export default function WelcomeScreen({ onStart }) {
           transition={{ delay: 0.6 }}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => onStart(lang)}
+          onClick={() => setShowConsent(true)}
           tabIndex={focusLevel === 2 ? 0 : -1}
           className={`w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all ${
             focusLevel === 2 ? 'ring-2 ring-white' : ''
