@@ -27,34 +27,65 @@ export default function Train() {
   });
 
   const [focusedIdx, setFocusedIdx] = useState(0);
+  const [focusMode, setFocusMode] = useState('domain'); // 'domain' or 'exercise'
+  const [focusedExerciseIdx, setFocusedExerciseIdx] = useState(0);
   const domainKeys = ['all', ...Object.keys(DOMAINS)];
 
   useEffect(() => {
     const handler = (e) => {
       // Don't intercept if typing in search
       if (document.activeElement?.tagName === 'INPUT' && document.activeElement?.type === 'text') return;
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      
+      // Spacebar: reset to domain focus at "all"
+      if (e.code === 'Space') {
         e.preventDefault();
-        setFocusedIdx(i => {
-          const next = Math.max(0, i - 1);
-          setSelectedDomain(domainKeys[next]);
-          return next;
-        });
-      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        setFocusedIdx(i => {
-          const next = Math.min(domainKeys.length - 1, i + 1);
-          setSelectedDomain(domainKeys[next]);
-          return next;
-        });
-      } else if (e.key === 'Enter' && filtered.length > 0) {
-        e.preventDefault();
-        navigate(`/exercise/${filtered[0].id}`);
+        setFocusMode('domain');
+        setFocusedIdx(0);
+        setSelectedDomain('all');
+        setFocusedExerciseIdx(0);
+        return;
+      }
+
+      if (focusMode === 'domain') {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          setFocusedIdx(i => {
+            const next = Math.max(0, i - 1);
+            setSelectedDomain(domainKeys[next]);
+            return next;
+          });
+        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          setFocusedIdx(i => {
+            const next = Math.min(domainKeys.length - 1, i + 1);
+            setSelectedDomain(domainKeys[next]);
+            return next;
+          });
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (filtered.length > 0) {
+            setFocusMode('exercise');
+            setFocusedExerciseIdx(0);
+          }
+        }
+      } else if (focusMode === 'exercise') {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setFocusedExerciseIdx(i => Math.max(0, i - 1));
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setFocusedExerciseIdx(i => Math.min(filtered.length - 1, i + 1));
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (filtered[focusedExerciseIdx]) {
+            navigate(`/exercise/${filtered[focusedExerciseIdx].id}`);
+          }
+        }
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [filtered, domainKeys.length]);
+  }, [filtered, domainKeys.length, focusMode, focusedExerciseIdx]);
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">
@@ -146,6 +177,7 @@ export default function Train() {
           <AnimatePresence>
             {filtered.map((ex, i) => {
               const domain = DOMAINS[ex.domain];
+              const isFocused = focusMode === 'exercise' && focusedExerciseIdx === i;
               return (
                 <motion.div
                   key={ex.id}
@@ -156,7 +188,11 @@ export default function Train() {
                 >
                   <Link
                     to={`/exercise/${ex.id}`}
-                    className="flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
+                    className={`flex items-center gap-4 bg-white dark:bg-slate-800 rounded-2xl p-4 border shadow-sm transition-all duration-200 group ${
+                      isFocused
+                        ? 'border-purple-500 dark:border-purple-400 shadow-lg shadow-purple-500/20 -translate-y-1'
+                        : 'border-slate-100 dark:border-slate-700 hover:shadow-md hover:-translate-y-0.5'
+                    }`}
                   >
                     <div className={`w-14 h-14 rounded-2xl ${domain.gradient} flex items-center justify-center text-2xl shadow-md flex-shrink-0`}>
                       {ex.icon}
