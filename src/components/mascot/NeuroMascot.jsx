@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useTheme } from '@/lib/ThemeContext';
 import { useAuth } from '@/lib/AuthContext';
+import { useLanguage } from '@/lib/LanguageContext';
 import { X, Send, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import NeuroCharacter from './NeuroCharacter';
@@ -149,6 +150,7 @@ const QUICK_ACTIONS = [
 export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
   const { applyExternalTheme } = useTheme();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [face, setFace] = useState('happy');
   const [bubble, setBubble] = useState(null);
@@ -242,12 +244,8 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
 
     // Show toast for last 3 clicks
     if (remaining <= 3 && remaining > 0) {
-      const messages = {
-        3: '🧠 Noch 3x klicken...',
-        2: '🧠 Noch 2x klicken...',
-        1: '🧠 Noch 1x klicken...',
-      };
-      toast.info(messages[remaining], { duration: 2000 });
+      const key = `devMode.clicksRemaining${remaining}`;
+      toast.info(t(key), { duration: 2000 });
     }
 
     // Unlock dev mode at 20 clicks
@@ -257,10 +255,10 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
 
       // Check if user is admin
       if (user?.role === 'admin') {
-        toast.success('🔓 Entwicklermodus freigeschaltet! ⚙️', { duration: 2000 });
+        toast.success(t('devMode.activated'), { duration: 2000 });
         setDevModeOpen(true);
       } else {
-        toast.error('🚫 Nur für Administratoren!', { duration: 2000 });
+        toast.error(t('devMode.notAdmin'), { duration: 2000 });
       }
     }
   };
