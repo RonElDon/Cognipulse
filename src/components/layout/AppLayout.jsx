@@ -22,17 +22,26 @@ export default function AppLayout({ lang = 'de' }) {
   const { darkMode, toggleDark, autoDark, enableAutoDark, accentColor } = useTheme();
   const appRef = useRef(null);
 
-  // Prevent arrow keys from scrolling the page out of the app
+  // Prevent arrow keys / space from ever scrolling the browser page
   useEffect(() => {
     const handler = (e) => {
-      const tag = document.activeElement?.tagName;
-      const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
-      if (!isInput && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
         e.preventDefault();
       }
     };
     window.addEventListener('keydown', handler, { passive: false });
     return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  // Keep focus inside the app so keyboard events always land here
+  useEffect(() => {
+    const handler = () => {
+      if (!document.activeElement || document.activeElement === document.body) {
+        appRef.current?.focus();
+      }
+    };
+    document.addEventListener('focusout', handler);
+    return () => document.removeEventListener('focusout', handler);
   }, []);
 
   const handleDebugBack = () => {
@@ -66,7 +75,7 @@ export default function AppLayout({ lang = 'de' }) {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 flex relative">
+    <div ref={appRef} tabIndex={-1} style={{ outline: 'none' }} className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 flex relative">
       {/* Desktop Sidebar */}
       <aside className={`hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 text-slate-900 dark:text-white fixed h-full z-40 transition-all duration-300 border-r border-slate-200 dark:border-slate-800 ${!sidebarOpen ? '-translate-x-full' : ''}`}>
         <div className="p-6 border-b border-slate-200 dark:border-slate-700">
