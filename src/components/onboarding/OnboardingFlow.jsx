@@ -153,7 +153,6 @@ export default function OnboardingFlow({ onComplete }) {
 
   // Single ref that always holds current state — avoids stale closures in keydown handler
   const stateRef = useRef({});
-  stateRef.current = { currentQuestion, currentStep, handleAnswer, handleBack };
 
   // Global keydown — reads everything from stateRef to avoid stale closures
   useEffect(() => {
@@ -329,6 +328,9 @@ export default function OnboardingFlow({ onComplete }) {
       setEmotion('happy');
     }
   };
+
+  // Update stateRef after all functions are defined — no TDZ issues
+  stateRef.current = { currentQuestion, currentStep, handleAnswer, handleBack };
 
   const handleSendMessage = () => {
     if (!input.trim()) return;
