@@ -96,7 +96,11 @@ export function ThemeProvider({ children }) {
   })();
 
   const heroStyle = selectedGradient === 'auto'
-    ? {}
+    ? {
+        background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 25%, ${accentColor}aa 50%, ${accentColor}88 75%, ${accentColor}55 100%)`,
+        backgroundSize: '300% 300%',
+        animation: 'gradientShift 8s ease infinite',
+      }
     : selectedGradient === 'custom'
       ? { background: `linear-gradient(135deg, ${customColor} 0%, ${customColor}99 100%)` }
       : { background: GRADIENT_PRESETS.find(p => p.id === selectedGradient)?.style };
