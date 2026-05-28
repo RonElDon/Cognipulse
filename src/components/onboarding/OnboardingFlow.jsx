@@ -2,10 +2,25 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Send, ArrowLeft } from 'lucide-react';
+import { Send, ArrowLeft, Check } from 'lucide-react';
 import WelcomeScreen from './WelcomeScreen';
 import DeviceCheckScreen from './DeviceCheckScreen';
 import { useTheme } from '@/lib/ThemeContext';
+
+const COLOR_PALETTE = [
+  { hex: '#8b5cf6', label: 'Lila' },
+  { hex: '#6366f1', label: 'Indigo' },
+  { hex: '#3b82f6', label: 'Blau' },
+  { hex: '#06b6d4', label: 'Cyan' },
+  { hex: '#10b981', label: 'Smaragd' },
+  { hex: '#f59e0b', label: 'Amber' },
+  { hex: '#f43f5e', label: 'Rose' },
+  { hex: '#f97316', label: 'Orange' },
+  { hex: '#ec4899', label: 'Pink' },
+  { hex: '#14b8a6', label: 'Teal' },
+  { hex: '#a855f7', label: 'Violett' },
+  { hex: '#ef4444', label: 'Rot' },
+];
 
 const GLOBE_EMOTIONS = {
   happy:    { bg: 'radial-gradient(circle at 38% 32%, #f5d0fe, #a855f7 55%, #6d28d9)', glow: '#a855f7', y: [-6, 6], dur: 2.6 },
@@ -84,6 +99,7 @@ const QUESTIONS = {
     { id: 'name', question: 'Lass mich dich kennenlernen — wie heißt du? (optional) 😊', placeholder: 'Dein Name oder Spitzname...', type: 'text', optional: true },
     { id: 'age', question: 'Und wie viele Jahre Gehirn-Power hast du bereits? 🧠', placeholder: 'Alter...', type: 'age' },
     { id: 'gender', question: 'Geschlecht? (freiwillig) ⚧️', options: [{ label: 'Männlich', value: 'männlich' }, { label: 'Weiblich', value: 'weiblich' }, { label: 'Divers', value: 'divers' }, { label: 'Keine Angabe', value: 'keine Angabe' }], type: 'select', defaultIdx: 3 },
+    { id: 'accentColor', question: 'Wähle deine persönliche Akzentfarbe — sie färbt die ganze App! 🎨', type: 'colorpicker' },
     { id: 'goal', question: 'Was treibt dich an? Was möchtest du mit deinem Gehirn erreichen? 🎯', placeholder: 'z.B. Gedächtnis verbessern, fokussierter werden...', type: 'text' },
     { id: 'dailyExercises', question: 'Wie viel Zeit hast du pro Tag für dein Brain-Workout? ⏱️', options: [
       { label: 'Starter (5 Min.)', value: '3' },
@@ -97,6 +113,7 @@ const QUESTIONS = {
     { id: 'name', question: 'Let me get to know you — what\'s your name? (optional) 😊', placeholder: 'Your name or nickname...', type: 'text', optional: true },
     { id: 'age', question: 'How many years of brain power do you have? 🧠', placeholder: 'Your age...', type: 'age' },
     { id: 'gender', question: 'Gender? (optional) ⚧️', options: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }, { label: 'Diverse', value: 'diverse' }, { label: 'Prefer not to say', value: 'prefer not to say' }], type: 'select', defaultIdx: 3 },
+    { id: 'accentColor', question: 'Choose your personal accent color — it will color the whole app! 🎨', type: 'colorpicker' },
     { id: 'goal', question: 'What drives you? What do you want to achieve with your brain? 💪', placeholder: 'e.g. improve memory, better focus...', type: 'text' },
     { id: 'dailyExercises', question: 'How much time do you have for your daily brain training? ⏱️', options: [
       { label: 'Starter (5 min)', value: '3' },
@@ -110,7 +127,8 @@ const QUESTIONS = {
 
 export default function OnboardingFlow({ onComplete }) {
   const navigate = useNavigate();
-  const { accentColor } = useTheme();
+  const { accentColor, setCustomColorValue } = useTheme();
+  const [pickedColor, setPickedColor] = useState('#8b5cf6');
   const [phase, setPhase] = useState('welcome'); // welcome | devicecheck | chat
   const [language, setLanguage] = useState('de');
   const [currentStep, setCurrentStep] = useState(0);
@@ -282,11 +300,15 @@ export default function OnboardingFlow({ onComplete }) {
           
           if (profiles.length > 0) {
             const profileId = profiles[0].id;
+            if (newAnswers.accentColor) {
+              setCustomColorValue(newAnswers.accentColor);
+            }
             await base44.entities.UserProfile.update(profileId, {
               display_name: newAnswers.name || user.full_name,
               age: parseInt(newAnswers.age) || null,
               gender: newAnswers.gender || null,
               preferred_language: language,
+              theme_accent_color: newAnswers.accentColor || null,
               goals: {
                 daily_exercises: parseInt(newAnswers.dailyExercises, 10) || 3,
                 focus_domains: []
@@ -720,6 +742,50 @@ export default function OnboardingFlow({ onComplete }) {
               className="w-full mt-2 py-3 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-30 text-white font-bold transition-all shadow-lg"
             >
               Bestätigen
+            </button>
+          </div>
+        ) : currentQuestion.type === 'colorpicker' ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-6 gap-3">
+              {COLOR_PALETTE.map(c => (
+                <button
+                  key={c.hex}
+                  onClick={() => {
+                    setPickedColor(c.hex);
+                    setCustomColorValue(c.hex);
+                  }}
+                  className="relative aspect-square rounded-2xl transition-all hover:scale-110 active:scale-95"
+                  style={{ background: c.hex, boxShadow: pickedColor === c.hex ? `0 0 0 3px white, 0 0 0 5px ${c.hex}` : 'none' }}
+                  title={c.label}
+                >
+                  {pickedColor === c.hex && (
+                    <Check className="absolute inset-0 m-auto w-5 h-5 text-white drop-shadow-md" />
+                  )}
+                </button>
+              ))}
+            </div>
+            {/* Native color input for truly custom color */}
+            <div className="flex items-center gap-3 bg-white/10 rounded-2xl px-4 py-3 border border-white/15">
+              <label className="text-white/70 text-sm font-semibold flex-1">
+                {language === 'de' ? 'Eigene Farbe wählen' : 'Pick custom color'}
+              </label>
+              <input
+                type="color"
+                value={pickedColor}
+                onChange={e => {
+                  setPickedColor(e.target.value);
+                  setCustomColorValue(e.target.value);
+                }}
+                className="w-10 h-10 rounded-xl cursor-pointer border-0 bg-transparent p-0.5"
+              />
+            </div>
+            <button
+              onClick={() => handleAnswer(pickedColor)}
+              disabled={saving}
+              style={{ background: pickedColor }}
+              className="w-full py-4 rounded-2xl disabled:opacity-30 text-white font-black text-base transition-all shadow-lg hover:opacity-90"
+            >
+              {language === 'de' ? 'Diese Farbe verwenden ✓' : 'Use this color ✓'}
             </button>
           </div>
         ) : (
