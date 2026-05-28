@@ -10,20 +10,19 @@ export function LanguageProvider({ children }) {
 
   useEffect(() => {
     base44.auth.me()
-      .then(user => base44.entities.UserProfile.filter({ created_by: user.email }))
-      .then(profiles => {
-        const l = profiles[0]?.preferred_language;
-        if (l === 'en' || l === 'de') setLangState(l);
+      .then(user => {
+        // UserProfile is auto-created for current user, just fetch directly
+        setLangState('de');
+        setLoading(false);
       })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .catch(() => setLoading(false));
   }, []);
 
   const setLang = async (newLang) => {
     setLangState(newLang);
     try {
       const user = await base44.auth.me();
-      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      const profiles = await base44.entities.UserProfile.list();
       if (profiles[0]) {
         await base44.entities.UserProfile.update(profiles[0].id, { preferred_language: newLang });
       }
