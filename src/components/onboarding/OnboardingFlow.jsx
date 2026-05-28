@@ -332,9 +332,23 @@ export default function OnboardingFlow({ onComplete }) {
   // Update stateRef after all functions are defined — no TDZ issues
   stateRef.current = { currentQuestion, currentStep, handleAnswer, handleBack };
 
+  // Extract just the name from phrases like "mein Name ist Aaron" / "my name is Aaron"
+  const extractName = (text) => {
+    const patterns = [
+      /(?:mein name ist|ich bin|ich heiße|ich heisse|nennt mich|name:?)\s+([a-züäöÜÄÖß][a-züäöÜÄÖß\-' ]{0,30})/i,
+      /(?:my name is|i am|i'm|call me|name:?)\s+([a-z][a-z\-' ]{0,30})/i,
+    ];
+    for (const pat of patterns) {
+      const match = text.match(pat);
+      if (match) return match[1].trim();
+    }
+    return text.trim();
+  };
+
   const handleSendMessage = () => {
     if (!input.trim()) return;
-    handleAnswer(input);
+    const value = currentQuestion.id === 'name' ? extractName(input) : input;
+    handleAnswer(value);
   };
 
   const getDaysInMonth = (month, year) => {
