@@ -151,28 +151,26 @@ export default function OnboardingFlow({ onComplete }) {
     }
   }, [currentStep, currentQuestion.type]);
 
-  // Keep a ref to handleAnswer so the keydown handler is never stale
-  const handleAnswerRef = useRef(null);
-  useEffect(() => { handleAnswerRef.current = handleAnswer; });
+  // Single ref that always holds current state — avoids stale closures in keydown handler
+  const stateRef = useRef({});
+  stateRef.current = { currentQuestion, currentStep, handleAnswer, handleBack };
 
-  // Keep a ref to handleBack so the keydown handler is never stale
-  const handleBackRef = useRef(null);
-  useEffect(() => { handleBackRef.current = handleBack; });
-
-  // Global keydown — single source of truth for keyboard navigation
+  // Global keydown — reads everything from stateRef to avoid stale closures
   useEffect(() => {
     const handler = (e) => {
-      // Backspace/Delete → go back a step (only when not typing in a text input)
-      if ((e.key === 'Backspace' || e.key === 'Delete') && currentStep > 0) {
+      const { currentQuestion: q, currentStep: step, handleAnswer: answer, handleBack: back } = stateRef.current;
+
+      // Backspace/Delete → go back (only when not typing in a text input)
+      if ((e.key === 'Backspace' || e.key === 'Delete') && step > 0) {
         const tag = document.activeElement?.tagName;
         if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
           e.preventDefault();
-          handleBackRef.current?.();
+          back();
           return;
         }
       }
 
-      if (currentQuestion.type === 'age') {
+      if (q.type === 'age') {
         if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
           e.preventDefault();
           setAgeSlider(v => Math.max(13, v - 1));
@@ -181,10 +179,10 @@ export default function OnboardingFlow({ onComplete }) {
           setAgeSlider(v => Math.min(99, v + 1));
         } else if (e.key === 'Enter') {
           e.preventDefault();
-          setAgeSlider(v => { handleAnswerRef.current?.(String(v)); return v; });
+          setAgeSlider(v => { answer(String(v)); return v; });
         }
-      } else if (currentQuestion.type === 'select') {
-        const opts = currentQuestion.options;
+      } else if (q.type === 'select') {
+        const opts = q.options;
         const len = opts.length;
         const cols = len >= 5 ? 1 : 2;
 
@@ -217,7 +215,7 @@ export default function OnboardingFlow({ onComplete }) {
           setSelectedOptionIdx(prev => {
             const idx = prev ?? 0;
             const opt = opts[idx];
-            if (opt) handleAnswerRef.current?.(opt.value || opt);
+            if (opt) answer(opt.value || opt);
             return prev;
           });
         }
@@ -225,7 +223,7 @@ export default function OnboardingFlow({ onComplete }) {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [currentQuestion.type, currentQuestion.options]);
+  }, []); // mount once — no stale closures thanks to stateRef
 
   const handleWelcomeDone = (lang, consents) => {
     setLanguage(lang);
@@ -584,7 +582,7 @@ export default function OnboardingFlow({ onComplete }) {
                   const v = Math.min(99, Math.max(13, parseInt(e.target.value) || 13));
                   setAgeSlider(v);
                 }}
-                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAnswerRef.current?.(String(ageSlider)); } }}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); stateRef.current.handleAnswer(String(ageSlider)); } }}
                 className="w-24 text-center text-white font-black text-5xl bg-transparent border-b-2 border-white/40 focus:border-white focus:outline-none"
                 style={{ appearance: 'textfield', MozAppearance: 'textfield' }}
               />
