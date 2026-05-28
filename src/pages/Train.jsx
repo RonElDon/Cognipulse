@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DOMAINS, EXERCISES } from '@/lib/exercises';
@@ -23,6 +23,36 @@ export default function Train() {
     const matchesSearch = !searchQuery || ex.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesDomain && matchesSearch;
   });
+
+  const [focusedIdx, setFocusedIdx] = useState(0);
+  const domainKeys = ['all', ...Object.keys(DOMAINS)];
+
+  useEffect(() => {
+    const handler = (e) => {
+      // Don't intercept if typing in search
+      if (document.activeElement?.tagName === 'INPUT' && document.activeElement?.type === 'text') return;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusedIdx(i => {
+          const next = Math.max(0, i - 1);
+          setSelectedDomain(domainKeys[next]);
+          return next;
+        });
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusedIdx(i => {
+          const next = Math.min(domainKeys.length - 1, i + 1);
+          setSelectedDomain(domainKeys[next]);
+          return next;
+        });
+      } else if (e.key === 'Enter' && filtered.length > 0) {
+        e.preventDefault();
+        navigate(`/exercise/${filtered[0].id}`);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [filtered, domainKeys.length]);
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">

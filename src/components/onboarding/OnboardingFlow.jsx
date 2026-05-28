@@ -514,10 +514,25 @@ export default function OnboardingFlow({ onComplete }) {
           </div>
         ) : currentQuestion.type === 'age' ? (
           <div className="space-y-5">
-            <div className="flex flex-col items-center gap-2">
-              <div className="text-white font-black text-6xl">{ageSlider}</div>
-              <div className="text-white/40 text-sm font-semibold">Jahre</div>
+            {/* Direct number input + slider together */}
+            <div className="flex items-center justify-center gap-4">
+              <button onClick={() => setAgeSlider(v => Math.max(13, v - 1))} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-xl font-black transition-all flex items-center justify-center">−</button>
+              <input
+                type="number"
+                min={13}
+                max={99}
+                value={ageSlider}
+                onChange={e => {
+                  const v = Math.min(99, Math.max(13, parseInt(e.target.value) || 13));
+                  setAgeSlider(v);
+                }}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAnswerRef.current?.(String(ageSlider)); } }}
+                className="w-24 text-center text-white font-black text-5xl bg-transparent border-b-2 border-white/40 focus:border-white focus:outline-none"
+                style={{ appearance: 'textfield', MozAppearance: 'textfield' }}
+              />
+              <button onClick={() => setAgeSlider(v => Math.min(99, v + 1))} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-xl font-black transition-all flex items-center justify-center">+</button>
             </div>
+            <div className="text-white/40 text-sm font-semibold text-center">Jahre</div>
             <div className="px-2">
               <input
                 ref={sliderRef}
