@@ -15,7 +15,7 @@ export default function Profile() {
   const [editName, setEditName] = useState(false);
   const [newName, setNewName] = useState('');
   const [results, setResults] = useState([]);
-  const { t } = useLanguage();
+  const { t, setLang, lang } = useLanguage();
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -48,8 +48,9 @@ export default function Profile() {
     toast.success(t('profile.nameSaved'));
   };
 
-  const handleLanguageChange = async (lang) => {
-    await updateProfile({ preferred_language: lang });
+  const handleLanguageChange = async (newLang) => {
+    setLang(newLang);
+    await updateProfile({ preferred_language: newLang });
     toast.success(t('profile.languageChanged'));
   };
 
@@ -158,7 +159,7 @@ export default function Profile() {
                 key={l.code}
                 onClick={() => handleLanguageChange(l.code)}
                 className={`py-3 rounded-2xl font-bold text-sm transition-all ${
-                  profile?.preferred_language === l.code
+                  lang === l.code
                     ? 'bg-blue-600 text-white shadow-md'
                     : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                 }`}
