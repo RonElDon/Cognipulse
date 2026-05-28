@@ -62,9 +62,10 @@ const BASELINE_EXERCISES = Object.entries(BASELINE_POOL).map(([domain, pool]) =>
 
 export default function BaselineAssessment() {
   const navigate = useNavigate();
-  const [phase, setPhase] = useState('intro'); // intro | exercise | done
+  const [phase, setPhase] = useState('intro'); // intro | between | exercise | done
   const [currentIdx, setCurrentIdx] = useState(0);
   const [results, setResults] = useState([]);
+  const [lastResult, setLastResult] = useState(null);
   const completedRef = useRef(false);
 
   // Enter to start test from intro
@@ -107,7 +108,10 @@ export default function BaselineAssessment() {
     completedRef.current = false;
 
     const nextIdx = currentIdx + 1;
-    if (nextIdx >= BASELINE_EXERCISES.length) {
+    const isLastExercise = nextIdx >= BASELINE_EXERCISES.length;
+    setLastResult({ ...gameResult, exercise_name: ex.nameExercise, domain: ex.domain, icon: ex.icon, color: ex.color, _isLast: isLastExercise });
+
+    if (isLastExercise) {
       // Save baseline to profile
       try {
         const user = await base44.auth.me();
@@ -129,11 +133,83 @@ export default function BaselineAssessment() {
           });
         }
       } catch (e) { console.error(e); }
-      setPhase('done');
+      setPhase('between'); // show last result before done
     } else {
       setCurrentIdx(nextIdx);
+      setPhase('between');
     }
   };
+
+
+
+  // ── BETWEEN EXERCISES ──────────────────────────────────────
+  if (phase === 'between' && lastResult) {
+    const isLast = lastResult._isLast;
+    const nextEx = !isLast ? BASELINE_EXERCISES[currentIdx] : null;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 flex items-center justify-center p-6">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-sm text-center space-y-6"
+        >
+          {/* Result summary */}
+          <div className="text-5xl">{lastResult.icon}</div>
+          <div>
+            <div className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">{lastResult.exercise_name}</div>
+            <h2 className="text-2xl font-black text-white mb-1">Ergebnis</h2>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div className="text-3xl font-black text-white">{lastResult.score ?? '—'}%</div>
+              <div className="text-white/40 text-xs mt-1">Score</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <div className="text-3xl font-black text-white">
+                {lastResult.accuracy != null ? `${Math.round(lastResult.accuracy)}%` : '—'}
+              </div>
+              <div className="text-white/40 text-xs mt-1">Genauigkeit</div>
+            </div>
+            {lastResult.reaction_time_ms > 0 && (
+              <div className="col-span-2 bg-white/5 border border-white/10 rounded-2xl p-4">
+                <div className="text-3xl font-black text-white">{Math.round(lastResult.reaction_time_ms)} ms</div>
+                <div className="text-white/40 text-xs mt-1">Reaktionszeit</div>
+              </div>
+            )}
+          </div>
+
+          {/* Progress */}
+          <div className="text-white/40 text-xs">
+            {results.length} / {BASELINE_EXERCISES.length} Übungen abgeschlossen
+          </div>
+          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
+              style={{ width: `${(results.length / BASELINE_EXERCISES.length) * 100}%` }}
+            />
+          </div>
+
+          {isLast ? (
+            <button
+              onClick={() => setPhase('done')}
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-base shadow-xl hover:opacity-90 transition-all"
+            >
+              Auswertung ansehen 🏆
+            </button>
+          ) : (
+            <div className="space-y-3">
+              <div className="text-white/40 text-xs">Nächste Übung: <span className="text-white/70 font-bold">{nextEx?.nameExercise}</span></div>
+              <button
+                onClick={() => setPhase('exercise')}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all"
+              >
+                Weiter → {nextEx?.icon}
+              </button>
+            </div>
+          )}
+        </motion.div>
+      </div>
+    );
+  }
 
   // ── INTRO ──────────────────────────────────────────────────
   if (phase === 'intro') {
