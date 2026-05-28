@@ -4,22 +4,32 @@ import { base44 } from '@/api/base44Client';
 import { DOMAINS, EXERCISES, getLevel } from '@/lib/exercises';
 import { useProfile } from '@/lib/useProfile';
 import XPBar from '@/components/ui/XPBar';
-import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { TrendingUp, Calendar, Zap, Brain, Award, History } from 'lucide-react';
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
+import { TrendingUp, Calendar, Zap, Brain, Award, History, Medal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/LanguageContext';
+import { computeEarnedBadges } from '@/lib/badges';
+import BadgeCollection from '@/components/badges/BadgeCollection';
+
+const PAGE_TABS = [
+  { id: 'stats',   label: 'Statistik', icon: <TrendingUp className="w-4 h-4" /> },
+  { id: 'badges',  label: 'Abzeichen', icon: <Medal className="w-4 h-4" /> },
+];
 
 export default function Progress() {
   const { profile, loading } = useProfile();
   const [results, setResults] = useState([]);
   const [loadingResults, setLoadingResults] = useState(true);
+  const [activePageTab, setActivePageTab] = useState('stats');
   const { t } = useLanguage();
 
   useEffect(() => {
-    base44.entities.ExerciseResult.list('-created_date', 100)
+    base44.entities.ExerciseResult.list('-created_date', 200)
       .then(setResults)
       .finally(() => setLoadingResults(false));
   }, []);
+
+  const earnedIds = computeEarnedBadges(results, profile);
 
   const xp = profile?.total_xp || 0;
   const { current: lvl } = getLevel(xp);
@@ -83,7 +93,34 @@ export default function Progress() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-5">
+      {/* Page tab switcher */}
+      <div className="max-w-2xl mx-auto px-4 -mt-5 mb-0 relative z-10">
+        <div className="flex gap-2 bg-white dark:bg-slate-800 rounded-2xl p-1.5 shadow-lg border border-slate-100 dark:border-slate-700 w-fit mx-auto">
+          {PAGE_TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActivePageTab(tab.id)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                activePageTab === tab.id
+                  ? 'bg-purple-600 text-white shadow-md'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+              }`}
+            >
+              {tab.icon} {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4 mt-4 space-y-5">
+
+      {/* ── BADGES TAB ── */}
+      {activePageTab === 'badges' && (
+        <BadgeCollection earnedIds={earnedIds} results={results} />
+      )}
+
+      {/* ── STATS TAB ── */}
+      {activePageTab === 'stats' && (<>
         {/* XP Card */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-5 border border-slate-100 dark:border-slate-700"
@@ -248,6 +285,7 @@ export default function Progress() {
             <p className="text-slate-400 mt-2">{t('progress.noDataSub')}</p>
           </div>
         )}
+      </>)}
       </div>
     </div>
   );
