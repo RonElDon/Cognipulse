@@ -232,7 +232,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
 
   const handleClickBrain = () => {
     clickCountRef.current += 1;
-    const remaining = 20 - clickCountRef.current;
+    const remaining = 10 - clickCountRef.current;
 
     // Clear existing timeout
     if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
@@ -248,8 +248,8 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
       toast.info(t(key), { duration: 2000 });
     }
 
-    // Unlock dev mode at 20 clicks
-    if (clickCountRef.current === 20) {
+    // Unlock dev mode at 10 clicks
+    if (clickCountRef.current === 10) {
       clickCountRef.current = 0;
       if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
 
