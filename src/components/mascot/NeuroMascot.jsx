@@ -350,7 +350,7 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
             handleOpen();
           }
         }}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-300/40 dark:shadow-purple-900/40 flex items-center justify-center border-2 border-white/30"
+        className="fixed bottom-6 right-4 md:bottom-6 md:right-6 z-[9999] w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-300/40 dark:shadow-purple-900/40 flex items-center justify-center border-2 border-white/30 pointer-events-auto"
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.93 }}
       >
