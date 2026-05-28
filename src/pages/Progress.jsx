@@ -11,10 +11,7 @@ import { useLanguage } from '@/lib/LanguageContext';
 import { computeEarnedBadges } from '@/lib/badges';
 import BadgeCollection from '@/components/badges/BadgeCollection';
 
-const PAGE_TABS = [
-  { id: 'stats',   label: 'Statistik', icon: <TrendingUp className="w-4 h-4" /> },
-  { id: 'badges',  label: 'Abzeichen', icon: <Medal className="w-4 h-4" /> },
-];
+// PAGE_TABS defined inside component to use t()
 
 export default function Progress() {
   const { profile, loading } = useProfile();
@@ -30,6 +27,11 @@ export default function Progress() {
   }, []);
 
   const earnedIds = computeEarnedBadges(results, profile);
+
+  const PAGE_TABS = [
+    { id: 'stats',  label: t('progress.tabStats'),  icon: <TrendingUp className="w-4 h-4" /> },
+    { id: 'badges', label: t('progress.tabBadges'), icon: <Medal className="w-4 h-4" /> },
+  ];
 
   const xp = profile?.total_xp || 0;
   const { current: lvl } = getLevel(xp);

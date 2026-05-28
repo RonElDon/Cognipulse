@@ -1,23 +1,25 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BadgeChip from './BadgeChip';
-import { ALL_BADGES, XP_BADGES, EXERCISE_BADGES, STREAK_BADGES, DOMAIN_BADGES, SPECIAL_BADGES, CATEGORY_LABELS, BADGE_TIERS } from '@/lib/badges';
+import { ALL_BADGES, BADGE_TIERS } from '@/lib/badges';
 import { DOMAINS } from '@/lib/exercises';
-
-const TABS = [
-  { id: 'all',       label: 'Alle',       icon: '🏅' },
-  { id: 'xp',        label: 'Synapsen',   icon: '⚡' },
-  { id: 'exercises', label: 'Fleiß',      icon: '💪' },
-  { id: 'streak',    label: 'Rhythmus',   icon: '🔥' },
-  { id: 'domain',    label: 'Bereiche',   icon: '🧠' },
-  { id: 'special',   label: 'Besondere',  icon: '🌟' },
-];
+import { useLanguage } from '@/lib/LanguageContext';
 
 const TIER_ORDER = ['bronze', 'silver', 'gold', 'platin', 'diamond', 'master', 'legend'];
 
 export default function BadgeCollection({ earnedIds = new Set(), results = [] }) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('all');
   const [filterTier, setFilterTier] = useState('all');
+
+  const TABS = [
+    { id: 'all',       label: t('progress.badgeAll'),       icon: '🏅' },
+    { id: 'xp',        label: t('progress.badgeSynapses'),  icon: '⚡' },
+    { id: 'exercises', label: t('progress.badgeDiligence'), icon: '💪' },
+    { id: 'streak',    label: t('progress.badgeRhythm'),    icon: '🔥' },
+    { id: 'domain',    label: t('progress.badgeDomains'),   icon: '🧠' },
+    { id: 'special',   label: t('progress.badgeSpecial'),   icon: '🌟' },
+  ];
 
   const totalCount = ALL_BADGES.length;
   const earnedCount = ALL_BADGES.filter(b => earnedIds.has(b.id)).length;
@@ -76,18 +78,18 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
         </div>
         <div>
           <div className="text-xl font-black text-slate-800 dark:text-slate-100">
-            Sammlung <span className="text-purple-600 dark:text-purple-400">{earnedCount}</span>
+            {t('progress.badgeCollection')} <span className="text-purple-600 dark:text-purple-400">{earnedCount}</span>
             <span className="text-slate-400"> / {totalCount}</span>
           </div>
-          <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Abzeichen freigeschaltet</div>
+          <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{t('progress.badgeUnlocked')}</div>
           <div className="mt-2 flex gap-1.5 flex-wrap">
-            {TIER_ORDER.filter(t => t !== 'legend').map(t => {
-              const cnt = ALL_BADGES.filter(b => b.tier === t && earnedIds.has(b.id)).length;
+            {TIER_ORDER.filter(tier => tier !== 'legend').map(tier => {
+              const cnt = ALL_BADGES.filter(b => b.tier === tier && earnedIds.has(b.id)).length;
               if (cnt === 0) return null;
               return (
-                <span key={t} className="text-xs font-bold px-2 py-0.5 rounded-full"
-                  style={{ background: BADGE_TIERS[t]?.color + '25', color: BADGE_TIERS[t]?.color }}>
-                  {cnt} {BADGE_TIERS[t]?.label}
+                <span key={tier} className="text-xs font-bold px-2 py-0.5 rounded-full"
+                  style={{ background: BADGE_TIERS[tier]?.color + '25', color: BADGE_TIERS[tier]?.color }}>
+                  {cnt} {BADGE_TIERS[tier]?.label}
                 </span>
               );
             })}
@@ -121,7 +123,7 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
             className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeDomain === 'all' ? 'bg-slate-700 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
             }`}
-          >Alle</button>
+          >{t('progress.badgeAll')}</button>
           {domainKeys.map(dk => {
             const d = DOMAINS[dk];
             return (
@@ -130,7 +132,7 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
                   activeDomain === dk ? 'text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                 }`}
                 style={activeDomain === dk ? { backgroundColor: d.color } : {}}>
-                {d.icon} {d.nameDE}
+                {d.icon} {d.nameDE || d.name}
               </button>
             );
           })}
@@ -144,20 +146,20 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
           className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
             filterTier === 'all' ? 'bg-slate-700 text-white border-transparent' : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700'
           }`}
-        >Alle Stufen</button>
-        {TIER_ORDER.map(t => (
+        >{t('progress.badgeAllLevels')}</button>
+        {TIER_ORDER.map(tier => (
           <button
-            key={t}
-            onClick={() => setFilterTier(t === filterTier ? 'all' : t)}
+            key={tier}
+            onClick={() => setFilterTier(tier === filterTier ? 'all' : tier)}
             className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all"
             style={{
-              borderColor: filterTier === t ? BADGE_TIERS[t]?.color : 'transparent',
-              background: filterTier === t ? BADGE_TIERS[t]?.color + '22' : undefined,
-              color: BADGE_TIERS[t]?.color,
-              ...(filterTier !== t ? { background: '#1e293b44' } : {}),
+              borderColor: filterTier === tier ? BADGE_TIERS[tier]?.color : 'transparent',
+              background: filterTier === tier ? BADGE_TIERS[tier]?.color + '22' : undefined,
+              color: BADGE_TIERS[tier]?.color,
+              ...(filterTier !== tier ? { background: '#1e293b44' } : {}),
             }}
           >
-            {BADGE_TIERS[t]?.label}
+            {BADGE_TIERS[tier]?.label}
           </button>
         ))}
       </div>
@@ -192,7 +194,7 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
 
       {displayList.length === 0 && (
         <div className="text-center py-8 text-slate-400 text-sm">
-          Keine Abzeichen in dieser Kategorie.
+          {t('progress.badgeNone')}
         </div>
       )}
     </div>

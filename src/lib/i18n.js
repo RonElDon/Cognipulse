@@ -65,6 +65,20 @@ export const T = {
       accuracy: 'Genauigkeit',
       noData: 'Noch keine Trainingsdaten',
       domainBreakdown: 'Bereiche',
+      // Tabs
+      tabStats: 'Statistik',
+      tabBadges: 'Abzeichen',
+      // Badge collection
+      badgeCollection: 'Sammlung',
+      badgeUnlocked: 'Abzeichen freigeschaltet',
+      badgeAllLevels: 'Alle Stufen',
+      badgeAll: 'Alle',
+      badgeSynapses: 'Synapsen',
+      badgeDiligence: 'Fleiß',
+      badgeRhythm: 'Rhythmus',
+      badgeDomains: 'Bereiche',
+      badgeSpecial: 'Besondere',
+      badgeNone: 'Keine Abzeichen in dieser Kategorie.',
     },
     // Leaderboard
     leaderboard: {
@@ -244,6 +258,20 @@ export const T = {
       accuracy: 'Accuracy',
       noData: 'No training data yet',
       domainBreakdown: 'Domains',
+      // Tabs
+      tabStats: 'Statistics',
+      tabBadges: 'Badges',
+      // Badge collection
+      badgeCollection: 'Collection',
+      badgeUnlocked: 'badges unlocked',
+      badgeAllLevels: 'All Tiers',
+      badgeAll: 'All',
+      badgeSynapses: 'Synapses',
+      badgeDiligence: 'Diligence',
+      badgeRhythm: 'Rhythm',
+      badgeDomains: 'Domains',
+      badgeSpecial: 'Special',
+      badgeNone: 'No badges in this category.',
     },
     leaderboard: {
       title: '🏆 Leaderboard',
