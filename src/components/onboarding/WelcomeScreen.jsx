@@ -1,16 +1,48 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import ConsentScreen from './ConsentScreen';
+import DeveloperModeOverlay from '@/components/DeveloperModeOverlay';
 
 export default function WelcomeScreen({ onStart }) {
   const [lang, setLang] = useState('de');
   const [showConsent, setShowConsent] = useState(false);
   const [focusLevel, setFocusLevel] = useState(1); // 0 = Sprachen, 1 = Brain-Icon, 2 = Button-Ebene
   const [isPressingBrain, setIsPressingBrain] = useState(false);
+  const [devModeOpen, setDevModeOpen] = useState(false);
 
   const brainRef = useRef(null);
   const languageContainerRef = useRef(null);
   const ctaRef = useRef(null);
+  const clickCountRef = useRef(0);
+  const clickTimeoutRef = useRef(null);
+
+  const handleBrainTap = () => {
+    setIsPressingBrain(true);
+    setTimeout(() => setIsPressingBrain(false), 300);
+
+    clickCountRef.current += 1;
+    const remaining = 10 - clickCountRef.current;
+
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    clickTimeoutRef.current = setTimeout(() => { clickCountRef.current = 0; }, 5000);
+
+    if (remaining > 0 && remaining <= 9) {
+      toast.info(
+        lang === 'de'
+          ? `Noch ${remaining} Klick${remaining === 1 ? '' : 's'}, um die Entwickleroptionen freizuschalten!`
+          : `${remaining} more click${remaining === 1 ? '' : 's'} to unlock developer options!`,
+        { duration: 2000 }
+      );
+    }
+
+    if (clickCountRef.current === 10) {
+      clickCountRef.current = 0;
+      if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+      toast.success(lang === 'de' ? 'Entwicklermodus aktiviert!' : 'Developer Mode activated!', { duration: 2000 });
+      setDevModeOpen(true);
+    }
+  };
 
   // Automatisch Fokus auf das aktuelle focusLevel Element setzen
   useEffect(() => {
@@ -68,8 +100,7 @@ export default function WelcomeScreen({ onStart }) {
       if (focusLevel === 0 && lang !== 'en') setLang('en');
     } else if (e.key === 'Enter' && focusLevel === 1) {
       e.preventDefault();
-      setIsPressingBrain(true);
-      setTimeout(() => setIsPressingBrain(false), 300);
+      handleBrainTap();
     } else if (e.key === 'Enter' && focusLevel === 2) {
       e.preventDefault();
       onStart(lang);
@@ -118,10 +149,7 @@ export default function WelcomeScreen({ onStart }) {
         <motion.div
           ref={brainRef}
           tabIndex={focusLevel === 1 ? 0 : -1}
-          onClick={() => {
-            setIsPressingBrain(true);
-            setTimeout(() => setIsPressingBrain(false), 300);
-          }}
+          onClick={handleBrainTap}
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: isPressingBrain ? 0.85 : 1, opacity: 1 }}
           transition={{ duration: 0.25 }}
@@ -178,6 +206,8 @@ export default function WelcomeScreen({ onStart }) {
 
         <p className="text-white/30 text-xs">{t.hint}</p>
       </motion.div>
+
+      <DeveloperModeOverlay isOpen={devModeOpen} onClose={() => setDevModeOpen(false)} />
     </div>
   );
 }
