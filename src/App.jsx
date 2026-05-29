@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import { LanguageProvider } from '@/lib/LanguageContext';
+import { WandProvider } from '@/lib/WandContext';
 // Add page imports here
 import AppLayout from './components/layout/AppLayout.jsx';
 import OnboardingGate from './components/onboarding/OnboardingGate';
@@ -69,14 +70,16 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <LanguageProvider>
-          <QueryClientProvider client={queryClientInstance}>
-            <Router>
-              <OnboardingGate>
-                <AuthenticatedApp />
-              </OnboardingGate>
-            </Router>
-            <Toaster />
-          </QueryClientProvider>
+          <WandProvider>
+            <QueryClientProvider client={queryClientInstance}>
+              <Router>
+                <OnboardingGate>
+                  <AuthenticatedApp />
+                </OnboardingGate>
+              </Router>
+              <Toaster />
+            </QueryClientProvider>
+          </WandProvider>
         </LanguageProvider>
       </AuthProvider>
     </ThemeProvider>

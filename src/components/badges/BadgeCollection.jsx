@@ -4,13 +4,38 @@ import BadgeChip from './BadgeChip';
 import { ALL_BADGES, BADGE_TIERS } from '@/lib/badges';
 import { DOMAINS } from '@/lib/exercises';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useWand } from '@/lib/WandContext';
+import { useProfile } from '@/lib/useProfile';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 
 const TIER_ORDER = ['bronze', 'silver', 'gold', 'platin', 'diamond', 'master', 'legend'];
 
 export default function BadgeCollection({ earnedIds = new Set(), results = [] }) {
   const { t } = useLanguage();
+  const { wandActive } = useWand();
+  const { profile } = useProfile();
   const [activeTab, setActiveTab] = useState('all');
   const [filterTier, setFilterTier] = useState('all');
+
+  const handleWandClick = async (badge, isEarned) => {
+    if (!wandActive || !profile) return;
+    const current = profile.badges || [];
+    const next = isEarned
+      ? current.filter(id => id !== badge.id)
+      : [...current, badge.id];
+    try {
+      await base44.entities.UserProfile.update(profile.id, { badges: next });
+      toast.success(
+        isEarned
+          ? t('devMode.lockSuccess', { id: badge.title })
+          : t('devMode.unlockSuccess', { id: badge.title })
+      );
+    } catch (err) {
+      toast.error(t('devMode.unlockError'));
+      console.error(err);
+    }
+  };
 
   const TABS = [
     { id: 'all',       label: t('progress.badgeAll'),       icon: '🏅' },
@@ -177,9 +202,12 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.7 }}
                 transition={{ duration: 0.25, delay: i * 0.015 }}
-                className="flex flex-col items-center gap-1"
+                className={`flex flex-col items-center gap-1 ${wandActive ? 'wand-target rounded-2xl' : ''}`}
+                onClick={wandActive ? () => handleWandClick(badge, isEarned) : undefined}
               >
-                <BadgeChip badge={badge} earned={isEarned} size={64} />
+                <div className={wandActive ? 'pointer-events-none' : ''}>
+                  <BadgeChip badge={badge} earned={isEarned} size={64} />
+                </div>
                 <div className="text-center leading-tight" style={{ width: 64 }}>
                   <div className="text-xs font-bold truncate"
                     style={{ color: isEarned ? BADGE_TIERS[badge.tier]?.color : '#64748b', fontSize: 9 }}>

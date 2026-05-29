@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { X, Wand2, Zap, RotateCcw } from 'lucide-react';
+import { X, Wand2, Zap, RotateCcw, Minus, Sparkles } from 'lucide-react';
 import { useProfile } from '@/lib/useProfile';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useWand } from '@/lib/WandContext';
 import { ALL_BADGES } from '@/lib/badges';
 import { toast } from 'sonner';
 
 export default function DeveloperModeOverlay({ isOpen, onClose }) {
   const { profile, loading } = useProfile();
   const { t } = useLanguage();
+  const { wandActive, setWandActive } = useWand();
+  const [minimized, setMinimized] = useState(false);
   const [loadingAction, setLoadingAction] = useState(false);
   const allBadgeIds = ALL_BADGES.map(b => b.id);
   const currentBadges = profile?.badges || [];
@@ -80,7 +83,6 @@ export default function DeveloperModeOverlay({ isOpen, onClose }) {
         onboarding_completed: false
       });
       toast.success(t('devMode.resetOnboarding'));
-      // Redirect nach kurzer Verzögerung
       setTimeout(() => {
         window.location.href = '/';
       }, 800);
@@ -92,17 +94,53 @@ export default function DeveloperModeOverlay({ isOpen, onClose }) {
     }
   };
 
+  const handleToggleWand = () => {
+    const next = !wandActive;
+    setWandActive(next);
+    if (next) {
+      setMinimized(true);
+      toast.success(t('devMode.wandActivated'), { duration: 3000 });
+    } else {
+      toast.info(t('devMode.wandDeactivated'), { duration: 2000 });
+    }
+  };
+
+  const handleClose = () => {
+    setWandActive(false);
+    setMinimized(false);
+    onClose();
+  };
+
   if (loading) return null;
+
+  // Minimized floating chip
+  if (isOpen && minimized) {
+    return (
+      <motion.button
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        onClick={() => { setMinimized(false); }}
+        className={`fixed bottom-24 left-4 z-[60] flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl font-black text-white text-sm ${
+          wandActive
+            ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 wand-target'
+            : 'bg-gradient-to-r from-purple-600 to-indigo-600'
+        }`}
+      >
+        {wandActive ? <Sparkles className="w-4 h-4" /> : <span>🔧</span>}
+        {wandActive ? t('devMode.wandModeActive') : t('devMode.expand')}
+      </motion.button>
+    );
+  }
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && !minimized && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-          onClick={onClose}
+          className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4"
+          onClick={handleClose}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
@@ -116,18 +154,49 @@ export default function DeveloperModeOverlay({ isOpen, onClose }) {
               <h2 className="text-xl font-black text-white flex items-center gap-2">
                 🔧 {t('devMode.onboardingTitle')}
               </h2>
-              <button
-                onClick={onClose}
-                className="text-white/80 hover:text-white transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setMinimized(true)}
+                  className="text-white/80 hover:text-white transition-colors p-1"
+                  title={t('devMode.minimize')}
+                >
+                  <Minus className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleClose}
+                  className="text-white/80 hover:text-white transition-colors p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Content */}
             <div className="p-6 space-y-4">
-              {/* Badges Section */}
+              {/* Magic Wand Section */}
               <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-black text-slate-700 dark:text-slate-200">
+                  <Sparkles className="w-4 h-4 text-fuchsia-600" />
+                  {t('devMode.magicWand')}
+                </div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                  {t('devMode.magicWandDesc')}
+                </div>
+                <button
+                  onClick={handleToggleWand}
+                  className={`w-full font-bold py-2.5 px-3 rounded-xl text-sm transition-all flex items-center justify-center gap-2 text-white ${
+                    wandActive
+                      ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500'
+                      : 'bg-slate-700 hover:bg-slate-600'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {wandActive ? t('devMode.wandOn') : t('devMode.wandOff')}
+                </button>
+              </div>
+
+              {/* Badges Section */}
+              <div className="space-y-2 border-t border-slate-200 dark:border-slate-700 pt-4">
                 <div className="flex items-center gap-2 text-sm font-black text-slate-700 dark:text-slate-200">
                   <Wand2 className="w-4 h-4 text-purple-600" />
                   {t('devMode.wizardBadge')}
