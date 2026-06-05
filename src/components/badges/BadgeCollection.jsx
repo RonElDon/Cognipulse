@@ -14,9 +14,13 @@ const TIER_ORDER = ['bronze', 'silver', 'gold', 'platin', 'diamond', 'master', '
 export default function BadgeCollection({ earnedIds = new Set(), results = [] }) {
   const { t } = useLanguage();
   const { wandActive } = useWand();
-  const { profile } = useProfile();
+  const { profile, updateProfile } = useProfile();
   const [activeTab, setActiveTab] = useState('all');
   const [filterTier, setFilterTier] = useState('all');
+  // Local override so wand changes are reflected instantly without reloading the parent page
+  const [localEarned, setLocalEarned] = useState(null);
+
+  const effectiveEarnedIds = localEarned ?? earnedIds;
 
   const handleWandClick = async (badge, isEarned) => {
     if (!wandActive || !profile) return;
@@ -24,14 +28,17 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
     const next = isEarned
       ? current.filter(id => id !== badge.id)
       : [...current, badge.id];
+    // Optimistically update the UI immediately
+    setLocalEarned(new Set(next));
     try {
-      await base44.entities.UserProfile.update(profile.id, { badges: next });
+      await updateProfile({ badges: next });
       toast.success(
         isEarned
           ? t('devMode.lockSuccess', { id: badge.title })
           : t('devMode.unlockSuccess', { id: badge.title })
       );
     } catch (err) {
+      setLocalEarned(new Set(current)); // revert on error
       toast.error(t('devMode.unlockError'));
       console.error(err);
     }
@@ -47,7 +54,7 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
   ];
 
   const totalCount = ALL_BADGES.length;
-  const earnedCount = ALL_BADGES.filter(b => earnedIds.has(b.id)).length;
+  const earnedCount = ALL_BADGES.filter(b => effectiveEarnedIds.has(b.id)).length;
   const pct = Math.round((earnedCount / totalCount) * 100);
 
   const filtered = useMemo(() => {
@@ -56,12 +63,12 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
     if (filterTier !== 'all') list = list.filter(b => b.tier === filterTier);
     // Sort: earned first, then by tier
     return [...list].sort((a, b) => {
-      const ae = earnedIds.has(a.id) ? 0 : 1;
-      const be = earnedIds.has(b.id) ? 0 : 1;
+      const ae = effectiveEarnedIds.has(a.id) ? 0 : 1;
+      const be = effectiveEarnedIds.has(b.id) ? 0 : 1;
       if (ae !== be) return ae - be;
       return TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier);
     });
-  }, [activeTab, filterTier, earnedIds]);
+  }, [activeTab, filterTier, effectiveEarnedIds]);
 
   // Domain sub-tabs for the domain tab
   const domainKeys = ['attention', 'memory', 'executive', 'visuomotor', 'processing', 'reasoning'];
@@ -109,7 +116,7 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
           <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{t('progress.badgeUnlocked')}</div>
           <div className="mt-2 flex gap-1.5 flex-wrap">
             {TIER_ORDER.filter(tier => tier !== 'legend').map(tier => {
-              const cnt = ALL_BADGES.filter(b => b.tier === tier && earnedIds.has(b.id)).length;
+              const cnt = ALL_BADGES.filter(b => b.tier === tier && effectiveEarnedIds.has(b.id)).length;
               if (cnt === 0) return null;
               return (
                 <span key={tier} className="text-xs font-bold px-2 py-0.5 rounded-full"
@@ -193,7 +200,7 @@ export default function BadgeCollection({ earnedIds = new Set(), results = [] })
       <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
         <AnimatePresence mode="popLayout">
           {displayList.map((badge, i) => {
-            const isEarned = earnedIds.has(badge.id);
+            const isEarned = effectiveEarnedIds.has(badge.id);
             return (
               <motion.div
                 key={badge.id}

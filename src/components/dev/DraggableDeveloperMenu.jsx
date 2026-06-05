@@ -89,6 +89,17 @@ export default function DraggableDeveloperMenu() {
     else toast.info(t('devMode.wandDeactivated'), { duration: 2000 });
   };
 
+  // When the wand is active and the menu is minimized, tapping the chip turns the wand OFF
+  // so the user can always exit wand mode. Otherwise it just opens the menu.
+  const handleChipClick = () => {
+    if (wandActive) {
+      setWandActive(false);
+      toast.info(t('devMode.wandDeactivated'), { duration: 2000 });
+    } else {
+      openMenu();
+    }
+  };
+
   const handleClose = () => {
     setWandActive(false);
     deactivateDeveloperMode();
@@ -114,13 +125,13 @@ export default function DraggableDeveloperMenu() {
         initial={{ scale: 0.8, opacity: 0, x: menuPosition.x, y: menuPosition.y }}
         animate={{ scale: 1, opacity: 1, x: menuPosition.x, y: menuPosition.y }}
         onDragEnd={(_, info) => setMenuPosition({ x: menuPosition.x + info.offset.x, y: menuPosition.y + info.offset.y })}
-        onClick={openMenu}
+        onClick={handleChipClick}
         className={`fixed bottom-28 left-4 z-[9998] flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl font-black text-white text-sm cursor-grab active:cursor-grabbing ${
           wandActive ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 wand-target' : 'bg-gradient-to-r from-purple-600 to-indigo-600'
         }`}
       >
-        {wandActive ? <Sparkles className="w-4 h-4" /> : <span>🔧</span>}
-        {wandActive ? t('devMode.wandModeActive') : t('devMode.expand')}
+        {wandActive ? <X className="w-4 h-4" /> : <span>🔧</span>}
+        {wandActive ? t('devMode.wandExit') : t('devMode.expand')}
       </motion.button>
     );
   }
