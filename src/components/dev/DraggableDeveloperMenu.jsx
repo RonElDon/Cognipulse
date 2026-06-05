@@ -10,7 +10,7 @@ import { ALL_BADGES } from '@/lib/badges';
 import { toast } from 'sonner';
 
 export default function DraggableDeveloperMenu() {
-  const { isDeveloperModeActive, isMenuOpen, openMenu, closeMenu, deactivateDeveloperMode } = useDeveloperMode();
+  const { isDeveloperModeActive, isMenuOpen, openMenu, closeMenu, deactivateDeveloperMode, menuPosition, setMenuPosition } = useDeveloperMode();
   const { profile, loading } = useProfile();
   const { t } = useLanguage();
   const { wandActive, setWandActive } = useWand();
@@ -90,8 +90,9 @@ export default function DraggableDeveloperMenu() {
       <motion.button
         drag
         dragMomentum={false}
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
+        initial={{ scale: 0.8, opacity: 0, x: menuPosition.x, y: menuPosition.y }}
+        animate={{ scale: 1, opacity: 1, x: menuPosition.x, y: menuPosition.y }}
+        onDragEnd={(_, info) => setMenuPosition({ x: menuPosition.x + info.offset.x, y: menuPosition.y + info.offset.y })}
         onClick={openMenu}
         className={`fixed bottom-28 left-4 z-[9998] flex items-center gap-2 px-4 py-3 rounded-2xl shadow-2xl font-black text-white text-sm cursor-grab active:cursor-grabbing ${
           wandActive ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 wand-target' : 'bg-gradient-to-r from-purple-600 to-indigo-600'
@@ -107,9 +108,9 @@ export default function DraggableDeveloperMenu() {
     <motion.div
       drag
       dragMomentum={false}
-      dragConstraints={{ left: -20, right: 20, top: -400, bottom: 20 }}
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
+      initial={{ scale: 0.9, opacity: 0, x: menuPosition.x, y: menuPosition.y }}
+      animate={{ scale: 1, opacity: 1, x: menuPosition.x, y: menuPosition.y }}
+      onDragEnd={(_, info) => setMenuPosition({ x: menuPosition.x + info.offset.x, y: menuPosition.y + info.offset.y })}
       className="fixed bottom-24 left-4 z-[9998] w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-800 overflow-hidden"
     >
       {/* Header — drag handle */}

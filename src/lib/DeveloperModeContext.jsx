@@ -1,10 +1,13 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'cp_dev_mode_active';
+const POSITION_KEY = 'cp_dev_menu_position';
 
 const DeveloperModeContext = createContext({
   isDeveloperModeActive: false,
   isMenuOpen: false,
+  menuPosition: { x: 0, y: 0 },
+  setMenuPosition: () => {},
   activateDeveloperMode: () => {},
   deactivateDeveloperMode: () => {},
   openMenu: () => {},
@@ -20,6 +23,21 @@ export function DeveloperModeProvider({ children }) {
     }
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuPosition, setMenuPositionState] = useState(() => {
+    try {
+      const saved = localStorage.getItem(POSITION_KEY);
+      return saved ? JSON.parse(saved) : { x: 0, y: 0 };
+    } catch {
+      return { x: 0, y: 0 };
+    }
+  });
+
+  const setMenuPosition = (pos) => {
+    setMenuPositionState(pos);
+    try {
+      localStorage.setItem(POSITION_KEY, JSON.stringify(pos));
+    } catch { /* ignore */ }
+  };
 
   useEffect(() => {
     try {
@@ -45,6 +63,8 @@ export function DeveloperModeProvider({ children }) {
       value={{
         isDeveloperModeActive,
         isMenuOpen,
+        menuPosition,
+        setMenuPosition,
         activateDeveloperMode,
         deactivateDeveloperMode,
         openMenu,
