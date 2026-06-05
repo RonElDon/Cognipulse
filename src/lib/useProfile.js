@@ -32,8 +32,15 @@ export function useProfile() {
   }
 
   async function updateProfile(data) {
-    if (!profile) return;
-    const updated = await base44.entities.UserProfile.update(profile.id, data);
+    let target = profile;
+    // Safety net: if the profile wasn't loaded yet, fetch it fresh before updating
+    if (!target) {
+      const user = await base44.auth.me();
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      target = profiles[0];
+      if (!target) return;
+    }
+    const updated = await base44.entities.UserProfile.update(target.id, data);
     setProfile(updated);
     return updated;
   }

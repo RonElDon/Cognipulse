@@ -43,9 +43,14 @@ export default function Profile() {
 
   const handleSaveName = async () => {
     if (!newName.trim()) return;
-    await updateProfile({ display_name: newName.trim() });
-    setEditName(false);
-    toast.success(t('profile.nameSaved'));
+    try {
+      await updateProfile({ display_name: newName.trim() });
+      setEditName(false);
+      toast.success(t('profile.nameSaved'));
+    } catch (e) {
+      console.error('Name save failed:', e);
+      toast.error(t('common.error'));
+    }
   };
 
   const handleLanguageChange = async (newLang) => {

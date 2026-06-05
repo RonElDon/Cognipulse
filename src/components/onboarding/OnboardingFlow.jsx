@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { Send, ArrowLeft, Check } from 'lucide-react';
 import WelcomeScreen from './WelcomeScreen';
 import DeviceCheckScreen from './DeviceCheckScreen';
+import NameConfirm from './NameConfirm';
 import { useTheme } from '@/lib/ThemeContext';
 
 const COLOR_PALETTE = [
@@ -139,6 +140,7 @@ export default function OnboardingFlow({ onComplete }) {
   const [input, setInput] = useState('');
   const [selectedOptionIdx, setSelectedOptionIdx] = useState(null);
   const [ageSlider, setAgeSlider] = useState(25);
+  const [pendingName, setPendingName] = useState(null); // name awaiting "is this your name?" confirmation
   const [dateInput, setDateInput] = useState({ day: '', month: '', year: '' });
   const [dateFocus, setDateFocus] = useState('day');
   const chatEndRef = useRef(null);
@@ -354,23 +356,26 @@ export default function OnboardingFlow({ onComplete }) {
   // Update stateRef after all functions are defined — no TDZ issues
   stateRef.current = { currentQuestion, currentStep, handleAnswer, handleBack };
 
-  // Extract just the name from phrases like "mein Name ist Aaron" / "my name is Aaron"
-  const extractName = (text) => {
-    const patterns = [
-      /(?:mein name ist|ich bin|ich heiße|ich heisse|nennt mich|name:?)\s+([a-züäöÜÄÖß][a-züäöÜÄÖß\-' ]{0,30})/i,
-      /(?:my name is|i am|i'm|call me|name:?)\s+([a-z][a-z\-' ]{0,30})/i,
-    ];
-    for (const pat of patterns) {
-      const match = text.match(pat);
-      if (match) return match[1].trim();
-    }
-    return text.trim();
-  };
-
   const handleSendMessage = () => {
     if (!input.trim()) return;
-    const value = currentQuestion.id === 'name' ? extractName(input) : input;
-    handleAnswer(value);
+    // For the name step, ask for confirmation ("is this your name?") before accepting it
+    if (currentQuestion.id === 'name') {
+      setPendingName(input.trim());
+      return;
+    }
+    handleAnswer(input);
+  };
+
+  const handleConfirmName = () => {
+    const name = pendingName;
+    setPendingName(null);
+    handleAnswer(name);
+  };
+
+  const handleRejectName = () => {
+    setPendingName(null);
+    setInput('');
+    setTimeout(() => inputRef.current?.focus(), 50);
   };
 
   const getDaysInMonth = (month, year) => {
@@ -574,7 +579,15 @@ export default function OnboardingFlow({ onComplete }) {
 
       {/* Input */}
       <div className="relative z-10 flex-shrink-0 px-4 pb-6 pt-2">
-        {currentQuestion.type === 'text' ? (
+        {currentQuestion.type === 'text' && pendingName ? (
+          <NameConfirm
+            name={pendingName}
+            accentColor={accentColor}
+            language={language}
+            onConfirm={handleConfirmName}
+            onReject={handleRejectName}
+          />
+        ) : currentQuestion.type === 'text' ? (
           <div className="space-y-2">
             <div className="flex gap-2 bg-white/5 backdrop-blur-md border border-white/15 rounded-2xl p-2">
               <input
