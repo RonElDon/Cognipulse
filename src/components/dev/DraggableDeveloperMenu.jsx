@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { X, Wand2, Zap, RotateCcw, Minus, Sparkles, Lock, GripVertical } from 'lucide-react';
+import { X, Wand2, Zap, RotateCcw, Minus, Sparkles, Lock, GripVertical, SkipForward } from 'lucide-react';
 import { useProfile } from '@/lib/useProfile';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useWand } from '@/lib/WandContext';
@@ -54,6 +54,18 @@ export default function DraggableDeveloperMenu() {
       toast.success(`∞ ${t('devMode.grantResources')}`);
     } catch (err) {
       toast.error(t('devMode.grantError'));
+      console.error(err);
+    } finally { setLoadingAction(false); }
+  };
+
+  const handleSkipOnboarding = async () => {
+    setLoadingAction(true);
+    try {
+      await base44.entities.UserProfile.update(profile.id, { onboarding_completed: true });
+      toast.success(t('devMode.skipOnboarding'));
+      setTimeout(() => { window.location.href = '/'; }, 800);
+    } catch (err) {
+      toast.error(t('devMode.resetError'));
       console.error(err);
     } finally { setLoadingAction(false); }
   };
@@ -196,6 +208,13 @@ export default function DraggableDeveloperMenu() {
             className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-2 px-3 rounded-xl text-sm transition-all flex items-center justify-center gap-2"
           >
             <Lock className="w-4 h-4" /> {t('devMode.lockBtn')}
+          </button>
+          <button
+            onClick={handleSkipOnboarding}
+            disabled={loadingAction}
+            className="w-full bg-violet-500 hover:bg-violet-600 disabled:opacity-50 text-white font-bold py-2 px-3 rounded-xl text-sm transition-all flex items-center justify-center gap-2"
+          >
+            <SkipForward className="w-4 h-4" /> {t('devMode.skipOnboarding')}
           </button>
           <button
             onClick={handleResetOnboarding}
