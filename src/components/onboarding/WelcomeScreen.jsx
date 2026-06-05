@@ -2,14 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import ConsentScreen from './ConsentScreen';
-import DeveloperModeOverlay from '@/components/DeveloperModeOverlay';
+import { useDeveloperMode } from '@/lib/DeveloperModeContext';
 
 export default function WelcomeScreen({ onStart }) {
+  const { activateDeveloperMode } = useDeveloperMode();
   const [lang, setLang] = useState('de');
   const [showConsent, setShowConsent] = useState(false);
   const [focusLevel, setFocusLevel] = useState(1); // 0 = Sprachen, 1 = Brain-Icon, 2 = Button-Ebene
   const [isPressingBrain, setIsPressingBrain] = useState(false);
-  const [devModeOpen, setDevModeOpen] = useState(false);
 
   const brainRef = useRef(null);
   const languageContainerRef = useRef(null);
@@ -40,7 +40,7 @@ export default function WelcomeScreen({ onStart }) {
       clickCountRef.current = 0;
       if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
       toast.success(lang === 'de' ? 'Entwicklermodus aktiviert!' : 'Developer Mode activated!', { duration: 2000 });
-      setDevModeOpen(true);
+      activateDeveloperMode();
     }
   };
 
@@ -206,8 +206,6 @@ export default function WelcomeScreen({ onStart }) {
 
         <p className="text-white/30 text-xs">{t.hint}</p>
       </motion.div>
-
-      <DeveloperModeOverlay isOpen={devModeOpen} onClose={() => setDevModeOpen(false)} />
     </div>
   );
 }

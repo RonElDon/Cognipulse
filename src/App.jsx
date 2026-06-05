@@ -8,6 +8,8 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import { LanguageProvider } from '@/lib/LanguageContext';
 import { WandProvider } from '@/lib/WandContext';
+import { DeveloperModeProvider } from '@/lib/DeveloperModeContext';
+import DraggableDeveloperMenu from './components/dev/DraggableDeveloperMenu';
 // Add page imports here
 import AppLayout from './components/layout/AppLayout.jsx';
 import OnboardingGate from './components/onboarding/OnboardingGate';
@@ -71,14 +73,17 @@ function App() {
       <AuthProvider>
         <LanguageProvider>
           <WandProvider>
-            <QueryClientProvider client={queryClientInstance}>
-              <Router>
-                <OnboardingGate>
-                  <AuthenticatedApp />
-                </OnboardingGate>
-              </Router>
-              <Toaster />
-            </QueryClientProvider>
+            <DeveloperModeProvider>
+              <QueryClientProvider client={queryClientInstance}>
+                <Router>
+                  <OnboardingGate>
+                    <AuthenticatedApp />
+                  </OnboardingGate>
+                </Router>
+                <DraggableDeveloperMenu />
+                <Toaster />
+              </QueryClientProvider>
+            </DeveloperModeProvider>
           </WandProvider>
         </LanguageProvider>
       </AuthProvider>
