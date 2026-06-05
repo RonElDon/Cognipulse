@@ -107,15 +107,6 @@ export default function DraggableDeveloperMenu() {
 
   if (!isDeveloperModeActive || loading || !profile) return null;
 
-  // Determine which screen half the chip currently sits in.
-  // Chip base anchor is bottom-28 (~7rem from bottom) + left-4. We add the saved offset.
-  const vw = typeof window !== 'undefined' ? window.innerWidth : 1024;
-  const vh = typeof window !== 'undefined' ? window.innerHeight : 768;
-  const chipX = 16 + menuPosition.x;            // left anchor + offset
-  const chipY = vh - 112 + menuPosition.y;      // bottom-28 anchor (~112px) + offset
-  const isTopHalf = chipY < vh / 2;
-  const isRightHalf = chipX > vw / 2;
-
   // Minimized floating chip
   if (!isMenuOpen) {
     return (
@@ -143,15 +134,7 @@ export default function DraggableDeveloperMenu() {
       initial={{ scale: 0.9, opacity: 0, x: menuPosition.x, y: menuPosition.y }}
       animate={{ scale: 1, opacity: 1, x: menuPosition.x, y: menuPosition.y }}
       onDragEnd={(_, info) => setMenuPosition({ x: menuPosition.x + info.offset.x, y: menuPosition.y + info.offset.y })}
-      style={{
-        // Open from the chip's corner toward the screen center so it stays visible
-        top: isTopHalf ? '7rem' : 'auto',
-        bottom: isTopHalf ? 'auto' : '7rem',
-        left: isRightHalf ? 'auto' : '1rem',
-        right: isRightHalf ? '1rem' : 'auto',
-        transformOrigin: `${isTopHalf ? 'top' : 'bottom'} ${isRightHalf ? 'right' : 'left'}`,
-      }}
-      className="fixed z-[9998] w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-800 overflow-hidden"
+      className="fixed bottom-28 left-4 z-[9998] w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-800 overflow-hidden"
     >
       {/* Header — drag handle */}
       <div
