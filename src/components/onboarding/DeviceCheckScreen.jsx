@@ -1,18 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Smartphone, Volume2, Monitor, CheckCircle2, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Eye, Volume2, Monitor, CheckCircle2, Loader2 } from 'lucide-react';
+import ReactionTest from './ReactionTest';
 
 const CHECKS = [
-  { id: 'touch', icon: Smartphone, label: 'Touch / Klick-Reaktion', desc: 'Tippe unten auf das Feld' },
-  { id: 'audio', icon: Volume2, label: 'Ton', desc: 'Stelle sicher, dass du Töne hören kannst' },
+  { id: 'visual', icon: Eye, label: 'Visuelle Reaktion', desc: 'Klicke, sobald der Kreis grün aufleuchtet' },
+  { id: 'audio', icon: Volume2, label: 'Ton-Reaktion', desc: 'Klicke, sobald du den Ton hörst' },
   { id: 'screen', icon: Monitor, label: 'Bildschirmgröße', desc: 'Ideal für das Training' },
 ];
 
 export default function DeviceCheckScreen({ onDone }) {
-  const [step, setStep] = useState(0); // 0=touch, 1=audio, 2=screen, 3=done
+  const [step, setStep] = useState(0); // 0=visual, 1=audio, 2=screen, 3=done
   const [results, setResults] = useState({});
-  const [tapping, setTapping] = useState(false);
-  const audioCtxRef = useRef(null);
 
   // Screen size check runs automatically
   useEffect(() => {
@@ -25,33 +24,6 @@ export default function DeviceCheckScreen({ onDone }) {
       }, 900);
     }
   }, [step]);
-
-  const handleTouchCheck = () => {
-    setTapping(true);
-    setTimeout(() => {
-      setTapping(false);
-      setResults(r => ({ ...r, touch: true }));
-      setStep(1);
-    }, 500);
-  };
-
-  const handleAudioCheck = () => {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      audioCtxRef.current = ctx;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.setValueAtTime(440, ctx.currentTime);
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.5);
-    } catch (_) {}
-    setResults(r => ({ ...r, audio: true }));
-    setTimeout(() => setStep(2), 600);
-  };
 
   if (step === 3) {
     return (
@@ -114,26 +86,25 @@ export default function DeviceCheckScreen({ onDone }) {
         </div>
 
         {step === 0 && (
-          <motion.button
-            whileTap={{ scale: 0.92 }}
-            onClick={handleTouchCheck}
-            className={`w-full py-16 rounded-3xl border-2 transition-all text-white font-black text-lg ${
-              tapping
-                ? 'bg-purple-600 border-purple-400 scale-95'
-                : 'bg-white/5 border-white/20 hover:bg-white/10 hover:border-purple-400/50'
-            }`}
-          >
-            {tapping ? '✓ Registriert!' : 'Hier tippen / klicken'}
-          </motion.button>
+          <ReactionTest
+            key="visual"
+            mode="visual"
+            onPass={(ms) => {
+              setResults(r => ({ ...r, visual: true, visualMs: ms }));
+              setStep(1);
+            }}
+          />
         )}
 
         {step === 1 && (
-          <button
-            onClick={handleAudioCheck}
-            className="w-full py-5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-base shadow-xl hover:from-purple-500 hover:to-indigo-500 transition-all"
-          >
-            🔊 Testton abspielen
-          </button>
+          <ReactionTest
+            key="audio"
+            mode="audio"
+            onPass={(ms) => {
+              setResults(r => ({ ...r, audio: true, audioMs: ms }));
+              setStep(2);
+            }}
+          />
         )}
 
         {step === 2 && (
