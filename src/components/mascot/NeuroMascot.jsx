@@ -5,9 +5,7 @@ import { useTheme } from '@/lib/ThemeContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
 import { X, Send, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
 import NeuroCharacter from './NeuroCharacter';
-import DeveloperModeOverlay from '@/components/DeveloperModeOverlay';
 
 // Emotion configs for the animated globe
 const GLOBE_EMOTIONS = {
@@ -159,11 +157,8 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [devModeOpen, setDevModeOpen] = useState(false);
   const chatEndRef = useRef(null);
   const unsubRef = useRef(null);
-  const clickCountRef = useRef(0);
-  const clickTimeoutRef = useRef(null);
   // Track last applied theme to avoid re-applying same values
   const lastThemeRef = useRef(null);
 
@@ -228,34 +223,6 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
   // Theme changes only come from the backend (applyThemeSetting), not from parsing message text
   const applyThemeFromMessage = (_content) => {
     // intentionally empty — theme is applied via syncThemeFromProfile after backend call
-  };
-
-  const handleClickBrain = () => {
-    clickCountRef.current += 1;
-    const remaining = 10 - clickCountRef.current;
-
-    // Clear existing timeout
-    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
-
-    // Reset counter after 5 seconds of inactivity
-    clickTimeoutRef.current = setTimeout(() => {
-      clickCountRef.current = 0;
-    }, 5000);
-
-    // Show toast for clicks 1-9 (as we count down to 0)
-    if (remaining > 0 && remaining <= 9) {
-      const key = `devMode.clicksRemaining${remaining}`;
-      toast.info(t(key), { duration: 2000 });
-    }
-
-    // Unlock dev mode at 10 clicks
-    if (clickCountRef.current === 10) {
-      clickCountRef.current = 0;
-      if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
-
-      toast.success(t('devMode.activated'), { duration: 2000 });
-      setDevModeOpen(true);
-    }
   };
 
   const handleOpen = async () => {
@@ -343,7 +310,6 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
       {/* Mascot button — simple, no distraction */}
       <motion.button
         onClick={() => {
-          handleClickBrain();
           if (open) {
             setOpen(false);
           } else {
@@ -486,9 +452,6 @@ export default function NeuroMascot({ lastResult, popupsEnabled = true }) {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Developer Mode Overlay */}
-      <DeveloperModeOverlay isOpen={devModeOpen} onClose={() => setDevModeOpen(false)} />
     </>
   );
 }
